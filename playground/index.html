@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>AI Translator playground</title>
+    <style>
+      body { font: 15px/1.5 system-ui, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 16px; }
+      label { display: block; margin-top: 20px; font-weight: 600; }
+      input, textarea, [contenteditable] { width: 100%; box-sizing: border-box; padding: 8px; font: inherit; border: 1px solid #ccc; border-radius: 6px; }
+      textarea { height: 80px; }
+    </style>
+  </head>
+  <body>
+    <h1>AI Translator playground</h1>
+    <p>Select some text in a field below. The translate icon should appear. Plain text like this paragraph should not show it.</p>
+    <label for="input">Text input</label>
+    <input id="input" value="Hello, how are you today?" />
+    <label for="textarea">Textarea</label>
+    <textarea id="textarea">I would like to order a coffee, please.</textarea>
+    <label>Contenteditable</label>
+    <div id="editor" contenteditable="true">Good morning, dear colleagues.</div>
+    <label for="password">Password (ignored)</label>
+    <input id="password" type="password" value="secret" />
+  </body>
+</html>
