@@ -78,10 +78,10 @@
     "semantic_hash": "11545efcdf259ad936b55ca5866f4031"
   },
   "src/entrypoints/background.ts": {
-    "mtime": 1789659715.3032632,
-    "seen": 1789660285.04388,
-    "ast_hash": "08329e5221729fc705448c60c99fa764",
-    "semantic_hash": "08329e5221729fc705448c60c99fa764"
+    "mtime": 1789661821.88252,
+    "seen": 1789666563.865309,
+    "ast_hash": "bb17232f9c094826211458e5f4bb65ef",
+    "semantic_hash": ""
   },
   "src/entrypoints/content.ts": {
     "mtime": 1789659779.4201105,
@@ -108,10 +108,10 @@
     "semantic_hash": "0d5854611a8ec15beb268dc332c3bd16"
   },
   "src/providers/mock/mock-translator.ts": {
-    "mtime": 1789659692.840118,
-    "seen": 1789660285.043882,
-    "ast_hash": "189127c467c2b8f4610ad8835bbbb09a",
-    "semantic_hash": "189127c467c2b8f4610ad8835bbbb09a"
+    "mtime": 1789666534.649351,
+    "seen": 1789666563.865313,
+    "ast_hash": "84be234130051c3eb87fa2cc31d7588a",
+    "semantic_hash": ""
   },
   "src/settings/settings.ts": {
     "mtime": 1789659692.8278873,

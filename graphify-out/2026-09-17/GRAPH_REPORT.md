@@ -1,12 +1,12 @@
 # Graph Report - ai-translator-ext  (2026-09-17)
 
 ## Corpus Check
-- 37 files · ~16,332 words
+- 37 files · ~16,434 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 3 file(s) not represented in the graph (top: (none) 2, .css 1)
 
 ## Summary
-- 227 nodes · 371 edges · 17 communities (13 shown, 4 thin omitted)
+- 228 nodes · 372 edges · 18 communities (14 shown, 4 thin omitted)
 - Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 22 edges (avg confidence: 0.82)
 - Token cost: 0 input · 0 output
 
@@ -28,6 +28,7 @@
 - graphify reference: GitHub clone and cross-repo merge
 - graphify reference: transcribe video and audio
 - extraction-spec.md
+- storage-settings.ts
 
 ## God Nodes (most connected - your core abstractions)
 1. `TranslatorWidget` - 20 edges
@@ -60,19 +61,19 @@
 - **Content Script Selection-to-Replacement Flow** — claude_selection_snapshot, claude_closed_shadow_root_widget, claude_requestid_stale_response_guard, claude_execcommand_insert_text_replacement [EXTRACTED 1.00]
 - **Pluggable Provider Extension Pattern** — claude_dependency_inversion_translation_engines, claude_single_composition_root, claude_add_provider_procedure, readme_deepl_provider_example, claude_mock_provider [INFERRED 0.85]
 
-## Communities (17 total, 4 thin omitted)
+## Communities (18 total, 4 thin omitted)
 
 ### Community 0 - "background.ts"
-Cohesion: 0.09
-Nodes (26): ref_wxt_browser, ref_wxt_utils_define_background, ref_wxt_utils_storage, ProviderInfo, TranslatorRegistry, setup(), TranslationService, TranslateRequest (+18 more)
+Cohesion: 0.11
+Nodes (20): ref_wxt_browser, ref_wxt_utils_define_background, ProviderInfo, TranslatorRegistry, setup(), TranslationService, TranslateRequest, TranslateResult (+12 more)
 
 ### Community 1 - "content.ts"
 Cohesion: 0.15
-Nodes (22): vitest, ref_wxt_utils_define_content_script, dispatchInput(), replaceInContentEditable(), replaceInTextControl(), replaceSelection(), tryInsertText(), deepActiveElement() (+14 more)
+Nodes (21): ref_wxt_utils_define_content_script, dispatchInput(), replaceInContentEditable(), replaceInTextControl(), replaceSelection(), tryInsertText(), deepActiveElement(), EditableSelection (+13 more)
 
 ### Community 2 - "package.json"
 Cohesion: 0.08
-Nodes (22): description, devDependencies, happy-dom, typescript, vitest, wxt, name, private (+14 more)
+Nodes (23): description, devDependencies, happy-dom, typescript, vitest, wxt, name, private (+15 more)
 
 ### Community 3 - "CLAUDE.md"
 Cohesion: 0.11
@@ -114,25 +115,29 @@ Nodes (3): For git commit hook, For native CLAUDE.md integration, graphify refer
 Cohesion: 0.50
 Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphify reference: incremental update and cluster-only
 
+### Community 17 - "storage-settings.ts"
+Cohesion: 0.33
+Nodes (6): ref_wxt_utils_storage, DEFAULT_SETTINGS, Settings, SettingsReader, SettingsRepository, settingsItem
+
 ## Knowledge Gaps
 - **69 isolated node(s):** `name`, `description`, `private`, `version`, `type` (+64 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 95 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 96 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `vitest` connect `content.ts` to `background.ts`, `package.json`?**
+- **Why does `vitest` connect `package.json` to `background.ts`, `content.ts`?**
   _High betweenness centrality (0.114) - this node is a cross-community bridge._
 - **Why does `TranslatorWidget` connect `TranslatorWidget` to `content.ts`, `translator-widget.ts`?**
   _High betweenness centrality (0.080) - this node is a cross-community bridge._
 - **What connects `name`, `description`, `private` to the rest of the system?**
   _69 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `background.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.0946938775510204 - nodes in this community are weakly interconnected._
-- **Should `content.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.1477832512315271 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.11265969802555169 - nodes in this community are weakly interconnected._
 - **Should `package.json` be split into smaller, more focused modules?**
-  _Cohesion score 0.08333333333333333 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08 - nodes in this community are weakly interconnected._
 - **Should `CLAUDE.md` be split into smaller, more focused modules?**
   _Cohesion score 0.11067193675889328 - nodes in this community are weakly interconnected._
+- **Should `What You Must Do When Invoked` be split into smaller, more focused modules?**
+  _Cohesion score 0.08 - nodes in this community are weakly interconnected._

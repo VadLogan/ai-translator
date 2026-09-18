@@ -15,5 +15,6 @@
   "13": "graphify reference: incremental update and cluster-only",
   "14": "graphify reference: GitHub clone and cross-repo merge",
   "15": "graphify reference: transcribe video and audio",
-  "16": "extraction-spec.md"
+  "16": "extraction-spec.md",
+  "17": "storage-settings.ts"
 }

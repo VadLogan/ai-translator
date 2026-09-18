@@ -1,0 +1,7 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    ports:
+      - "127.0.0.1:8787:8787" # matches the extension's default WXT_API_URL and host_permissions

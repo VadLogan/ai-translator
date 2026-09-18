@@ -205,45 +205,6 @@
       "source_location": "L4"
     },
     {
-      "id": "src_settings_settings_settings",
-      "label": "Settings",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "settings",
-      "source_file": "src/settings/settings.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_settings_settings_settingsreader",
-      "label": "SettingsReader",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "settingsreader",
-      "source_file": "src/settings/settings.ts",
-      "source_location": "L15"
-    },
-    {
-      "id": "src_settings_settings_settingsrepository",
-      "label": "SettingsRepository",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "settingsrepository",
-      "source_file": "src/settings/settings.ts",
-      "source_location": "L19"
-    },
-    {
       "id": "src_content_selection_editableselection",
       "label": "EditableSelection",
       "_callable": true,
@@ -255,6 +216,45 @@
       "norm_label": "editableselection",
       "source_file": "src/content/selection.ts",
       "source_location": "L1"
+    },
+    {
+      "id": "src_settings_settings_settings",
+      "label": "Settings",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "storage-settings.ts",
+      "file_type": "code",
+      "norm_label": "settings",
+      "source_file": "src/settings/settings.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_settings_settings_settingsreader",
+      "label": "SettingsReader",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "storage-settings.ts",
+      "file_type": "code",
+      "norm_label": "settingsreader",
+      "source_file": "src/settings/settings.ts",
+      "source_location": "L15"
+    },
+    {
+      "id": "src_settings_settings_settingsrepository",
+      "label": "SettingsRepository",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "storage-settings.ts",
+      "file_type": "code",
+      "norm_label": "settingsrepository",
+      "source_file": "src/settings/settings.ts",
+      "source_location": "L19"
     },
     {
       "id": "src_content_ui_translator_widget_translatorwidget",
@@ -441,6 +441,18 @@
       "source_location": "L15"
     },
     {
+      "id": "src_entrypoints_background_reloadplaygroundwhenready",
+      "label": "reloadPlaygroundWhenReady()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "background.ts",
+      "file_type": "code",
+      "norm_label": "reloadplaygroundwhenready()",
+      "source_file": "src/entrypoints/background.ts",
+      "source_location": "L51"
+    },
+    {
       "id": "src_messaging_messages_ismessage",
       "label": "isMessage()",
       "_callable": true,
@@ -499,18 +511,6 @@
       "norm_label": ".get()",
       "source_file": "src/settings/settings.ts",
       "source_location": "L16"
-    },
-    {
-      "id": "src_settings_settings_settingsrepository_update",
-      "label": ".update()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": ".update()",
-      "source_file": "src/settings/settings.ts",
-      "source_location": "L20"
     },
     {
       "id": "src_content_replace_dispatchinput",
@@ -751,6 +751,18 @@
       "norm_label": "translate()",
       "source_file": "src/entrypoints/content.ts",
       "source_location": "L57"
+    },
+    {
+      "id": "src_settings_settings_settingsrepository_update",
+      "label": ".update()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "storage-settings.ts",
+      "file_type": "code",
+      "norm_label": ".update()",
+      "source_file": "src/settings/settings.ts",
+      "source_location": "L20"
     },
     {
       "id": "src_content_ui_translator_widget_clamp",
@@ -1124,51 +1136,7 @@
       "file_type": "code",
       "norm_label": "mocktranslatorfactory",
       "source_file": "src/providers/mock/mock-translator.ts",
-      "source_location": "L13"
-    },
-    {
-      "id": "src_settings_settings",
-      "label": "settings.ts",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "settings.ts",
-      "source_file": "src/settings/settings.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_settings_settings_default_settings",
-      "label": "DEFAULT_SETTINGS",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "default_settings",
-      "source_file": "src/settings/settings.ts",
-      "source_location": "L9"
-    },
-    {
-      "id": "src_settings_storage_settings",
-      "label": "storage-settings.ts",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "storage-settings.ts",
-      "source_file": "src/settings/storage-settings.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "src_settings_storage_settings_settingsitem",
-      "label": "settingsItem",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "settingsitem",
-      "source_file": "src/settings/storage-settings.ts",
-      "source_location": "L4"
+      "source_location": "L15"
     },
     {
       "id": "src_content_replace",
@@ -1235,17 +1203,6 @@
       "norm_label": "content.ts",
       "source_file": "src/entrypoints/content.ts",
       "source_location": "L1"
-    },
-    {
-      "id": "ref_vitest",
-      "label": "vitest",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "concept",
-      "norm_label": "vitest",
-      "source_file": "package.json",
-      "source_location": "L20"
     },
     {
       "id": "claude_skills_graphify_references_query",
@@ -1560,6 +1517,50 @@
       "source_location": "L1"
     },
     {
+      "id": "src_settings_settings",
+      "label": "settings.ts",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "storage-settings.ts",
+      "file_type": "code",
+      "norm_label": "settings.ts",
+      "source_file": "src/settings/settings.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_settings_settings_default_settings",
+      "label": "DEFAULT_SETTINGS",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "storage-settings.ts",
+      "file_type": "code",
+      "norm_label": "default_settings",
+      "source_file": "src/settings/settings.ts",
+      "source_location": "L9"
+    },
+    {
+      "id": "src_settings_storage_settings",
+      "label": "storage-settings.ts",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "storage-settings.ts",
+      "file_type": "code",
+      "norm_label": "storage-settings.ts",
+      "source_file": "src/settings/storage-settings.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_settings_storage_settings_settingsitem",
+      "label": "settingsItem",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "storage-settings.ts",
+      "file_type": "code",
+      "norm_label": "settingsitem",
+      "source_file": "src/settings/storage-settings.ts",
+      "source_location": "L4"
+    },
+    {
       "id": "package",
       "label": "package.json",
       "_origin": "ast",
@@ -1811,6 +1812,17 @@
       "norm_label": "typescript",
       "source_file": "package.json",
       "source_location": "L19"
+    },
+    {
+      "id": "ref_vitest",
+      "label": "vitest",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "package.json",
+      "file_type": "concept",
+      "norm_label": "vitest",
+      "source_file": "package.json",
+      "source_location": "L20"
     },
     {
       "id": "ref_wxt",
@@ -2761,18 +2773,6 @@
       "type": "external"
     },
     {
-      "id": "ref_wxt_utils_storage",
-      "label": "ref_wxt_utils_storage",
-      "_origin": "semantic",
-      "community": 0,
-      "community_name": "background.ts",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "ref_wxt_utils_storage",
-      "source_file": "",
-      "type": "external"
-    },
-    {
       "id": "ref_wxt_utils_define_content_script",
       "label": "ref_wxt_utils_define_content_script",
       "_origin": "semantic",
@@ -2781,6 +2781,18 @@
       "external": true,
       "file_type": "concept",
       "norm_label": "ref_wxt_utils_define_content_script",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "ref_wxt_utils_storage",
+      "label": "ref_wxt_utils_storage",
+      "_origin": "semantic",
+      "community": 17,
+      "community_name": "storage-settings.ts",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "ref_wxt_utils_storage",
       "source_file": "",
       "type": "external"
     },
@@ -6077,6 +6089,17 @@
       "weight": 1.0
     },
     {
+      "source": "src_entrypoints_background",
+      "target": "src_entrypoints_background_reloadplaygroundwhenready",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/entrypoints/background.ts",
+      "source_location": "L51",
+      "weight": 1.0
+    },
+    {
       "source": "src_entrypoints_content",
       "target": "src_entrypoints_content_main",
       "relation": "contains",
@@ -6172,7 +6195,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/providers/mock/mock-translator.ts",
-      "source_location": "L13",
+      "source_location": "L15",
       "weight": 1.0
     },
     {

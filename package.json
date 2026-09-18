@@ -1,25 +1,15 @@
 {
-  "name": "ai-translator-ext",
-  "description": "Translate selected text in any input field on the fly",
+  "name": "ai-translator",
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "workspaces": ["api", "extension"],
   "scripts": {
-    "dev": "wxt",
-    "dev:playground": "python3 -m http.server 5555 --bind 127.0.0.1 -d playground & wxt",
-    "build": "wxt build",
-    "zip": "wxt zip",
-    "deploy": "npm run compile && npm test && wxt zip && wxt submit --chrome-zip .output/$npm_package_name-$npm_package_version-chrome.zip",
-    "deploy:check": "wxt zip && wxt submit --dry-run --chrome-zip .output/$npm_package_name-$npm_package_version-chrome.zip",
-    "compile": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "postinstall": "wxt prepare"
-  },
-  "devDependencies": {
-    "happy-dom": "^20.14.5",
-    "typescript": "^5.9.3",
-    "vitest": "^5.0.1",
-    "wxt": "^0.21.4"
+    "dev": "npm run dev:api & npm run dev:extension",
+    "dev:api": "npm run dev -w api",
+    "dev:extension": "npm run dev:playground -w extension",
+    "build": "npm run build --workspaces --if-present",
+    "compile": "npm run compile --workspaces --if-present",
+    "test": "npm test --workspaces --if-present"
   }
 }

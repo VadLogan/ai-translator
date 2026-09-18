@@ -7,7 +7,7 @@ export interface Settings {
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-  activeProviderId: 'mock',
+  activeProviderId: 'api',
   favoriteLanguages: ['en', 'uk', 'de', 'es', 'fr'],
   providerConfigs: {},
 };

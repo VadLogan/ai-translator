@@ -1,12 +1,10 @@
 import type { TranslateRequest, TranslateResult, Translator, TranslatorFactory } from '../../core/translator';
 
-/** Fake provider for exercising the UI flow without any API. */
+/** Offline fallback: exercises the UI flow with no API running. */
 export class MockTranslator implements Translator {
   constructor(private readonly delayMs = 300) {}
 
   async translate({ text, targetLang }: TranslateRequest): Promise<TranslateResult> {
-    // Runs in the background worker: see chrome://extensions → "service worker" → Console.
-    console.info(`[mock] ${new Date().toISOString()} translate to "${targetLang}":`, text);
     await new Promise((resolve) => setTimeout(resolve, this.delayMs));
     return { text: `[${targetLang}] ${text}` };
   }
