@@ -8,3 +8,4 @@ web-ext.config.ts
 extension/.output
 extension/output
 extension/.wxt
+api/.env
