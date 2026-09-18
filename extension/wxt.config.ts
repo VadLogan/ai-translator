@@ -2,6 +2,8 @@ import { defineConfig } from 'wxt';
 
 export default defineConfig({
   srcDir: 'src',
+  // Not dot-prefixed so the folder shows up in Chrome's "Load unpacked" file picker.
+  outDir: 'output',
   manifest: {
     name: 'AI Translator',
     description: 'Select text in any input field and translate it in place.',

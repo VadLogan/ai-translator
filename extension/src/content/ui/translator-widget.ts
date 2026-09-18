@@ -1,4 +1,6 @@
 import type { Language } from '../../core/languages';
+import type { Anchor } from '../selection';
+import ICON_SVG from '../../assets/translate-icon.svg?raw';
 import { WIDGET_CSS } from './styles';
 
 export interface WidgetCallbacks {
@@ -7,12 +9,6 @@ export interface WidgetCallbacks {
   onOpenSettings(): void;
 }
 
-export interface Point {
-  x: number;
-  y: number;
-}
-
-const ICON_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>`;
 const ICON_SIZE = 26;
 const GAP = 6;
 const VIEWPORT_MARGIN = 8;
@@ -22,7 +18,7 @@ export class TranslatorWidget {
   private readonly host: HTMLElement;
   private readonly icon: HTMLButtonElement;
   private readonly panel: HTMLDivElement;
-  private anchor: Point = { x: 0, y: 0 };
+  private anchor: Anchor = { x: 0, top: 0, bottom: 0 };
 
   constructor(
     private readonly callbacks: WidgetCallbacks,
@@ -83,14 +79,16 @@ export class TranslatorWidget {
     return event.composedPath().includes(this.host);
   }
 
-  showIcon(point: Point): void {
+  showIcon(anchor: Anchor): void {
     this.mount();
-    this.anchor = point;
+    this.anchor = anchor;
     this.panel.hidden = true;
     this.icon.hidden = false;
     const viewport = this.viewport();
-    this.icon.style.left = `${clamp(point.x + GAP, VIEWPORT_MARGIN, viewport.width - ICON_SIZE - VIEWPORT_MARGIN)}px`;
-    this.icon.style.top = `${clamp(point.y + GAP, VIEWPORT_MARGIN, viewport.height - ICON_SIZE - VIEWPORT_MARGIN)}px`;
+    let top = anchor.top - ICON_SIZE - GAP;
+    if (top < VIEWPORT_MARGIN) top = anchor.bottom + GAP; // no room above: drop below the selection
+    this.icon.style.left = `${clamp(anchor.x - ICON_SIZE / 2, VIEWPORT_MARGIN, viewport.width - ICON_SIZE - VIEWPORT_MARGIN)}px`;
+    this.icon.style.top = `${clamp(top, VIEWPORT_MARGIN, viewport.height - ICON_SIZE - VIEWPORT_MARGIN)}px`;
   }
 
   showLanguages(languages: readonly Language[]): void {
@@ -136,9 +134,9 @@ export class TranslatorWidget {
   private positionPanel(): void {
     const viewport = this.viewport();
     const { width, height } = this.panel.getBoundingClientRect();
-    let top = this.anchor.y + GAP;
+    let top = this.anchor.bottom + GAP;
     if (top + height > viewport.height - VIEWPORT_MARGIN) {
-      top = this.anchor.y - height - GAP; // flip above the selection
+      top = this.anchor.top - height - GAP; // flip above the selection
     }
     this.panel.style.left = `${clamp(this.anchor.x + GAP, VIEWPORT_MARGIN, viewport.width - width - VIEWPORT_MARGIN)}px`;
     this.panel.style.top = `${clamp(top, VIEWPORT_MARGIN, viewport.height - height - VIEWPORT_MARGIN)}px`;

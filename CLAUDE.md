@@ -15,7 +15,7 @@ Root commands fan out to both workspaces (`npm test`, `npm run compile`, `npm ru
 - `npm run dev -w api`: API only on :8787, `node --watch` (Node 24 runs the TS directly — no build step, so keep API code erasable: no enums, no parameter properties)
 - `./start-api.sh`: API only, in Docker, logs in the foreground; Ctrl+C stops and removes the container
 - `docker compose up --build`: API in a container on 127.0.0.1:8787 (same address as `npm run dev -w api`, so don't run both). Build context is the repo root; `api/Dockerfile` installs from the lockfile.
-- `npm run build`: production build into `extension/.output/chrome-mv3`. Load it unpacked from `chrome://extensions`.
+- `npm run build`: production build into `extension/output/chrome-mv3`. Load it unpacked from `chrome://extensions`.
 - `npm run compile`: type check. The extension needs the generated `.wxt/` types; run `npx wxt prepare` in `extension/` on a fresh checkout or after adding entrypoints.
 - `npm test`: all unit tests (Vitest), both workspaces
 - `npm run deploy`: compile + test + zip + `wxt submit` to the Chrome Web Store. Credentials live in the git-ignored `.env.submit`, created by `npx wxt submit init`. Bump `package.json` version first, because the manifest version comes from it. `npm run deploy:check` is a dry run.
@@ -39,7 +39,7 @@ Extension layout:
 
 **Content script** (`src/entrypoints/content.ts` + `src/content/`):
 - `selection.ts` snapshots the selection when the icon appears: offsets for text controls, a cloned `Range` for contenteditable. Before replacing, it checks with `isSelectionUnchanged` that the text wasn't edited during translation. Only input types that support the selection API count (text/search/url/tel).
-- `replace.ts` prefers `document.execCommand('insertText')`, which preserves native undo and is picked up by React-style frameworks. It falls back to `setRangeText` or `Range` edits plus a synthetic `input` event. If `execCommand` returns true, trust it; don't re-apply the edit.
+- `replace.ts`, for contenteditable: first dispatches a synthetic `paste` event. Model-based editors (CKEditor, Lexical, ProseMirror; e.g. Teams) revert direct DOM edits, `execCommand` included, but they handle paste and cancel it, and a cancelled paste means done. Otherwise, and for inputs and textareas, it uses `document.execCommand('insertText')`, which preserves native undo and is picked up by React-style frameworks. It falls back to `setRangeText` or `Range` edits plus a synthetic `input` event. If `execCommand` returns true, trust it; don't re-apply the edit.
 - `ui/translator-widget.ts` is plain DOM inside a **closed** shadow root on a fixed-position host. `preventDefault` on `mousedown` inside the widget keeps focus and the selection in the page's field, so don't remove it.
 - A `requestId` counter makes stale translation responses get ignored after the widget closes.
 

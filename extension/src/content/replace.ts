@@ -18,6 +18,13 @@ function tryInsertText(doc: Document, text: string): boolean {
   }
 }
 
+/** True if the page's editor took the synthetic paste (it cancels the event when it does). */
+function tryPaste(element: HTMLElement, text: string): boolean {
+  const clipboardData = new DataTransfer();
+  clipboardData.setData('text/plain', text);
+  return !element.dispatchEvent(new ClipboardEvent('paste', { clipboardData, bubbles: true, cancelable: true }));
+}
+
 function dispatchInput(element: HTMLElement, data: string): void {
   element.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertReplacementText', data }));
 }
@@ -45,6 +52,9 @@ function replaceInContentEditable(
   selection?.removeAllRanges();
   selection?.addRange(range);
 
+  // Model-based editors (CKEditor, Lexical, ProseMirror, ... e.g. Teams, Slack) revert
+  // direct DOM edits, execCommand included, but they all handle paste and cancel it.
+  if (tryPaste(element, replacement)) return;
   if (tryInsertText(doc, replacement)) return;
 
   range.deleteContents();

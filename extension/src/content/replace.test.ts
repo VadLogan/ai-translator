@@ -51,4 +51,23 @@ describe('replaceSelection', () => {
 
     expect(editor.textContent).toBe('Hello Welt');
   });
+
+  it('hands contenteditable text to an editor that handles paste', () => {
+    document.body.innerHTML = '<div contenteditable="true">Hello world</div>';
+    const editor = document.querySelector('div')!;
+    let pasted = '';
+    editor.addEventListener('paste', (event) => {
+      pasted = event.clipboardData!.getData('text/plain');
+      event.preventDefault(); // what model-based editors do
+    });
+    const range = document.createRange();
+    range.setStart(editor.firstChild!, 6);
+    range.setEnd(editor.firstChild!, 11);
+    document.getSelection()!.addRange(range);
+
+    replaceSelection(getEditableSelection()!, 'Welt');
+
+    expect(pasted).toBe('Welt');
+    expect(editor.textContent).toBe('Hello world'); // left to the editor, no DOM edit
+  });
 });

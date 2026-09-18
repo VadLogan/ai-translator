@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it } from 'vitest';
-import { getEditableSelection, isSelectionUnchanged } from './selection';
+import { getEditableSelection, getSelectionAnchor, isSelectionUnchanged } from './selection';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -66,5 +66,16 @@ describe('isSelectionUnchanged', () => {
     expect(isSelectionUnchanged(snapshot)).toBe(true);
     input.value = 'Howdy world';
     expect(isSelectionUnchanged(snapshot)).toBe(false);
+  });
+});
+
+describe('getSelectionAnchor', () => {
+  it('brackets the pointer line in a text field so the icon can sit above it', () => {
+    document.body.innerHTML = '<textarea style="line-height: 20px">Hello world</textarea>';
+    const textarea = document.querySelector('textarea')!;
+    textarea.focus();
+    textarea.setSelectionRange(0, 5);
+
+    expect(getSelectionAnchor(getEditableSelection()!, { x: 50, y: 100 })).toEqual({ x: 50, top: 90, bottom: 110 });
   });
 });

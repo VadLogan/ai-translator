@@ -80,11 +80,30 @@ export function isSelectionUnchanged(snapshot: EditableSelection): boolean {
   return snapshot.range.toString() === snapshot.text;
 }
 
-/** Viewport point just below the end of the selection. */
-export function getSelectionAnchorPoint(snapshot: EditableSelection): { x: number; y: number } {
-  const rect =
-    snapshot.kind === 'content-editable'
-      ? snapshot.range.getBoundingClientRect()
-      : snapshot.element.getBoundingClientRect();
-  return { x: rect.right, y: rect.bottom };
+/** Where the selection sits in the viewport: a horizontal position plus its top and bottom edges. */
+export interface Anchor {
+  x: number;
+  top: number;
+  bottom: number;
+}
+
+/**
+ * Anchor for the selected text. Text controls don't expose the selection's rect,
+ * so a mouse selection uses the pointer's line and a keyboard one uses the whole field.
+ */
+export function getSelectionAnchor(snapshot: EditableSelection, pointer?: { x: number; y: number }): Anchor {
+  if (snapshot.kind === 'content-editable') {
+    const rect = snapshot.range.getBoundingClientRect();
+    return { x: pointer?.x ?? rect.right, top: rect.top, bottom: rect.bottom };
+  }
+  const rect = snapshot.element.getBoundingClientRect();
+  if (!pointer) return { x: rect.right, top: rect.top, bottom: rect.bottom };
+  // ponytail: pointer line ± half a line height; a mirror div would give the exact rect if this drifts.
+  const half = lineHeight(snapshot.element) / 2;
+  return { x: pointer.x, top: pointer.y - half, bottom: pointer.y + half };
+}
+
+function lineHeight(element: HTMLElement): number {
+  const style = element.ownerDocument.defaultView!.getComputedStyle(element);
+  return parseFloat(style.lineHeight) || (parseFloat(style.fontSize) || 16) * 1.2;
 }

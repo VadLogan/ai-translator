@@ -6,4 +6,5 @@ web-ext.config.ts
 .DS_Store
 .env.submit
 extension/.output
+extension/output
 extension/.wxt

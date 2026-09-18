@@ -3,11 +3,11 @@ import { findLanguage, type Language } from '../core/languages';
 import { replaceSelection } from '../content/replace';
 import {
   getEditableSelection,
-  getSelectionAnchorPoint,
+  getSelectionAnchor,
   isSelectionUnchanged,
   type EditableSelection,
 } from '../content/selection';
-import { TranslatorWidget, type Point } from '../content/ui/translator-widget';
+import { TranslatorWidget } from '../content/ui/translator-widget';
 import { sendMessage } from '../messaging/messages';
 import { storageSettings } from '../settings/storage-settings';
 
@@ -38,20 +38,28 @@ export default defineContentScript({
       widget.hide();
     }
 
-    function refresh(pointer?: Point): void {
-      if (widget.isMenuOpen) return;
+    function refresh(pointer?: { x: number; y: number }): void {
+      // After an extension reload or update this script is orphaned: every chrome.* call throws
+      // "Extension context invalidated". Reading isInvalid lets WXT notice, remove our listeners
+      // and fire onInvalidated, so the stale copy goes quiet.
+      if (ctx.isInvalid || widget.isMenuOpen) return;
       const selection = getEditableSelection();
       if (!selection) {
         close();
         return;
       }
       snapshot = selection;
-      widget.showIcon(pointer ?? getSelectionAnchorPoint(selection));
+      widget.showIcon(getSelectionAnchor(selection, pointer));
     }
 
     async function showLanguages(): Promise<void> {
-      const { favoriteLanguages } = await storageSettings.get();
-      widget.showLanguages(favoriteLanguages.map(findLanguage).filter((l): l is Language => l !== undefined));
+      try {
+        const { favoriteLanguages } = await storageSettings.get();
+        widget.showLanguages(favoriteLanguages.map(findLanguage).filter((l): l is Language => l !== undefined));
+      } catch {
+        // Only fails when the extension was reloaded while the icon was showing.
+        widget.showError('The extension was updated. Reload the page.', close);
+      }
     }
 
     async function translate(targetLang: string): Promise<void> {
@@ -88,7 +96,18 @@ export default defineContentScript({
     ctx.addEventListener(document, 'keyup', (event) => {
       if (event.key !== 'Escape') refresh();
     });
-    ctx.addEventListener(window, 'scroll', () => widget.isVisible && close(), { capture: true, passive: true });
+    // Close only when the scroll moves the selected field: pages like Teams scroll unrelated
+    // panes (chat list, typing indicators) constantly, which would otherwise kill the menu.
+    ctx.addEventListener(
+      window,
+      'scroll',
+      (event) => {
+        const target = event.target;
+        const movesField = target === document || (target instanceof Node && !!snapshot && target.contains(snapshot.element));
+        if (widget.isVisible && movesField) close();
+      },
+      { capture: true, passive: true },
+    );
     ctx.addEventListener(window, 'resize', () => widget.isVisible && close());
   },
 });
