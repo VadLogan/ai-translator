@@ -1,0 +1,3 @@
+# .graphifyignore
+api/node_modules/
+extension/node_modules/

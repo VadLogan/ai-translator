@@ -28,7 +28,7 @@ Response `200`:
 { "text": "[de] hello", "detectedSourceLang": "en" }
 ```
 
-`detectedSourceLang` is optional. The current provider is a stub that returns `[<targetLang>] <text>`.
+`detectedSourceLang` is optional. Translation is done by OpenAI (`api/src/translate.ts`).
 
 Example:
 
@@ -55,8 +55,12 @@ Every error has the same shape:
 
 ## Configuration
 
+Put these in `api/.env` (git-ignored; start from [`.env.example`](.env.example)). `npm run dev -w api` loads it with dotenv, and `docker compose` / `./start-api.sh` pass it to the container at runtime.
+
 | Env var           | Default | Meaning                                                                 |
 |-------------------|---------|-------------------------------------------------------------------------|
+| `OPENAI_API_KEY`  | —       | Required. The API fails to start without it                             |
+| `OPENAI_MODEL`    | `gpt-5.6-luna` | Model used for translation                                       |
 | `PORT`            | `8787`  | Listen port                                                             |
 | `ALLOWED_ORIGINS` | unset   | Comma-separated CORS allowlist, e.g. `chrome-extension://<id>`. Unset allows any origin (dev only). |
 

@@ -4,5 +4,5 @@ export interface Settings {
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-  favoriteLanguages: ['en', 'uk', 'de', 'es', 'fr'],
+  favoriteLanguages: ['en', 'pl'],
 };

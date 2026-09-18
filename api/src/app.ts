@@ -53,8 +53,7 @@ app.post('/translate', async (c) => {
 
   try {
     return c.json(await translate(parsed));
-  } catch (error) {
-    console.error('[translate] failed:', error);
+  } catch {
     return fail(c, 502, 'provider-failed', 'Translation provider failed');
   }
 });

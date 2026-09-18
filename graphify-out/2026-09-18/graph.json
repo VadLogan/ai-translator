@@ -16,246 +16,10 @@
         "confidence": "EXTRACTED",
         "confidence_score": 1.0,
         "source_file": "CLAUDE.md"
-      },
-      {
-        "id": "provider_extension_pattern",
-        "label": "Pluggable Provider Extension Pattern",
-        "nodes": [
-          "claude_dependency_inversion_translation_engines",
-          "claude_single_composition_root",
-          "claude_add_provider_procedure",
-          "readme_deepl_provider_example",
-          "claude_mock_provider"
-        ],
-        "relation": "form",
-        "confidence": "INFERRED",
-        "confidence_score": 0.85,
-        "source_file": "CLAUDE.md"
       }
     ]
   },
   "nodes": [
-    {
-      "id": "extension_src_core_registry_providerinfo",
-      "label": "ProviderInfo",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "providerinfo",
-      "source_file": "extension/src/core/registry.ts",
-      "source_location": "L3"
-    },
-    {
-      "id": "extension_src_core_registry_translatorregistry",
-      "label": "TranslatorRegistry",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "translatorregistry",
-      "source_file": "extension/src/core/registry.ts",
-      "source_location": "L8"
-    },
-    {
-      "id": "extension_src_core_translation_service_translationservice",
-      "label": "TranslationService",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "translationservice",
-      "source_file": "extension/src/core/translation-service.ts",
-      "source_location": "L5"
-    },
-    {
-      "id": "extension_src_core_translator_translaterequest",
-      "label": "TranslateRequest",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "translaterequest",
-      "source_file": "extension/src/core/translator.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_core_translator_translateresult",
-      "label": "TranslateResult",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "translateresult",
-      "source_file": "extension/src/core/translator.ts",
-      "source_location": "L9"
-    },
-    {
-      "id": "extension_src_core_translator_translationerror",
-      "label": "TranslationError",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "translationerror",
-      "source_file": "extension/src/core/translator.ts",
-      "source_location": "L31"
-    },
-    {
-      "id": "extension_src_core_translator_translationerrorcode",
-      "label": "TranslationErrorCode",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "translationerrorcode",
-      "source_file": "extension/src/core/translator.ts",
-      "source_location": "L29"
-    },
-    {
-      "id": "extension_src_core_translator_translator",
-      "label": "Translator",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "translator",
-      "source_file": "extension/src/core/translator.ts",
-      "source_location": "L15"
-    },
-    {
-      "id": "extension_src_core_translator_translatorfactory",
-      "label": "TranslatorFactory",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "translatorfactory",
-      "source_file": "extension/src/core/translator.ts",
-      "source_location": "L23"
-    },
-    {
-      "id": "extension_src_messaging_messages_message",
-      "label": "Message",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "message",
-      "source_file": "extension/src/messaging/messages.ts",
-      "source_location": "L5"
-    },
-    {
-      "id": "extension_src_messaging_messages_response",
-      "label": "Response",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "response",
-      "source_file": "extension/src/messaging/messages.ts",
-      "source_location": "L17"
-    },
-    {
-      "id": "extension_src_messaging_messages_responsemap",
-      "label": "ResponseMap",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "responsemap",
-      "source_file": "extension/src/messaging/messages.ts",
-      "source_location": "L10"
-    },
-    {
-      "id": "extension_src_providers_api_api_translator_apitranslator",
-      "label": "ApiTranslator",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "apitranslator",
-      "source_file": "extension/src/providers/api/api-translator.ts",
-      "source_location": "L13"
-    },
-    {
-      "id": "extension_src_providers_mock_mock_translator_mocktranslator",
-      "label": "MockTranslator",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "mocktranslator",
-      "source_file": "extension/src/providers/mock/mock-translator.ts",
-      "source_location": "L4"
-    },
-    {
-      "id": "extension_src_settings_settings_settings",
-      "label": "Settings",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "settings",
-      "source_file": "extension/src/settings/settings.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_settings_settings_settingsreader",
-      "label": "SettingsReader",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "settingsreader",
-      "source_file": "extension/src/settings/settings.ts",
-      "source_location": "L15"
-    },
-    {
-      "id": "extension_src_settings_settings_settingsrepository",
-      "label": "SettingsRepository",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "settingsrepository",
-      "source_file": "extension/src/settings/settings.ts",
-      "source_location": "L19"
-    },
     {
       "id": "extension_src_content_selection_editableselection",
       "label": "EditableSelection",
@@ -270,30 +34,30 @@
       "source_location": "L1"
     },
     {
-      "id": "extension_src_content_ui_translator_widget_point",
-      "label": "Point",
+      "id": "extension_src_settings_settings_settings",
+      "label": "Settings",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 1,
       "community_name": "content.ts",
       "file_type": "code",
-      "norm_label": "point",
-      "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L10"
+      "norm_label": "settings",
+      "source_file": "extension/src/settings/settings.ts",
+      "source_location": "L1"
     },
     {
-      "id": "extension_src_core_languages_language",
-      "label": "Language",
+      "id": "extension_src_content_selection_anchor",
+      "label": "Anchor",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
+      "community": 17,
+      "community_name": "TranslatorWidget",
       "file_type": "code",
-      "norm_label": "language",
-      "source_file": "extension/src/core/languages.ts",
-      "source_location": "L1"
+      "norm_label": "anchor",
+      "source_file": "extension/src/content/selection.ts",
+      "source_location": "L84"
     },
     {
       "id": "extension_src_content_ui_translator_widget_translatorwidget",
@@ -306,7 +70,7 @@
       "file_type": "code",
       "norm_label": "translatorwidget",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L21"
+      "source_location": "L17"
     },
     {
       "id": "extension_src_content_ui_translator_widget_widgetcallbacks",
@@ -319,7 +83,59 @@
       "file_type": "code",
       "norm_label": "widgetcallbacks",
       "source_file": "extension/src/content/ui/translator-widget.ts",
+      "source_location": "L6"
+    },
+    {
+      "id": "extension_src_core_languages_language",
+      "label": "Language",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "TranslatorWidget",
+      "file_type": "code",
+      "norm_label": "language",
+      "source_file": "extension/src/core/languages.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_messaging_messages_message",
+      "label": "Message",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "message",
+      "source_file": "extension/src/messaging/messages.ts",
       "source_location": "L4"
+    },
+    {
+      "id": "extension_src_messaging_messages_response",
+      "label": "Response",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "response",
+      "source_file": "extension/src/messaging/messages.ts",
+      "source_location": "L12"
+    },
+    {
+      "id": "extension_src_messaging_messages_responsemap",
+      "label": "ResponseMap",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "responsemap",
+      "source_file": "extension/src/messaging/messages.ts",
+      "source_location": "L6"
     },
     {
       "id": "shared_contract_apierrorcode",
@@ -374,244 +190,100 @@
       "source_location": "L11"
     },
     {
-      "id": "extension_src_core_registry_test_factory",
-      "label": "factory()",
+      "id": "extension_src_content_ui_translator_widget_translatorwidget_destroy",
+      "label": ".destroy()",
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "background.ts",
+      "community_name": "main",
       "file_type": "code",
-      "norm_label": "factory()",
-      "source_file": "extension/src/core/registry.test.ts",
-      "source_location": "L5"
+      "norm_label": ".destroy()",
+      "source_file": "extension/src/content/ui/translator-widget.ts",
+      "source_location": "L66"
     },
     {
-      "id": "extension_src_core_registry_translatorregistry_get",
-      "label": ".get()",
+      "id": "extension_src_content_ui_translator_widget_translatorwidget_owns",
+      "label": ".owns()",
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "background.ts",
+      "community_name": "main",
       "file_type": "code",
-      "norm_label": ".get()",
-      "source_file": "extension/src/core/registry.ts",
+      "norm_label": ".owns()",
+      "source_file": "extension/src/content/ui/translator-widget.ts",
+      "source_location": "L78"
+    },
+    {
+      "id": "extension_src_core_languages_findlanguage",
+      "label": "findLanguage()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "main",
+      "file_type": "code",
+      "norm_label": "findlanguage()",
+      "source_file": "extension/src/core/languages.ts",
+      "source_location": "L40"
+    },
+    {
+      "id": "extension_src_entrypoints_content_main",
+      "label": "main()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "main",
+      "file_type": "code",
+      "norm_label": "main()",
+      "source_file": "extension/src/entrypoints/content.ts",
       "source_location": "L19"
     },
     {
-      "id": "extension_src_core_registry_translatorregistry_list",
-      "label": ".list()",
+      "id": "extension_src_entrypoints_content_main_close",
+      "label": "close()",
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "background.ts",
+      "community_name": "main",
       "file_type": "code",
-      "norm_label": ".list()",
-      "source_file": "extension/src/core/registry.ts",
-      "source_location": "L30"
+      "norm_label": "close()",
+      "source_file": "extension/src/entrypoints/content.ts",
+      "source_location": "L35"
     },
     {
-      "id": "extension_src_core_registry_translatorregistry_register",
-      "label": ".register()",
+      "id": "extension_src_entrypoints_content_main_showlanguages",
+      "label": "showLanguages()",
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "background.ts",
+      "community_name": "main",
       "file_type": "code",
-      "norm_label": ".register()",
-      "source_file": "extension/src/core/registry.ts",
-      "source_location": "L11"
+      "norm_label": "showlanguages()",
+      "source_file": "extension/src/entrypoints/content.ts",
+      "source_location": "L55"
     },
     {
-      "id": "extension_src_core_translation_service_test_setup",
-      "label": "setup()",
+      "id": "extension_src_entrypoints_content_main_translate",
+      "label": "translate()",
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "background.ts",
+      "community_name": "main",
       "file_type": "code",
-      "norm_label": "setup()",
-      "source_file": "extension/src/core/translation-service.test.ts",
-      "source_location": "L7"
+      "norm_label": "translate()",
+      "source_file": "extension/src/entrypoints/content.ts",
+      "source_location": "L65"
     },
     {
-      "id": "extension_src_core_translation_service_translationservice_constructor",
-      "label": ".constructor()",
+      "id": "extension_src_messaging_messages_sendmessage",
+      "label": "sendMessage()",
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "background.ts",
+      "community_name": "main",
       "file_type": "code",
-      "norm_label": ".constructor()",
-      "source_file": "extension/src/core/translation-service.ts",
-      "source_location": "L6"
-    },
-    {
-      "id": "extension_src_core_translation_service_translationservice_translate",
-      "label": ".translate()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": ".translate()",
-      "source_file": "extension/src/core/translation-service.ts",
-      "source_location": "L11"
-    },
-    {
-      "id": "extension_src_core_translator_translationerror_constructor",
-      "label": ".constructor()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": ".constructor()",
-      "source_file": "extension/src/core/translator.ts",
-      "source_location": "L32"
-    },
-    {
-      "id": "extension_src_core_translator_translator_translate",
-      "label": ".translate()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": ".translate()",
-      "source_file": "extension/src/core/translator.ts",
-      "source_location": "L16"
-    },
-    {
-      "id": "extension_src_core_translator_translatorfactory_create",
-      "label": ".create()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": ".create()",
-      "source_file": "extension/src/core/translator.ts",
-      "source_location": "L26"
-    },
-    {
-      "id": "extension_src_entrypoints_background_handle",
-      "label": "handle()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "handle()",
-      "source_file": "extension/src/entrypoints/background.ts",
-      "source_location": "L15"
-    },
-    {
-      "id": "extension_src_entrypoints_background_reloadplaygroundwhenready",
-      "label": "reloadPlaygroundWhenReady()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "reloadplaygroundwhenready()",
-      "source_file": "extension/src/entrypoints/background.ts",
-      "source_location": "L51"
-    },
-    {
-      "id": "extension_src_messaging_messages_ismessage",
-      "label": "isMessage()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "ismessage()",
+      "norm_label": "sendmessage()",
       "source_file": "extension/src/messaging/messages.ts",
-      "source_location": "L21"
-    },
-    {
-      "id": "extension_src_providers_api_api_translator_apitranslator_constructor",
-      "label": ".constructor()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": ".constructor()",
-      "source_file": "extension/src/providers/api/api-translator.ts",
-      "source_location": "L14"
-    },
-    {
-      "id": "extension_src_providers_api_api_translator_apitranslator_translate",
-      "label": ".translate()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": ".translate()",
-      "source_file": "extension/src/providers/api/api-translator.ts",
-      "source_location": "L16"
-    },
-    {
-      "id": "extension_src_providers_index_registerproviders",
-      "label": "registerProviders()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "registerproviders()",
-      "source_file": "extension/src/providers/index.ts",
-      "source_location": "L6"
-    },
-    {
-      "id": "extension_src_providers_mock_mock_translator_mocktranslator_constructor",
-      "label": ".constructor()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": ".constructor()",
-      "source_file": "extension/src/providers/mock/mock-translator.ts",
-      "source_location": "L5"
-    },
-    {
-      "id": "extension_src_providers_mock_mock_translator_mocktranslator_translate",
-      "label": ".translate()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": ".translate()",
-      "source_file": "extension/src/providers/mock/mock-translator.ts",
-      "source_location": "L7"
-    },
-    {
-      "id": "extension_src_settings_settings_settingsreader_get",
-      "label": ".get()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": ".get()",
-      "source_file": "extension/src/settings/settings.ts",
-      "source_location": "L16"
-    },
-    {
-      "id": "extension_src_settings_settings_settingsrepository_update",
-      "label": ".update()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": ".update()",
-      "source_file": "extension/src/settings/settings.ts",
-      "source_location": "L20"
+      "source_location": "L18"
     },
     {
       "id": "extension_src_content_replace_dispatchinput",
@@ -623,7 +295,7 @@
       "file_type": "code",
       "norm_label": "dispatchinput()",
       "source_file": "extension/src/content/replace.ts",
-      "source_location": "L21"
+      "source_location": "L28"
     },
     {
       "id": "extension_src_content_replace_replaceincontenteditable",
@@ -635,7 +307,7 @@
       "file_type": "code",
       "norm_label": "replaceincontenteditable()",
       "source_file": "extension/src/content/replace.ts",
-      "source_location": "L38"
+      "source_location": "L45"
     },
     {
       "id": "extension_src_content_replace_replaceintextcontrol",
@@ -647,7 +319,7 @@
       "file_type": "code",
       "norm_label": "replaceintextcontrol()",
       "source_file": "extension/src/content/replace.ts",
-      "source_location": "L25"
+      "source_location": "L32"
     },
     {
       "id": "extension_src_content_replace_replaceselection",
@@ -672,6 +344,18 @@
       "norm_label": "tryinserttext()",
       "source_file": "extension/src/content/replace.ts",
       "source_location": "L13"
+    },
+    {
+      "id": "extension_src_content_replace_trypaste",
+      "label": "tryPaste()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "content.ts",
+      "file_type": "code",
+      "norm_label": "trypaste()",
+      "source_file": "extension/src/content/replace.ts",
+      "source_location": "L22"
     },
     {
       "id": "extension_src_content_selection_deepactiveelement",
@@ -710,16 +394,16 @@
       "source_location": "L55"
     },
     {
-      "id": "extension_src_content_selection_getselectionanchorpoint",
-      "label": "getSelectionAnchorPoint()",
+      "id": "extension_src_content_selection_getselectionanchor",
+      "label": "getSelectionAnchor()",
       "_callable": true,
       "_origin": "ast",
       "community": 1,
       "community_name": "content.ts",
       "file_type": "code",
-      "norm_label": "getselectionanchorpoint()",
+      "norm_label": "getselectionanchor()",
       "source_file": "extension/src/content/selection.ts",
-      "source_location": "L84"
+      "source_location": "L94"
     },
     {
       "id": "extension_src_content_selection_iseditablehost",
@@ -758,64 +442,16 @@
       "source_location": "L19"
     },
     {
-      "id": "extension_src_content_ui_translator_widget_translatorwidget_destroy",
-      "label": ".destroy()",
+      "id": "extension_src_content_selection_lineheight",
+      "label": "lineHeight()",
       "_callable": true,
       "_origin": "ast",
       "community": 1,
       "community_name": "content.ts",
       "file_type": "code",
-      "norm_label": ".destroy()",
-      "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L70"
-    },
-    {
-      "id": "extension_src_content_ui_translator_widget_translatorwidget_owns",
-      "label": ".owns()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": ".owns()",
-      "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L82"
-    },
-    {
-      "id": "extension_src_core_languages_findlanguage",
-      "label": "findLanguage()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "findlanguage()",
-      "source_file": "extension/src/core/languages.ts",
-      "source_location": "L40"
-    },
-    {
-      "id": "extension_src_entrypoints_content_main",
-      "label": "main()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "main()",
-      "source_file": "extension/src/entrypoints/content.ts",
-      "source_location": "L19"
-    },
-    {
-      "id": "extension_src_entrypoints_content_main_close",
-      "label": "close()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "close()",
-      "source_file": "extension/src/entrypoints/content.ts",
-      "source_location": "L35"
+      "norm_label": "lineheight()",
+      "source_file": "extension/src/content/selection.ts",
+      "source_location": "L106"
     },
     {
       "id": "extension_src_entrypoints_content_main_refresh",
@@ -830,30 +466,6 @@
       "source_location": "L41"
     },
     {
-      "id": "extension_src_entrypoints_content_main_showlanguages",
-      "label": "showLanguages()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "showlanguages()",
-      "source_file": "extension/src/entrypoints/content.ts",
-      "source_location": "L52"
-    },
-    {
-      "id": "extension_src_entrypoints_content_main_translate",
-      "label": "translate()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "translate()",
-      "source_file": "extension/src/entrypoints/content.ts",
-      "source_location": "L57"
-    },
-    {
       "id": "extension_src_entrypoints_options_main_init",
       "label": "init()",
       "_callable": true,
@@ -863,7 +475,7 @@
       "file_type": "code",
       "norm_label": "init()",
       "source_file": "extension/src/entrypoints/options/main.ts",
-      "source_location": "L15"
+      "source_location": "L13"
     },
     {
       "id": "extension_src_entrypoints_options_main_setstatus",
@@ -875,19 +487,7 @@
       "file_type": "code",
       "norm_label": "setstatus()",
       "source_file": "extension/src/entrypoints/options/main.ts",
-      "source_location": "L10"
-    },
-    {
-      "id": "extension_src_messaging_messages_sendmessage",
-      "label": "sendMessage()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "sendmessage()",
-      "source_file": "extension/src/messaging/messages.ts",
-      "source_location": "L25"
+      "source_location": "L8"
     },
     {
       "id": "extension_src_content_ui_translator_widget_clamp",
@@ -899,7 +499,7 @@
       "file_type": "code",
       "norm_label": "clamp()",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L171"
+      "source_location": "L169"
     },
     {
       "id": "extension_src_content_ui_translator_widget_translatorwidget_constructor",
@@ -911,7 +511,7 @@
       "file_type": "code",
       "norm_label": ".constructor()",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L27"
+      "source_location": "L23"
     },
     {
       "id": "extension_src_content_ui_translator_widget_translatorwidget_divider",
@@ -923,7 +523,7 @@
       "file_type": "code",
       "norm_label": ".divider()",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L154"
+      "source_location": "L152"
     },
     {
       "id": "extension_src_content_ui_translator_widget_translatorwidget_element",
@@ -935,7 +535,7 @@
       "file_type": "code",
       "norm_label": ".element()",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L158"
+      "source_location": "L156"
     },
     {
       "id": "extension_src_content_ui_translator_widget_translatorwidget_hide",
@@ -947,7 +547,7 @@
       "file_type": "code",
       "norm_label": ".hide()",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L123"
+      "source_location": "L121"
     },
     {
       "id": "extension_src_content_ui_translator_widget_translatorwidget_ismenuopen",
@@ -959,7 +559,7 @@
       "file_type": "code",
       "norm_label": ".ismenuopen()",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L74"
+      "source_location": "L70"
     },
     {
       "id": "extension_src_content_ui_translator_widget_translatorwidget_isvisible",
@@ -971,7 +571,7 @@
       "file_type": "code",
       "norm_label": ".isvisible()",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L78"
+      "source_location": "L74"
     },
     {
       "id": "extension_src_content_ui_translator_widget_translatorwidget_mount",
@@ -983,7 +583,7 @@
       "file_type": "code",
       "norm_label": ".mount()",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L66"
+      "source_location": "L62"
     },
     {
       "id": "extension_src_content_ui_translator_widget_translatorwidget_positionpanel",
@@ -995,7 +595,7 @@
       "file_type": "code",
       "norm_label": ".positionpanel()",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L136"
+      "source_location": "L134"
     },
     {
       "id": "extension_src_content_ui_translator_widget_translatorwidget_settingslink",
@@ -1007,7 +607,7 @@
       "file_type": "code",
       "norm_label": ".settingslink()",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L147"
+      "source_location": "L145"
     },
     {
       "id": "extension_src_content_ui_translator_widget_translatorwidget_showbusy",
@@ -1019,7 +619,7 @@
       "file_type": "code",
       "norm_label": ".showbusy()",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L110"
+      "source_location": "L108"
     },
     {
       "id": "extension_src_content_ui_translator_widget_translatorwidget_showerror",
@@ -1031,7 +631,7 @@
       "file_type": "code",
       "norm_label": ".showerror()",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L116"
+      "source_location": "L114"
     },
     {
       "id": "extension_src_content_ui_translator_widget_translatorwidget_showicon",
@@ -1043,7 +643,7 @@
       "file_type": "code",
       "norm_label": ".showicon()",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L86"
+      "source_location": "L82"
     },
     {
       "id": "extension_src_content_ui_translator_widget_translatorwidget_showlanguages",
@@ -1055,7 +655,7 @@
       "file_type": "code",
       "norm_label": ".showlanguages()",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L96"
+      "source_location": "L94"
     },
     {
       "id": "extension_src_content_ui_translator_widget_translatorwidget_showpanel",
@@ -1067,7 +667,7 @@
       "file_type": "code",
       "norm_label": ".showpanel()",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L128"
+      "source_location": "L126"
     },
     {
       "id": "extension_src_content_ui_translator_widget_translatorwidget_viewport",
@@ -1079,7 +679,7 @@
       "file_type": "code",
       "norm_label": ".viewport()",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L165"
+      "source_location": "L163"
     },
     {
       "id": "extension_src_content_ui_translator_widget_widgetcallbacks_oniconclick",
@@ -1091,7 +691,7 @@
       "file_type": "code",
       "norm_label": ".oniconclick()",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L5"
+      "source_location": "L7"
     },
     {
       "id": "extension_src_content_ui_translator_widget_widgetcallbacks_onlanguagepick",
@@ -1103,7 +703,7 @@
       "file_type": "code",
       "norm_label": ".onlanguagepick()",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L6"
+      "source_location": "L8"
     },
     {
       "id": "extension_src_content_ui_translator_widget_widgetcallbacks_onopensettings",
@@ -1115,7 +715,7 @@
       "file_type": "code",
       "norm_label": ".onopensettings()",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L7"
+      "source_location": "L9"
     },
     {
       "id": "api_src_app_fail",
@@ -1127,7 +727,7 @@
       "file_type": "code",
       "norm_label": "fail()",
       "source_file": "api/src/app.ts",
-      "source_location": "L63"
+      "source_location": "L64"
     },
     {
       "id": "api_src_app_isratelimited",
@@ -1139,7 +739,7 @@
       "file_type": "code",
       "norm_label": "isratelimited()",
       "source_file": "api/src/app.ts",
-      "source_location": "L10"
+      "source_location": "L11"
     },
     {
       "id": "api_src_app_parsebody",
@@ -1151,7 +751,7 @@
       "file_type": "code",
       "norm_label": "parsebody()",
       "source_file": "api/src/app.ts",
-      "source_location": "L20"
+      "source_location": "L21"
     },
     {
       "id": "api_src_app_test_post",
@@ -1163,7 +763,19 @@
       "file_type": "code",
       "norm_label": "post()",
       "source_file": "api/src/app.test.ts",
-      "source_location": "L4"
+      "source_location": "L9"
+    },
+    {
+      "id": "api_src_translate_createinput",
+      "label": "createInput()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "createinput()",
+      "source_file": "api/src/translate.ts",
+      "source_location": "L74"
     },
     {
       "id": "api_src_translate_translate",
@@ -1175,183 +787,67 @@
       "file_type": "code",
       "norm_label": "translate()",
       "source_file": "api/src/translate.ts",
-      "source_location": "L8"
-    },
-    {
-      "id": "extension_src_core_registry",
-      "label": "registry.ts",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "registry.ts",
-      "source_file": "extension/src/core/registry.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_core_registry_test",
-      "label": "registry.test.ts",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "registry.test.ts",
-      "source_file": "extension/src/core/registry.test.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_core_translation_service",
-      "label": "translation-service.ts",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "translation-service.ts",
-      "source_file": "extension/src/core/translation-service.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_core_translation_service_test",
-      "label": "translation-service.test.ts",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "translation-service.test.ts",
-      "source_file": "extension/src/core/translation-service.test.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_core_translator",
-      "label": "translator.ts",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "translator.ts",
-      "source_file": "extension/src/core/translator.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_entrypoints_background",
-      "label": "background.ts",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "background.ts",
-      "source_file": "extension/src/entrypoints/background.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_messaging_messages",
-      "label": "messages.ts",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "messages.ts",
-      "source_file": "extension/src/messaging/messages.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_providers_api_api_translator",
-      "label": "api-translator.ts",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "api-translator.ts",
-      "source_file": "extension/src/providers/api/api-translator.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_providers_api_api_translator_apitranslatorfactory",
-      "label": "apiTranslatorFactory",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "apitranslatorfactory",
-      "source_file": "extension/src/providers/api/api-translator.ts",
-      "source_location": "L41"
-    },
-    {
-      "id": "extension_src_providers_index",
-      "label": "index.ts",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "index.ts",
-      "source_file": "extension/src/providers/index.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_providers_mock_mock_translator",
-      "label": "mock-translator.ts",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "mock-translator.ts",
-      "source_file": "extension/src/providers/mock/mock-translator.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_providers_mock_mock_translator_mocktranslatorfactory",
-      "label": "mockTranslatorFactory",
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "mocktranslatorfactory",
-      "source_file": "extension/src/providers/mock/mock-translator.ts",
       "source_location": "L13"
     },
     {
-      "id": "extension_src_settings_settings",
-      "label": "settings.ts",
+      "id": "extension_src_api_test_reply",
+      "label": "reply()",
+      "_callable": true,
       "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
+      "community": 18,
+      "community_name": "app.ts",
       "file_type": "code",
-      "norm_label": "settings.ts",
-      "source_file": "extension/src/settings/settings.ts",
-      "source_location": "L1"
+      "norm_label": "reply()",
+      "source_file": "extension/src/api.test.ts",
+      "source_location": "L6"
     },
     {
-      "id": "extension_src_settings_settings_default_settings",
-      "label": "DEFAULT_SETTINGS",
+      "id": "extension_src_api_translate",
+      "label": "translate()",
+      "_callable": true,
       "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
+      "community": 18,
+      "community_name": "app.ts",
       "file_type": "code",
-      "norm_label": "default_settings",
-      "source_file": "extension/src/settings/settings.ts",
-      "source_location": "L9"
+      "norm_label": "translate()",
+      "source_file": "extension/src/api.ts",
+      "source_location": "L6"
     },
     {
-      "id": "extension_src_settings_storage_settings",
-      "label": "storage-settings.ts",
+      "id": "extension_src_entrypoints_background_handle",
+      "label": "handle()",
+      "_callable": true,
       "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
+      "community": 18,
+      "community_name": "app.ts",
       "file_type": "code",
-      "norm_label": "storage-settings.ts",
-      "source_file": "extension/src/settings/storage-settings.ts",
-      "source_location": "L1"
+      "norm_label": "handle()",
+      "source_file": "extension/src/entrypoints/background.ts",
+      "source_location": "L7"
     },
     {
-      "id": "extension_src_settings_storage_settings_settingsitem",
-      "label": "settingsItem",
+      "id": "extension_src_entrypoints_background_reloadplaygroundwhenready",
+      "label": "reloadPlaygroundWhenReady()",
+      "_callable": true,
       "_origin": "ast",
-      "community": 0,
-      "community_name": "background.ts",
+      "community": 18,
+      "community_name": "app.ts",
       "file_type": "code",
-      "norm_label": "settingsitem",
-      "source_file": "extension/src/settings/storage-settings.ts",
-      "source_location": "L4"
+      "norm_label": "reloadplaygroundwhenready()",
+      "source_file": "extension/src/entrypoints/background.ts",
+      "source_location": "L39"
+    },
+    {
+      "id": "extension_src_messaging_messages_ismessage",
+      "label": "isMessage()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "ismessage()",
+      "source_file": "extension/src/messaging/messages.ts",
+      "source_location": "L14"
     },
     {
       "id": "extension_src_content_replace",
@@ -1409,39 +905,6 @@
       "source_location": "L1"
     },
     {
-      "id": "extension_src_content_ui_styles",
-      "label": "styles.ts",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "styles.ts",
-      "source_file": "extension/src/content/ui/styles.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_content_ui_styles_widget_css",
-      "label": "WIDGET_CSS",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "widget_css",
-      "source_file": "extension/src/content/ui/styles.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_content_ui_translator_widget",
-      "label": "translator-widget.ts",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "translator-widget.ts",
-      "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L1"
-    },
-    {
       "id": "extension_src_core_languages",
       "label": "languages.ts",
       "_origin": "ast",
@@ -1484,6 +947,50 @@
       "norm_label": "main.ts",
       "source_file": "extension/src/entrypoints/options/main.ts",
       "source_location": "L1"
+    },
+    {
+      "id": "extension_src_settings_settings",
+      "label": "settings.ts",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "content.ts",
+      "file_type": "code",
+      "norm_label": "settings.ts",
+      "source_file": "extension/src/settings/settings.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_settings_settings_default_settings",
+      "label": "DEFAULT_SETTINGS",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "content.ts",
+      "file_type": "code",
+      "norm_label": "default_settings",
+      "source_file": "extension/src/settings/settings.ts",
+      "source_location": "L6"
+    },
+    {
+      "id": "extension_src_settings_storage_settings",
+      "label": "storage-settings.ts",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "content.ts",
+      "file_type": "code",
+      "norm_label": "storage-settings.ts",
+      "source_file": "extension/src/settings/storage-settings.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_settings_storage_settings_settingsitem",
+      "label": "settingsItem",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "content.ts",
+      "file_type": "code",
+      "norm_label": "settingsitem",
+      "source_file": "extension/src/settings/storage-settings.ts",
+      "source_location": "L4"
     },
     {
       "id": "extension_src_settings_storage_settings_storagesettings",
@@ -1809,6 +1316,39 @@
       "source_location": "L1"
     },
     {
+      "id": "extension_src_content_ui_styles",
+      "label": "styles.ts",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "TranslatorWidget",
+      "file_type": "code",
+      "norm_label": "styles.ts",
+      "source_file": "extension/src/content/ui/styles.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_content_ui_styles_widget_css",
+      "label": "WIDGET_CSS",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "TranslatorWidget",
+      "file_type": "code",
+      "norm_label": "widget_css",
+      "source_file": "extension/src/content/ui/styles.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_content_ui_translator_widget",
+      "label": "translator-widget.ts",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "TranslatorWidget",
+      "file_type": "code",
+      "norm_label": "translator-widget.ts",
+      "source_file": "extension/src/content/ui/translator-widget.ts",
+      "source_location": "L1"
+    },
+    {
       "id": "api_src_app",
       "label": "app.ts",
       "_origin": "ast",
@@ -1828,7 +1368,7 @@
       "file_type": "code",
       "norm_label": "app",
       "source_file": "api/src/app.ts",
-      "source_location": "L29"
+      "source_location": "L30"
     },
     {
       "id": "api_src_app_hits",
@@ -1839,7 +1379,7 @@
       "file_type": "code",
       "norm_label": "hits",
       "source_file": "api/src/app.ts",
-      "source_location": "L8"
+      "source_location": "L9"
     },
     {
       "id": "api_src_app_test",
@@ -1883,6 +1423,61 @@
       "file_type": "code",
       "norm_label": "translate.ts",
       "source_file": "api/src/translate.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "api_src_translate_client",
+      "label": "client",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "client",
+      "source_file": "api/src/translate.ts",
+      "source_location": "L4"
+    },
+    {
+      "id": "extension_src_api",
+      "label": "api.ts",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "api.ts",
+      "source_file": "extension/src/api.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_api_test",
+      "label": "api.test.ts",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "api.test.ts",
+      "source_file": "extension/src/api.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_entrypoints_background",
+      "label": "background.ts",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "background.ts",
+      "source_file": "extension/src/entrypoints/background.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_messaging_messages",
+      "label": "messages.ts",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "messages.ts",
+      "source_file": "extension/src/messaging/messages.ts",
       "source_location": "L1"
     },
     {
@@ -2214,6 +1809,108 @@
       "norm_label": "workspaces",
       "source_file": "package.json",
       "source_location": "L6"
+    },
+    {
+      "id": "api_readme",
+      "label": "README.md",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "AI Translator API",
+      "file_type": "document",
+      "node_kind": "page",
+      "norm_label": "readme.md",
+      "source_file": "api/README.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "api_readme_ai_translator_api",
+      "label": "AI Translator API",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "AI Translator API",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "ai translator api",
+      "source_file": "api/README.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "api_readme_configuration",
+      "label": "Configuration",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "AI Translator API",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "configuration",
+      "source_file": "api/README.md",
+      "source_location": "L56"
+    },
+    {
+      "id": "api_readme_errors",
+      "label": "Errors",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "AI Translator API",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "errors",
+      "source_file": "api/README.md",
+      "source_location": "L41"
+    },
+    {
+      "id": "api_readme_get_health",
+      "label": "`GET /health`",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "AI Translator API",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "`get /health`",
+      "source_file": "api/README.md",
+      "source_location": "L7"
+    },
+    {
+      "id": "api_readme_post_translate",
+      "label": "`POST /translate`",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "AI Translator API",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "`post /translate`",
+      "source_file": "api/README.md",
+      "source_location": "L15"
+    },
+    {
+      "id": "start_api",
+      "label": "start-api.sh",
+      "_origin": "ast",
+      "community": 24,
+      "community_name": "start-api.sh",
+      "file_type": "code",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "norm_label": "start-api.sh",
+      "source_file": "start-api.sh",
+      "source_location": "L1"
+    },
+    {
+      "id": "start_api_sh__entry",
+      "label": "start-api.sh script",
+      "_origin": "ast",
+      "community": 24,
+      "community_name": "start-api.sh",
+      "file_type": "code",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "norm_label": "start-api.sh script",
+      "source_file": "start-api.sh",
+      "source_location": "L1"
     },
     {
       "id": "claude_claude",
@@ -2863,6 +2560,17 @@
       "source_location": "L12"
     },
     {
+      "id": "api_package_dependencies_dotenv",
+      "label": "dotenv",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "api/package.json",
+      "file_type": "code",
+      "norm_label": "dotenv",
+      "source_file": "api/package.json",
+      "source_location": "L14"
+    },
+    {
       "id": "api_package_dependencies_hono",
       "label": "hono",
       "_origin": "ast",
@@ -2871,7 +2579,7 @@
       "file_type": "code",
       "norm_label": "hono",
       "source_file": "api/package.json",
-      "source_location": "L14"
+      "source_location": "L15"
     },
     {
       "id": "api_package_dependencies_hono_node_server",
@@ -2885,6 +2593,17 @@
       "source_location": "L13"
     },
     {
+      "id": "api_package_dependencies_openai",
+      "label": "openai",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "api/package.json",
+      "file_type": "code",
+      "norm_label": "openai",
+      "source_file": "api/package.json",
+      "source_location": "L16"
+    },
+    {
       "id": "api_package_devdependencies",
       "label": "devDependencies",
       "_origin": "ast",
@@ -2893,7 +2612,7 @@
       "file_type": "code",
       "norm_label": "devdependencies",
       "source_file": "api/package.json",
-      "source_location": "L16"
+      "source_location": "L18"
     },
     {
       "id": "api_package_devdependencies_types_node",
@@ -2904,7 +2623,7 @@
       "file_type": "code",
       "norm_label": "@types/node",
       "source_file": "api/package.json",
-      "source_location": "L17"
+      "source_location": "L19"
     },
     {
       "id": "api_package_devdependencies_typescript",
@@ -2915,7 +2634,7 @@
       "file_type": "code",
       "norm_label": "typescript",
       "source_file": "api/package.json",
-      "source_location": "L18"
+      "source_location": "L20"
     },
     {
       "id": "api_package_devdependencies_vitest",
@@ -2926,7 +2645,7 @@
       "file_type": "code",
       "norm_label": "vitest",
       "source_file": "api/package.json",
-      "source_location": "L19"
+      "source_location": "L21"
     },
     {
       "id": "api_package_name",
@@ -3036,7 +2755,7 @@
       "file_type": "concept",
       "norm_label": "typescript",
       "source_file": "api/package.json",
-      "source_location": "L18"
+      "source_location": "L20"
     },
     {
       "id": "api_package_json_ref_vitest",
@@ -3047,7 +2766,18 @@
       "file_type": "concept",
       "norm_label": "vitest",
       "source_file": "api/package.json",
-      "source_location": "L19"
+      "source_location": "L21"
+    },
+    {
+      "id": "ref_dotenv",
+      "label": "dotenv",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "api/package.json",
+      "file_type": "concept",
+      "norm_label": "dotenv",
+      "source_file": "api/package.json",
+      "source_location": "L14"
     },
     {
       "id": "ref_hono",
@@ -3058,7 +2788,18 @@
       "file_type": "concept",
       "norm_label": "hono",
       "source_file": "api/package.json",
-      "source_location": "L14"
+      "source_location": "L15"
+    },
+    {
+      "id": "ref_openai",
+      "label": "openai",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "api/package.json",
+      "file_type": "concept",
+      "norm_label": "openai",
+      "source_file": "api/package.json",
+      "source_location": "L16"
     },
     {
       "id": "ref_types_node",
@@ -3069,7 +2810,7 @@
       "file_type": "concept",
       "norm_label": "@types/node",
       "source_file": "api/package.json",
-      "source_location": "L17"
+      "source_location": "L19"
     },
     {
       "id": "extension_tsconfig",
@@ -3381,66 +3122,6 @@
       "source_url": null
     },
     {
-      "id": "readme_adding_translation_provider",
-      "label": "Adding a Translation Provider (README)",
-      "_origin": "semantic",
-      "author": null,
-      "captured_at": null,
-      "community": 3,
-      "community_name": "CLAUDE.md",
-      "contributor": null,
-      "file_type": "concept",
-      "norm_label": "adding a translation provider (readme)",
-      "source_file": "README.md",
-      "source_location": null,
-      "source_url": null
-    },
-    {
-      "id": "readme_architecture_diagram",
-      "label": "Content Script to Background Architecture Diagram",
-      "_origin": "semantic",
-      "author": null,
-      "captured_at": null,
-      "community": 3,
-      "community_name": "CLAUDE.md",
-      "contributor": null,
-      "file_type": "concept",
-      "norm_label": "content script to background architecture diagram",
-      "source_file": "README.md",
-      "source_location": null,
-      "source_url": null
-    },
-    {
-      "id": "readme_deepl_provider_example",
-      "label": "DeepL Provider Example",
-      "_origin": "semantic",
-      "author": null,
-      "captured_at": null,
-      "community": 3,
-      "community_name": "CLAUDE.md",
-      "contributor": null,
-      "file_type": "concept",
-      "norm_label": "deepl provider example",
-      "source_file": "README.md",
-      "source_location": null,
-      "source_url": null
-    },
-    {
-      "id": "readme",
-      "label": "README.md",
-      "_origin": "semantic",
-      "author": null,
-      "captured_at": null,
-      "community": 3,
-      "community_name": "CLAUDE.md",
-      "contributor": null,
-      "file_type": "document",
-      "norm_label": "readme.md",
-      "source_file": "README.md",
-      "source_location": null,
-      "source_url": null
-    },
-    {
       "id": "claude_background_translation_isolation",
       "label": "Translation Stays in Background Worker",
       "_origin": "semantic",
@@ -3505,38 +3186,14 @@
       "source_url": null
     },
     {
-      "id": "ref_wxt_browser",
-      "label": "ref_wxt_browser",
+      "id": "ref_vitest",
+      "label": "ref_vitest",
       "_origin": "semantic",
-      "community": 0,
-      "community_name": "background.ts",
+      "community": 1,
+      "community_name": "content.ts",
       "external": true,
       "file_type": "concept",
-      "norm_label": "ref_wxt_browser",
-      "source_file": "",
-      "type": "external"
-    },
-    {
-      "id": "ref_wxt_utils_define_background",
-      "label": "ref_wxt_utils_define_background",
-      "_origin": "semantic",
-      "community": 0,
-      "community_name": "background.ts",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "ref_wxt_utils_define_background",
-      "source_file": "",
-      "type": "external"
-    },
-    {
-      "id": "ref_wxt_utils_storage",
-      "label": "ref_wxt_utils_storage",
-      "_origin": "semantic",
-      "community": 0,
-      "community_name": "background.ts",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "ref_wxt_utils_storage",
+      "norm_label": "ref_vitest",
       "source_file": "",
       "type": "external"
     },
@@ -3553,6 +3210,66 @@
       "type": "external"
     },
     {
+      "id": "ref_wxt_utils_storage",
+      "label": "ref_wxt_utils_storage",
+      "_origin": "semantic",
+      "community": 1,
+      "community_name": "content.ts",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "ref_wxt_utils_storage",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "ref_assets_translate_icon_svg_raw",
+      "label": "ref_assets_translate_icon_svg_raw",
+      "_origin": "semantic",
+      "community": 17,
+      "community_name": "TranslatorWidget",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "ref_assets_translate_icon_svg_raw",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "ref_hono_cors",
+      "label": "ref_hono_cors",
+      "_origin": "semantic",
+      "community": 18,
+      "community_name": "app.ts",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "ref_hono_cors",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "ref_wxt_browser",
+      "label": "ref_wxt_browser",
+      "_origin": "semantic",
+      "community": 18,
+      "community_name": "app.ts",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "ref_wxt_browser",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "ref_wxt_utils_define_background",
+      "label": "ref_wxt_utils_define_background",
+      "_origin": "semantic",
+      "community": 18,
+      "community_name": "app.ts",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "ref_wxt_utils_define_background",
+      "source_file": "",
+      "type": "external"
+    },
+    {
       "id": "ref_vitest_config",
       "label": "ref_vitest_config",
       "_origin": "semantic",
@@ -3565,44 +3282,33 @@
       "type": "external"
     },
     {
-      "id": "ref_vitest",
-      "label": "ref_vitest",
-      "community": 0,
-      "community_name": "background.ts",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "ref_vitest",
-      "source_file": "",
-      "type": "external"
-    },
-    {
-      "id": "ref_hono_cors",
-      "label": "ref_hono_cors",
+      "id": "ref_dotenv_config",
+      "label": "ref_dotenv_config",
       "community": 18,
       "community_name": "app.ts",
       "external": true,
       "file_type": "concept",
-      "norm_label": "ref_hono_cors",
+      "norm_label": "ref_dotenv_config",
       "source_file": "",
       "type": "external"
     }
   ],
   "links": [
     {
-      "source": "extension_src_content_replace_replaceincontenteditable",
-      "target": "extension_src_content_replace_tryinserttext",
+      "source": "api_src_translate_translate",
+      "target": "api_src_translate_createinput",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "call",
-      "source_file": "extension/src/content/replace.ts",
-      "source_location": "L48",
+      "source_file": "api/src/translate.ts",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
       "source": "extension_src_content_replace_replaceincontenteditable",
-      "target": "extension_src_content_replace_dispatchinput",
+      "target": "extension_src_content_replace_trypaste",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -3613,6 +3319,30 @@
       "weight": 1.0
     },
     {
+      "source": "extension_src_content_replace_replaceincontenteditable",
+      "target": "extension_src_content_replace_tryinserttext",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "extension/src/content/replace.ts",
+      "source_location": "L58",
+      "weight": 1.0
+    },
+    {
+      "source": "extension_src_content_replace_replaceincontenteditable",
+      "target": "extension_src_content_replace_dispatchinput",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "extension/src/content/replace.ts",
+      "source_location": "L67",
+      "weight": 1.0
+    },
+    {
       "source": "extension_src_content_replace_replaceintextcontrol",
       "target": "extension_src_content_replace_tryinserttext",
       "relation": "calls",
@@ -3621,7 +3351,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/content/replace.ts",
-      "source_location": "L32",
+      "source_location": "L39",
       "weight": 1.0
     },
     {
@@ -3633,7 +3363,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/content/replace.ts",
-      "source_location": "L35",
+      "source_location": "L42",
       "weight": 1.0
     },
     {
@@ -3709,6 +3439,18 @@
       "weight": 1.0
     },
     {
+      "source": "extension_src_content_selection_getselectionanchor",
+      "target": "extension_src_content_selection_lineheight",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "extension/src/content/selection.ts",
+      "source_location": "L102",
+      "weight": 1.0
+    },
+    {
       "source": "extension_src_content_ui_translator_widget_translatorwidget_constructor",
       "target": "extension_src_content_ui_translator_widget_translatorwidget_hide",
       "relation": "calls",
@@ -3717,7 +3459,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L63",
+      "source_location": "L59",
       "weight": 1.0
     },
     {
@@ -3729,7 +3471,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L155",
+      "source_location": "L153",
       "weight": 1.0
     },
     {
@@ -3741,7 +3483,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L137",
+      "source_location": "L135",
       "weight": 1.0
     },
     {
@@ -3753,7 +3495,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L143",
+      "source_location": "L141",
       "weight": 1.0
     },
     {
@@ -3765,7 +3507,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L148",
+      "source_location": "L146",
       "weight": 1.0
     },
     {
@@ -3777,7 +3519,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L111",
+      "source_location": "L109",
       "weight": 1.0
     },
     {
@@ -3789,7 +3531,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L113",
+      "source_location": "L111",
       "weight": 1.0
     },
     {
@@ -3801,7 +3543,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L117",
+      "source_location": "L115",
       "weight": 1.0
     },
     {
@@ -3813,7 +3555,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L120",
+      "source_location": "L118",
       "weight": 1.0
     },
     {
@@ -3825,7 +3567,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L120",
+      "source_location": "L118",
       "weight": 1.0
     },
     {
@@ -3837,7 +3579,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L120",
+      "source_location": "L118",
       "weight": 1.0
     },
     {
@@ -3849,7 +3591,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L87",
+      "source_location": "L83",
       "weight": 1.0
     },
     {
@@ -3861,7 +3603,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L91",
+      "source_location": "L87",
       "weight": 1.0
     },
     {
@@ -3873,7 +3615,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L92",
+      "source_location": "L90",
       "weight": 1.0
     },
     {
@@ -3885,7 +3627,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L107",
+      "source_location": "L105",
       "weight": 1.0
     },
     {
@@ -3897,7 +3639,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L107",
+      "source_location": "L105",
       "weight": 1.0
     },
     {
@@ -3909,7 +3651,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L107",
+      "source_location": "L105",
       "weight": 1.0
     },
     {
@@ -3921,7 +3663,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L97",
+      "source_location": "L95",
       "weight": 1.0
     },
     {
@@ -3933,7 +3675,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L129",
+      "source_location": "L127",
       "weight": 1.0
     },
     {
@@ -3945,67 +3687,19 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L133",
+      "source_location": "L131",
       "weight": 1.0
     },
     {
-      "source": "extension_src_core_registry_translatorregistry_get",
-      "target": "extension_src_core_translator_translationerror",
+      "source": "extension_src_entrypoints_background_handle",
+      "target": "extension_src_api_translate",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "call",
-      "source_file": "extension/src/core/registry.ts",
-      "source_location": "L22",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service_test_setup",
-      "target": "extension_src_core_translation_service_translationservice",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "extension/src/core/translation-service.test.ts",
-      "source_location": "L11",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service_test_setup",
-      "target": "extension_src_core_registry_translatorregistry",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "extension/src/core/translation-service.test.ts",
-      "source_location": "L9",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service_translationservice_translate",
-      "target": "extension_src_core_translator_translationerror",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "extension/src/core/translation-service.ts",
-      "source_location": "L13",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service_translationservice_translate",
-      "target": "extension_src_core_translation_service_translationservice_translate",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "extension/src/core/translation-service.ts",
-      "source_location": "L21",
+      "source_file": "extension/src/entrypoints/background.ts",
+      "source_location": "L12",
       "weight": 1.0
     },
     {
@@ -4041,7 +3735,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/content.ts",
-      "source_location": "L43",
+      "source_location": "L46",
       "weight": 1.0
     },
     {
@@ -4053,19 +3747,19 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/content.ts",
-      "source_location": "L45",
+      "source_location": "L48",
       "weight": 1.0
     },
     {
       "source": "extension_src_entrypoints_content_main_refresh",
-      "target": "extension_src_content_selection_getselectionanchorpoint",
+      "target": "extension_src_content_selection_getselectionanchor",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/content.ts",
-      "source_location": "L49",
+      "source_location": "L52",
       "weight": 1.0
     },
     {
@@ -4077,7 +3771,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/content.ts",
-      "source_location": "L54",
+      "source_location": "L58",
       "weight": 1.0
     },
     {
@@ -4089,48 +3783,12 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/content.ts",
-      "source_location": "L61",
+      "source_location": "L69",
       "weight": 1.0
     },
     {
       "source": "extension_src_entrypoints_content_main_translate",
       "target": "extension_src_messaging_messages_sendmessage",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "extension/src/entrypoints/content.ts",
-      "source_location": "L63",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_content_main_translate",
-      "target": "extension_src_entrypoints_content_main_showlanguages",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "extension/src/entrypoints/content.ts",
-      "source_location": "L67",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_content_main_translate",
-      "target": "extension_src_content_selection_isselectionunchanged",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "extension/src/entrypoints/content.ts",
-      "source_location": "L68",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_content_main_translate",
-      "target": "extension_src_content_replace_replaceselection",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -4142,6 +3800,42 @@
     },
     {
       "source": "extension_src_entrypoints_content_main_translate",
+      "target": "extension_src_entrypoints_content_main_showlanguages",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "extension/src/entrypoints/content.ts",
+      "source_location": "L75",
+      "weight": 1.0
+    },
+    {
+      "source": "extension_src_entrypoints_content_main_translate",
+      "target": "extension_src_content_selection_isselectionunchanged",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "extension/src/entrypoints/content.ts",
+      "source_location": "L76",
+      "weight": 1.0
+    },
+    {
+      "source": "extension_src_entrypoints_content_main_translate",
+      "target": "extension_src_content_replace_replaceselection",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "extension/src/entrypoints/content.ts",
+      "source_location": "L79",
+      "weight": 1.0
+    },
+    {
+      "source": "extension_src_entrypoints_content_main_translate",
       "target": "extension_src_entrypoints_content_main_close",
       "relation": "calls",
       "_origin": "ast",
@@ -4149,31 +3843,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/content.ts",
-      "source_location": "L72",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_options_main_init",
-      "target": "extension_src_messaging_messages_sendmessage",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "extension/src/entrypoints/options/main.ts",
-      "source_location": "L18",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_options_main_init",
-      "target": "extension_src_entrypoints_options_main_setstatus",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "extension/src/entrypoints/options/main.ts",
-      "source_location": "L22",
+      "source_location": "L80",
       "weight": 1.0
     },
     {
@@ -4185,19 +3855,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/messaging/messages.ts",
-      "source_location": "L27",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_api_api_translator_apitranslator_translate",
-      "target": "extension_src_core_translator_translationerror",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "extension/src/providers/api/api-translator.ts",
-      "source_location": "L25",
+      "source_location": "L20",
       "weight": 1.0
     },
     {
@@ -4209,7 +3867,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "api/src/app.ts",
-      "source_location": "L10",
+      "source_location": "L11",
       "weight": 1.0
     },
     {
@@ -4221,7 +3879,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "api/src/app.ts",
-      "source_location": "L20",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -4233,7 +3891,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "api/src/app.ts",
-      "source_location": "L63",
+      "source_location": "L64",
       "weight": 1.0
     },
     {
@@ -4245,31 +3903,19 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "api/src/app.test.ts",
-      "source_location": "L4",
+      "source_location": "L9",
       "weight": 1.0
     },
     {
-      "source": "extension_src_core_registry_test",
-      "target": "extension_src_core_registry_test_factory",
+      "source": "extension_src_api_test",
+      "target": "extension_src_api_test_reply",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "call",
-      "source_file": "extension/src/core/registry.test.ts",
-      "source_location": "L5",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service_test",
-      "target": "extension_src_core_translation_service_test_setup",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "extension/src/core/translation-service.test.ts",
-      "source_location": "L7",
+      "source_file": "extension/src/api.test.ts",
+      "source_location": "L6",
       "weight": 1.0
     },
     {
@@ -4281,7 +3927,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/background.ts",
-      "source_location": "L15",
+      "source_location": "L7",
       "weight": 1.0
     },
     {
@@ -4317,7 +3963,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/content.ts",
-      "source_location": "L52",
+      "source_location": "L55",
       "weight": 1.0
     },
     {
@@ -4329,7 +3975,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/content.ts",
-      "source_location": "L57",
+      "source_location": "L65",
       "weight": 1.0
     },
     {
@@ -4341,66 +3987,30 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/options/main.ts",
-      "source_location": "L10",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "extension_src_content_ui_translator_widget_translatorwidget",
+      "target": "extension_src_content_selection_anchor",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "extension/src/content/ui/translator-widget.ts",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
       "source": "extension_src_messaging_messages_responsemap",
-      "target": "extension_src_core_translator_translateresult",
+      "target": "shared_contract_translateok",
       "relation": "references",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "field",
       "source_file": "extension/src/messaging/messages.ts",
-      "source_location": "L11",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_messaging_messages_responsemap",
-      "target": "extension_src_core_registry_providerinfo",
-      "relation": "references",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "field",
-      "source_file": "extension/src/messaging/messages.ts",
-      "source_location": "L12",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service_translationservice_translate",
-      "target": "extension_src_core_translator_translateresult",
-      "relation": "references",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "generic_arg",
-      "source_file": "extension/src/core/translation-service.ts",
-      "source_location": "L11",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_api_api_translator_apitranslator_translate",
-      "target": "extension_src_core_translator_translateresult",
-      "relation": "references",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "generic_arg",
-      "source_file": "extension/src/providers/api/api-translator.ts",
-      "source_location": "L16",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_mock_mock_translator_mocktranslator_translate",
-      "target": "extension_src_core_translator_translateresult",
-      "relation": "references",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "generic_arg",
-      "source_file": "extension/src/providers/mock/mock-translator.ts",
       "source_location": "L7",
       "weight": 1.0
     },
@@ -4430,7 +4040,7 @@
     },
     {
       "source": "api_package",
-      "target": "ref_hono",
+      "target": "ref_dotenv",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -4442,6 +4052,30 @@
     },
     {
       "source": "api_package",
+      "target": "ref_hono",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/package.json",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "api_package",
+      "target": "ref_openai",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/package.json",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "api_package",
       "target": "ref_types_node",
       "relation": "imports",
       "_origin": "ast",
@@ -4449,7 +4083,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "api/package.json",
-      "source_location": "L17",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -4461,7 +4095,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "api/package.json",
-      "source_location": "L18",
+      "source_location": "L20",
       "weight": 1.0
     },
     {
@@ -4473,7 +4107,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "api/package.json",
-      "source_location": "L19",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -4621,6 +4255,54 @@
       "weight": 1.0
     },
     {
+      "source": "extension_src_api",
+      "target": "shared_contract_translatebody",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "extension/src/api.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "extension_src_api",
+      "target": "shared_contract_translateerr",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "extension/src/api.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "extension_src_api",
+      "target": "shared_contract_translateok",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "extension/src/api.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "extension_src_api_test",
+      "target": "extension_src_api_translate",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "extension/src/api.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
       "source": "extension_src_content_replace",
       "target": "extension_src_content_selection_editableselection",
       "relation": "imports",
@@ -4670,6 +4352,18 @@
     },
     {
       "source": "extension_src_content_selection_test",
+      "target": "extension_src_content_selection_getselectionanchor",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "extension/src/content/selection.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "extension_src_content_selection_test",
       "target": "extension_src_content_selection_isselectionunchanged",
       "relation": "imports",
       "_origin": "ast",
@@ -4694,7 +4388,7 @@
     },
     {
       "source": "extension_src_content_ui_translator_widget",
-      "target": "extension_src_content_ui_styles_widget_css",
+      "target": "extension_src_content_selection_anchor",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -4705,219 +4399,27 @@
       "weight": 1.0
     },
     {
-      "source": "extension_src_core_registry",
-      "target": "extension_src_core_translator_translationerror",
+      "source": "extension_src_content_ui_translator_widget",
+      "target": "extension_src_content_ui_styles_widget_css",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "import",
-      "source_file": "extension/src/core/registry.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_registry",
-      "target": "extension_src_core_translator_translatorfactory",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/core/registry.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_registry_test",
-      "target": "extension_src_core_registry_translatorregistry",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/core/registry.test.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_registry_test",
-      "target": "extension_src_core_translator_translationerror",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/core/registry.test.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_registry_test",
-      "target": "extension_src_core_translator_translatorfactory",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/core/registry.test.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service",
-      "target": "extension_src_core_registry_translatorregistry",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/core/translation-service.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service",
-      "target": "extension_src_core_translator_translateresult",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/core/translation-service.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service",
-      "target": "extension_src_core_translator_translationerror",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/core/translation-service.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service",
-      "target": "extension_src_settings_settings_settingsreader",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/core/translation-service.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service_test",
-      "target": "extension_src_settings_settings_default_settings",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/core/translation-service.test.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service_test",
-      "target": "extension_src_settings_settings_settings",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/core/translation-service.test.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service_test",
-      "target": "extension_src_core_registry_translatorregistry",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/core/translation-service.test.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service_test",
-      "target": "extension_src_core_translation_service_translationservice",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/core/translation-service.test.ts",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service_test",
-      "target": "extension_src_core_translator_translationerror",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/core/translation-service.test.ts",
-      "source_location": "L5",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service_test",
-      "target": "extension_src_core_translator_translator",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/core/translation-service.test.ts",
-      "source_location": "L5",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_background",
-      "target": "extension_src_core_registry_translatorregistry",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/entrypoints/background.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_background",
-      "target": "extension_src_core_translator_translationerror",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/entrypoints/background.ts",
+      "source_file": "extension/src/content/ui/translator-widget.ts",
       "source_location": "L4",
       "weight": 1.0
     },
     {
       "source": "extension_src_entrypoints_background",
-      "target": "extension_src_core_translation_service_translationservice",
+      "target": "extension_src_api_translate",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "extension/src/entrypoints/background.ts",
-      "source_location": "L5",
+      "source_location": "L3",
       "weight": 1.0
     },
     {
@@ -4929,7 +4431,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "extension/src/entrypoints/background.ts",
-      "source_location": "L6",
+      "source_location": "L4",
       "weight": 1.0
     },
     {
@@ -4941,7 +4443,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "extension/src/entrypoints/background.ts",
-      "source_location": "L6",
+      "source_location": "L4",
       "weight": 1.0
     },
     {
@@ -4953,43 +4455,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "extension/src/entrypoints/background.ts",
-      "source_location": "L6",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_background",
-      "target": "extension_src_providers_index_registerproviders",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/entrypoints/background.ts",
-      "source_location": "L7",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_background",
-      "target": "extension_src_settings_storage_settings_storagesettings",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/entrypoints/background.ts",
-      "source_location": "L8",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_content",
-      "target": "extension_src_content_ui_translator_widget_point",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/entrypoints/content.ts",
-      "source_location": "L10",
+      "source_location": "L4",
       "weight": 1.0
     },
     {
@@ -5090,7 +4556,7 @@
     },
     {
       "source": "extension_src_entrypoints_content",
-      "target": "extension_src_content_selection_getselectionanchorpoint",
+      "target": "extension_src_content_selection_getselectionanchor",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -5126,18 +4592,6 @@
     },
     {
       "source": "extension_src_entrypoints_options_main",
-      "target": "extension_src_messaging_messages_sendmessage",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/entrypoints/options/main.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_options_main",
       "target": "extension_src_settings_storage_settings_storagesettings",
       "relation": "imports",
       "_origin": "ast",
@@ -5145,211 +4599,19 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "extension/src/entrypoints/options/main.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_messaging_messages",
-      "target": "extension_src_core_registry_providerinfo",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/messaging/messages.ts",
       "source_location": "L2",
       "weight": 1.0
     },
     {
       "source": "extension_src_messaging_messages",
-      "target": "extension_src_core_translator_translateresult",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/messaging/messages.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_messaging_messages",
-      "target": "extension_src_core_translator_translationerrorcode",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/messaging/messages.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_api_api_translator",
-      "target": "shared_contract_translateerr",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/providers/api/api-translator.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_api_api_translator",
       "target": "shared_contract_translateok",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "import",
-      "source_file": "extension/src/providers/api/api-translator.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_api_api_translator",
-      "target": "extension_src_core_translator_translaterequest",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/providers/api/api-translator.ts",
+      "source_file": "extension/src/messaging/messages.ts",
       "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_api_api_translator",
-      "target": "extension_src_core_translator_translateresult",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/providers/api/api-translator.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_api_api_translator",
-      "target": "extension_src_core_translator_translationerror",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/providers/api/api-translator.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_api_api_translator",
-      "target": "extension_src_core_translator_translator",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/providers/api/api-translator.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_api_api_translator",
-      "target": "extension_src_core_translator_translatorfactory",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/providers/api/api-translator.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_index",
-      "target": "extension_src_core_registry_translatorregistry",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/providers/index.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_index",
-      "target": "extension_src_providers_api_api_translator_apitranslatorfactory",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/providers/index.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_index",
-      "target": "extension_src_providers_mock_mock_translator_mocktranslatorfactory",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/providers/index.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_mock_mock_translator",
-      "target": "extension_src_core_translator_translaterequest",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/providers/mock/mock-translator.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_mock_mock_translator",
-      "target": "extension_src_core_translator_translateresult",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/providers/mock/mock-translator.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_mock_mock_translator",
-      "target": "extension_src_core_translator_translator",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/providers/mock/mock-translator.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_mock_mock_translator",
-      "target": "extension_src_core_translator_translatorfactory",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/providers/mock/mock-translator.ts",
-      "source_location": "L1",
       "weight": 1.0
     },
     {
@@ -5367,18 +4629,6 @@
     {
       "source": "extension_src_settings_storage_settings",
       "target": "extension_src_settings_settings_settings",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/settings/storage-settings.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_settings_storage_settings",
-      "target": "extension_src_settings_settings_settingsrepository",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -5434,6 +4684,18 @@
       "context": "import",
       "source_file": "api/src/app.ts",
       "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_app",
+      "target": "ref_dotenv_config",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/app.ts",
+      "source_location": "L5",
       "weight": 1.0
     },
     {
@@ -5495,6 +4757,55 @@
       "source_file": "api/src/translate.ts",
       "source_location": "L1",
       "type_only": true,
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_translate",
+      "target": "ref_openai",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/translate.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "extension_src_api",
+      "target": "shared_contract",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "extension/src/api.ts",
+      "source_location": "L1",
+      "type_only": true,
+      "weight": 1.0
+    },
+    {
+      "source": "extension_src_api_test",
+      "target": "ref_vitest",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "extension/src/api.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "extension_src_api_test",
+      "target": "extension_src_api",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "extension/src/api.test.ts",
+      "source_location": "L2",
       "weight": 1.0
     },
     {
@@ -5585,7 +4896,7 @@
     },
     {
       "source": "extension_src_content_ui_translator_widget",
-      "target": "extension_src_content_ui_styles",
+      "target": "extension_src_content_selection",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -5593,152 +4904,31 @@
       "context": "import",
       "source_file": "extension/src/content/ui/translator-widget.ts",
       "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_registry",
-      "target": "extension_src_core_translator",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/core/registry.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_registry_test",
-      "target": "ref_vitest",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/core/registry.test.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_registry_test",
-      "target": "extension_src_core_registry",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/core/registry.test.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_registry_test",
-      "target": "extension_src_core_translator",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/core/registry.test.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service",
-      "target": "extension_src_core_registry",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/core/translation-service.ts",
-      "source_location": "L1",
       "type_only": true,
       "weight": 1.0
     },
     {
-      "source": "extension_src_core_translation_service",
-      "target": "extension_src_core_translator",
+      "source": "extension_src_content_ui_translator_widget",
+      "target": "ref_assets_translate_icon_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "import",
-      "source_file": "extension/src/core/translation-service.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service",
-      "target": "extension_src_settings_settings",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/core/translation-service.ts",
-      "source_location": "L3",
-      "type_only": true,
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service_test",
-      "target": "ref_vitest",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/core/translation-service.test.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service_test",
-      "target": "extension_src_settings_settings",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/core/translation-service.test.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service_test",
-      "target": "extension_src_core_registry",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/core/translation-service.test.ts",
+      "source_file": "extension/src/content/ui/translator-widget.ts",
       "source_location": "L3",
       "weight": 1.0
     },
     {
-      "source": "extension_src_core_translation_service_test",
-      "target": "extension_src_core_translation_service",
+      "source": "extension_src_content_ui_translator_widget",
+      "target": "extension_src_content_ui_styles",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "import",
-      "source_file": "extension/src/core/translation-service.test.ts",
+      "source_file": "extension/src/content/ui/translator-widget.ts",
       "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service_test",
-      "target": "extension_src_core_translator",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/core/translation-service.test.ts",
-      "source_location": "L5",
       "weight": 1.0
     },
     {
@@ -5767,7 +4957,7 @@
     },
     {
       "source": "extension_src_entrypoints_background",
-      "target": "extension_src_core_registry",
+      "target": "extension_src_api",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -5779,30 +4969,6 @@
     },
     {
       "source": "extension_src_entrypoints_background",
-      "target": "extension_src_core_translator",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/entrypoints/background.ts",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_background",
-      "target": "extension_src_core_translation_service",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/entrypoints/background.ts",
-      "source_location": "L5",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_background",
       "target": "extension_src_messaging_messages",
       "relation": "imports_from",
       "_origin": "ast",
@@ -5810,31 +4976,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "extension/src/entrypoints/background.ts",
-      "source_location": "L6",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_background",
-      "target": "extension_src_providers_index",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/entrypoints/background.ts",
-      "source_location": "L7",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_background",
-      "target": "extension_src_settings_storage_settings",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/entrypoints/background.ts",
-      "source_location": "L8",
+      "source_location": "L4",
       "weight": 1.0
     },
     {
@@ -5935,18 +5077,6 @@
     },
     {
       "source": "extension_src_entrypoints_options_main",
-      "target": "extension_src_messaging_messages",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/entrypoints/options/main.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_options_main",
       "target": "extension_src_settings_storage_settings",
       "relation": "imports_from",
       "_origin": "ast",
@@ -5954,7 +5084,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "extension/src/entrypoints/options/main.ts",
-      "source_location": "L3",
+      "source_location": "L2",
       "weight": 1.0
     },
     {
@@ -5971,102 +5101,14 @@
     },
     {
       "source": "extension_src_messaging_messages",
-      "target": "extension_src_core_registry",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/messaging/messages.ts",
-      "source_location": "L2",
-      "type_only": true,
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_messaging_messages",
-      "target": "extension_src_core_translator",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/messaging/messages.ts",
-      "source_location": "L3",
-      "type_only": true,
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_api_api_translator",
       "target": "shared_contract",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "import",
-      "source_file": "extension/src/providers/api/api-translator.ts",
-      "source_location": "L1",
-      "type_only": true,
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_api_api_translator",
-      "target": "extension_src_core_translator",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/providers/api/api-translator.ts",
+      "source_file": "extension/src/messaging/messages.ts",
       "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_index",
-      "target": "extension_src_core_registry",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/providers/index.ts",
-      "source_location": "L1",
-      "type_only": true,
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_index",
-      "target": "extension_src_providers_api_api_translator",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/providers/index.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_index",
-      "target": "extension_src_providers_mock_mock_translator",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/providers/index.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_mock_mock_translator",
-      "target": "extension_src_core_translator",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/providers/mock/mock-translator.ts",
-      "source_location": "L1",
       "type_only": true,
       "weight": 1.0
     },
@@ -6119,6 +5161,18 @@
       "weight": 1.0
     },
     {
+      "source": "extension_src_content_ui_translator_widget_translatorwidget_showicon",
+      "target": "extension_src_content_selection_anchor",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "parameter_type",
+      "source_file": "extension/src/content/ui/translator-widget.ts",
+      "source_location": "L82",
+      "weight": 1.0
+    },
+    {
       "source": "extension_src_content_ui_translator_widget_translatorwidget_showlanguages",
       "target": "extension_src_core_languages_language",
       "relation": "references",
@@ -6127,115 +5181,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L96",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_registry_translatorregistry_register",
-      "target": "extension_src_core_translator_translatorfactory",
-      "relation": "references",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "parameter_type",
-      "source_file": "extension/src/core/registry.ts",
-      "source_location": "L11",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service_translationservice_constructor",
-      "target": "extension_src_core_registry_translatorregistry",
-      "relation": "references",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "parameter_type",
-      "source_file": "extension/src/core/translation-service.ts",
-      "source_location": "L6",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service_translationservice_constructor",
-      "target": "extension_src_settings_settings_settingsreader",
-      "relation": "references",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "parameter_type",
-      "source_file": "extension/src/core/translation-service.ts",
-      "source_location": "L6",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_api_api_translator_apitranslator_translate",
-      "target": "extension_src_core_translator_translaterequest",
-      "relation": "references",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "parameter_type",
-      "source_file": "extension/src/providers/api/api-translator.ts",
-      "source_location": "L16",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_mock_mock_translator_mocktranslator_translate",
-      "target": "extension_src_core_translator_translaterequest",
-      "relation": "references",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "parameter_type",
-      "source_file": "extension/src/providers/mock/mock-translator.ts",
-      "source_location": "L7",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_registry_translatorregistry_get",
-      "target": "extension_src_core_translator_translatorfactory",
-      "relation": "references",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "return_type",
-      "source_file": "extension/src/core/registry.ts",
-      "source_location": "L19",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_api_api_translator_apitranslator",
-      "target": "extension_src_core_translator_translator",
-      "relation": "implements",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "type",
-      "source_file": "extension/src/providers/api/api-translator.ts",
-      "source_location": "L13",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_mock_mock_translator_mocktranslator",
-      "target": "extension_src_core_translator_translator",
-      "relation": "implements",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "type",
-      "source_file": "extension/src/providers/mock/mock-translator.ts",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_settings_settings_settingsrepository",
-      "target": "extension_src_settings_settings_settingsreader",
-      "relation": "inherits",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "type",
-      "source_file": "extension/src/settings/settings.ts",
-      "source_location": "L19",
+      "source_location": "L94",
       "weight": 1.0
     },
     {
@@ -6257,7 +5203,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/package.json",
-      "source_location": "L16",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -6328,13 +5274,35 @@
     },
     {
       "source": "api_package_dependencies",
-      "target": "api_package_dependencies_hono",
+      "target": "api_package_dependencies_dotenv",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/package.json",
       "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "api_package_dependencies",
+      "target": "api_package_dependencies_hono",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/package.json",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "api_package_dependencies",
+      "target": "api_package_dependencies_openai",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/package.json",
+      "source_location": "L16",
       "weight": 1.0
     },
     {
@@ -6345,7 +5313,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/package.json",
-      "source_location": "L17",
+      "source_location": "L19",
       "weight": 1.0
     },
     {
@@ -6356,7 +5324,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/package.json",
-      "source_location": "L18",
+      "source_location": "L20",
       "weight": 1.0
     },
     {
@@ -6367,7 +5335,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/package.json",
-      "source_location": "L19",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -6415,6 +5383,61 @@
       "weight": 1.0
     },
     {
+      "source": "api_readme",
+      "target": "api_readme_ai_translator_api",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/README.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "api_readme_ai_translator_api",
+      "target": "api_readme_post_translate",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/README.md",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "api_readme_ai_translator_api",
+      "target": "api_readme_errors",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/README.md",
+      "source_location": "L41",
+      "weight": 1.0
+    },
+    {
+      "source": "api_readme_ai_translator_api",
+      "target": "api_readme_configuration",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/README.md",
+      "source_location": "L56",
+      "weight": 1.0
+    },
+    {
+      "source": "api_readme_ai_translator_api",
+      "target": "api_readme_get_health",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/README.md",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
       "source": "api_src_app",
       "target": "api_src_app_app",
       "relation": "contains",
@@ -6422,7 +5445,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/src/app.ts",
-      "source_location": "L29",
+      "source_location": "L30",
       "weight": 1.0
     },
     {
@@ -6433,7 +5456,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/src/app.ts",
-      "source_location": "L8",
+      "source_location": "L9",
       "weight": 1.0
     },
     {
@@ -6455,7 +5478,29 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/src/translate.ts",
-      "source_location": "L8",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_translate",
+      "target": "api_src_translate_client",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/src/translate.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_translate",
+      "target": "api_src_translate_createinput",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/src/translate.ts",
+      "source_location": "L74",
       "weight": 1.0
     },
     {
@@ -7405,6 +6450,17 @@
       "weight": 1.0
     },
     {
+      "source": "extension_src_api",
+      "target": "extension_src_api_translate",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extension/src/api.ts",
+      "source_location": "L6",
+      "weight": 1.0
+    },
+    {
       "source": "extension_src_content_replace",
       "target": "extension_src_content_replace_tryinserttext",
       "relation": "contains",
@@ -7417,13 +6473,24 @@
     },
     {
       "source": "extension_src_content_replace",
+      "target": "extension_src_content_replace_trypaste",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extension/src/content/replace.ts",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "extension_src_content_replace",
       "target": "extension_src_content_replace_dispatchinput",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/replace.ts",
-      "source_location": "L21",
+      "source_location": "L28",
       "weight": 1.0
     },
     {
@@ -7434,7 +6501,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/replace.ts",
-      "source_location": "L25",
+      "source_location": "L32",
       "weight": 1.0
     },
     {
@@ -7445,7 +6512,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/replace.ts",
-      "source_location": "L38",
+      "source_location": "L45",
       "weight": 1.0
     },
     {
@@ -7468,6 +6535,17 @@
       "confidence_score": 1.0,
       "source_file": "extension/src/content/selection.ts",
       "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "extension_src_content_selection",
+      "target": "extension_src_content_selection_lineheight",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extension/src/content/selection.ts",
+      "source_location": "L106",
       "weight": 1.0
     },
     {
@@ -7549,13 +6627,24 @@
     },
     {
       "source": "extension_src_content_selection",
-      "target": "extension_src_content_selection_getselectionanchorpoint",
+      "target": "extension_src_content_selection_anchor",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/selection.ts",
       "source_location": "L84",
+      "weight": 1.0
+    },
+    {
+      "source": "extension_src_content_selection",
+      "target": "extension_src_content_selection_getselectionanchor",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extension/src/content/selection.ts",
+      "source_location": "L94",
       "weight": 1.0
     },
     {
@@ -7571,24 +6660,13 @@
     },
     {
       "source": "extension_src_content_ui_translator_widget",
-      "target": "extension_src_content_ui_translator_widget_point",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L10",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_content_ui_translator_widget",
       "target": "extension_src_content_ui_translator_widget_clamp",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L171",
+      "source_location": "L169",
       "weight": 1.0
     },
     {
@@ -7599,7 +6677,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L21",
+      "source_location": "L17",
       "weight": 1.0
     },
     {
@@ -7610,7 +6688,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L4",
+      "source_location": "L6",
       "weight": 1.0
     },
     {
@@ -7647,105 +6725,6 @@
       "weight": 1.0
     },
     {
-      "source": "extension_src_core_registry",
-      "target": "extension_src_core_registry_providerinfo",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/core/registry.ts",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_registry",
-      "target": "extension_src_core_registry_translatorregistry",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/core/registry.ts",
-      "source_location": "L8",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service",
-      "target": "extension_src_core_translation_service_translationservice",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/core/translation-service.ts",
-      "source_location": "L5",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translator",
-      "target": "extension_src_core_translator_translaterequest",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/core/translator.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translator",
-      "target": "extension_src_core_translator_translator",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/core/translator.ts",
-      "source_location": "L15",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translator",
-      "target": "extension_src_core_translator_translatorfactory",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/core/translator.ts",
-      "source_location": "L23",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translator",
-      "target": "extension_src_core_translator_translationerrorcode",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/core/translator.ts",
-      "source_location": "L29",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translator",
-      "target": "extension_src_core_translator_translationerror",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/core/translator.ts",
-      "source_location": "L31",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translator",
-      "target": "extension_src_core_translator_translateresult",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/core/translator.ts",
-      "source_location": "L9",
-      "weight": 1.0
-    },
-    {
       "source": "extension_src_entrypoints_background",
       "target": "extension_src_entrypoints_background_reloadplaygroundwhenready",
       "relation": "contains",
@@ -7753,7 +6732,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/background.ts",
-      "source_location": "L51",
+      "source_location": "L39",
       "weight": 1.0
     },
     {
@@ -7775,18 +6754,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/options/main.ts",
-      "source_location": "L15",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_messaging_messages",
-      "target": "extension_src_messaging_messages_responsemap",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/messaging/messages.ts",
-      "source_location": "L10",
+      "source_location": "L13",
       "weight": 1.0
     },
     {
@@ -7797,7 +6765,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/messaging/messages.ts",
-      "source_location": "L17",
+      "source_location": "L12",
       "weight": 1.0
     },
     {
@@ -7808,7 +6776,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/messaging/messages.ts",
-      "source_location": "L21",
+      "source_location": "L14",
       "weight": 1.0
     },
     {
@@ -7819,7 +6787,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/messaging/messages.ts",
-      "source_location": "L25",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -7830,62 +6798,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/messaging/messages.ts",
-      "source_location": "L5",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_api_api_translator",
-      "target": "extension_src_providers_api_api_translator_apitranslator",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/providers/api/api-translator.ts",
-      "source_location": "L13",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_api_api_translator",
-      "target": "extension_src_providers_api_api_translator_apitranslatorfactory",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/providers/api/api-translator.ts",
-      "source_location": "L41",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_index",
-      "target": "extension_src_providers_index_registerproviders",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/providers/index.ts",
-      "source_location": "L6",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_mock_mock_translator",
-      "target": "extension_src_providers_mock_mock_translator_mocktranslatorfactory",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/providers/mock/mock-translator.ts",
-      "source_location": "L13",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_mock_mock_translator",
-      "target": "extension_src_providers_mock_mock_translator_mocktranslator",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/providers/mock/mock-translator.ts",
       "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "extension_src_messaging_messages",
+      "target": "extension_src_messaging_messages_responsemap",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extension/src/messaging/messages.ts",
+      "source_location": "L6",
       "weight": 1.0
     },
     {
@@ -7901,35 +6825,13 @@
     },
     {
       "source": "extension_src_settings_settings",
-      "target": "extension_src_settings_settings_settingsreader",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/settings/settings.ts",
-      "source_location": "L15",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_settings_settings",
-      "target": "extension_src_settings_settings_settingsrepository",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/settings/settings.ts",
-      "source_location": "L19",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_settings_settings",
       "target": "extension_src_settings_settings_default_settings",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/settings/settings.ts",
-      "source_location": "L9",
+      "source_location": "L6",
       "weight": 1.0
     },
     {
@@ -8186,6 +7088,17 @@
       "weight": 1.0
     },
     {
+      "source": "start_api",
+      "target": "start_api_sh__entry",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "start-api.sh",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
       "source": "extension_src_content_ui_translator_widget_translatorwidget",
       "target": "extension_src_content_ui_translator_widget_translatorwidget_showbusy",
       "relation": "method",
@@ -8193,7 +7106,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L110",
+      "source_location": "L108",
       "weight": 1.0
     },
     {
@@ -8204,7 +7117,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L116",
+      "source_location": "L114",
       "weight": 1.0
     },
     {
@@ -8215,7 +7128,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L123",
+      "source_location": "L121",
       "weight": 1.0
     },
     {
@@ -8226,7 +7139,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L128",
+      "source_location": "L126",
       "weight": 1.0
     },
     {
@@ -8237,7 +7150,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L136",
+      "source_location": "L134",
       "weight": 1.0
     },
     {
@@ -8248,7 +7161,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L147",
+      "source_location": "L145",
       "weight": 1.0
     },
     {
@@ -8259,7 +7172,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L154",
+      "source_location": "L152",
       "weight": 1.0
     },
     {
@@ -8270,7 +7183,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L158",
+      "source_location": "L156",
       "weight": 1.0
     },
     {
@@ -8281,7 +7194,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L165",
+      "source_location": "L163",
       "weight": 1.0
     },
     {
@@ -8292,7 +7205,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L27",
+      "source_location": "L23",
       "weight": 1.0
     },
     {
@@ -8303,7 +7216,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L66",
+      "source_location": "L62",
       "weight": 1.0
     },
     {
@@ -8314,7 +7227,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L70",
+      "source_location": "L66",
       "weight": 1.0
     },
     {
@@ -8325,7 +7238,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L74",
+      "source_location": "L70",
       "weight": 1.0
     },
     {
@@ -8336,7 +7249,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L78",
+      "source_location": "L74",
       "weight": 1.0
     },
     {
@@ -8347,7 +7260,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L82",
+      "source_location": "L78",
       "weight": 1.0
     },
     {
@@ -8358,7 +7271,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L86",
+      "source_location": "L82",
       "weight": 1.0
     },
     {
@@ -8369,7 +7282,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L96",
+      "source_location": "L94",
       "weight": 1.0
     },
     {
@@ -8380,7 +7293,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L5",
+      "source_location": "L7",
       "weight": 1.0
     },
     {
@@ -8391,7 +7304,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L6",
+      "source_location": "L8",
       "weight": 1.0
     },
     {
@@ -8402,161 +7315,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L7",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_registry_translatorregistry",
-      "target": "extension_src_core_registry_translatorregistry_register",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/core/registry.ts",
-      "source_location": "L11",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_registry_translatorregistry",
-      "target": "extension_src_core_registry_translatorregistry_get",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/core/registry.ts",
-      "source_location": "L19",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_registry_translatorregistry",
-      "target": "extension_src_core_registry_translatorregistry_list",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/core/registry.ts",
-      "source_location": "L30",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service_translationservice",
-      "target": "extension_src_core_translation_service_translationservice_translate",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/core/translation-service.ts",
-      "source_location": "L11",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service_translationservice",
-      "target": "extension_src_core_translation_service_translationservice_constructor",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/core/translation-service.ts",
-      "source_location": "L6",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translator_translationerror",
-      "target": "extension_src_core_translator_translationerror_constructor",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/core/translator.ts",
-      "source_location": "L32",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translator_translator",
-      "target": "extension_src_core_translator_translator_translate",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/core/translator.ts",
-      "source_location": "L16",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translator_translatorfactory",
-      "target": "extension_src_core_translator_translatorfactory_create",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/core/translator.ts",
-      "source_location": "L26",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_api_api_translator_apitranslator",
-      "target": "extension_src_providers_api_api_translator_apitranslator_constructor",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/providers/api/api-translator.ts",
-      "source_location": "L14",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_api_api_translator_apitranslator",
-      "target": "extension_src_providers_api_api_translator_apitranslator_translate",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/providers/api/api-translator.ts",
-      "source_location": "L16",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_mock_mock_translator_mocktranslator",
-      "target": "extension_src_providers_mock_mock_translator_mocktranslator_constructor",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/providers/mock/mock-translator.ts",
-      "source_location": "L5",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_mock_mock_translator_mocktranslator",
-      "target": "extension_src_providers_mock_mock_translator_mocktranslator_translate",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/providers/mock/mock-translator.ts",
-      "source_location": "L7",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_settings_settings_settingsreader",
-      "target": "extension_src_settings_settings_settingsreader_get",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/settings/settings.ts",
-      "source_location": "L16",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_settings_settings_settingsrepository",
-      "target": "extension_src_settings_settings_settingsrepository_update",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/settings/settings.ts",
-      "source_location": "L20",
+      "source_location": "L9",
       "weight": 1.0
     },
     {
@@ -8568,7 +7327,7 @@
       "confidence_score": 0.8,
       "context": "call",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L47",
+      "source_location": "L43",
       "weight": 1.0
     },
     {
@@ -8580,7 +7339,7 @@
       "confidence_score": 0.8,
       "context": "call",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L150",
+      "source_location": "L148",
       "weight": 1.0
     },
     {
@@ -8592,43 +7351,7 @@
       "confidence_score": 0.8,
       "context": "call",
       "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L103",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service_translationservice_translate",
-      "target": "extension_src_settings_settings_settingsreader_get",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "context": "call",
-      "source_file": "extension/src/core/translation-service.ts",
-      "source_location": "L16",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service_translationservice_translate",
-      "target": "extension_src_core_registry_translatorregistry_get",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "context": "call",
-      "source_file": "extension/src/core/translation-service.ts",
-      "source_location": "L18",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_background_handle",
-      "target": "extension_src_core_translation_service_translationservice_translate",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "context": "call",
-      "source_file": "extension/src/entrypoints/background.ts",
-      "source_location": "L19",
+      "source_location": "L101",
       "weight": 1.0
     },
     {
@@ -8652,31 +7375,7 @@
       "confidence_score": 0.8,
       "context": "call",
       "source_file": "extension/src/entrypoints/content.ts",
-      "source_location": "L77",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_providers_index_registerproviders",
-      "target": "extension_src_core_registry_translatorregistry_register",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "context": "call",
-      "source_file": "extension/src/providers/index.ts",
-      "source_location": "L7",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_core_translation_service_test",
-      "target": "extension_src_core_translator_translatorfactory_create",
-      "relation": "indirect_call",
-      "_origin": "ast",
-      "confidence": "INFERRED",
-      "confidence_score": 0.85,
-      "context": "argument",
-      "source_file": "extension/src/core/translation-service.test.ts",
-      "source_location": "L20",
+      "source_location": "L85",
       "weight": 1.0
     },
     {
@@ -8688,18 +7387,19 @@
       "confidence_score": 0.85,
       "context": "argument",
       "source_file": "extension/src/entrypoints/content.ts",
-      "source_location": "L54",
+      "source_location": "L58",
       "weight": 1.0
     },
     {
-      "source": "claude_add_provider_procedure",
-      "target": "readme_adding_translation_provider",
-      "relation": "cites",
-      "_origin": "semantic",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "CLAUDE.md",
-      "source_location": null,
+      "source": "extension_src_entrypoints_content_main_showlanguages",
+      "target": "extension_src_entrypoints_content_main_close",
+      "relation": "indirect_call",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "argument",
+      "source_file": "extension/src/entrypoints/content.ts",
+      "source_location": "L61",
       "weight": 1.0
     },
     {
@@ -8780,28 +7480,6 @@
       "weight": 1.0
     },
     {
-      "source": "readme",
-      "target": "readme_architecture_diagram",
-      "relation": "references",
-      "_origin": "semantic",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "README.md",
-      "source_location": null,
-      "weight": 1.0
-    },
-    {
-      "source": "readme_adding_translation_provider",
-      "target": "readme_deepl_provider_example",
-      "relation": "references",
-      "_origin": "semantic",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "README.md",
-      "source_location": null,
-      "weight": 1.0
-    },
-    {
       "source": "claude_requestid_stale_response_guard",
       "target": "claude_selection_snapshot",
       "relation": "semantically_similar_to",
@@ -8809,17 +7487,6 @@
       "confidence": "INFERRED",
       "confidence_score": 0.75,
       "source_file": "CLAUDE.md",
-      "source_location": null,
-      "weight": 1.0
-    },
-    {
-      "source": "readme_deepl_provider_example",
-      "target": "claude_mock_provider",
-      "relation": "semantically_similar_to",
-      "_origin": "semantic",
-      "confidence": "INFERRED",
-      "confidence_score": 0.75,
-      "source_file": "README.md",
       "source_location": null,
       "weight": 1.0
     },
@@ -8857,17 +7524,6 @@
       "weight": 1.0
     },
     {
-      "source": "readme_architecture_diagram",
-      "target": "claude_dependency_inversion_translation_engines",
-      "relation": "semantically_similar_to",
-      "_origin": "semantic",
-      "confidence": "INFERRED",
-      "confidence_score": 0.85,
-      "source_file": "README.md",
-      "source_location": null,
-      "weight": 1.0
-    },
-    {
       "source": "claude_selection_snapshot",
       "target": "claude_execcommand_insert_text_replacement",
       "relation": "shares_data_with",
@@ -8893,22 +7549,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "CLAUDE.md"
-    },
-    {
-      "id": "provider_extension_pattern",
-      "label": "Pluggable Provider Extension Pattern",
-      "nodes": [
-        "claude_dependency_inversion_translation_engines",
-        "claude_single_composition_root",
-        "claude_add_provider_procedure",
-        "readme_deepl_provider_example",
-        "claude_mock_provider"
-      ],
-      "relation": "form",
-      "confidence": "INFERRED",
-      "confidence_score": 0.85,
-      "source_file": "CLAUDE.md"
     }
   ],
-  "built_at_commit": "03e9e58361901faf417487b1e223931711ed61fe"
+  "built_at_commit": "31744e9f1e9c76cbf4ae34f50aeabeef0da3c3e5"
 }

@@ -1,6 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 import { app } from './app.ts';
 
+// The real provider calls OpenAI; tests only cover the HTTP layer.
+vi.mock('./translate.ts', () => ({
+  translate: vi.fn(async ({ text, targetLang }) => ({ text: `[${targetLang}] ${text}` })),
+}));
+
 const post = (body: unknown) =>
   app.request('/translate', {
     method: 'POST',
@@ -9,14 +14,11 @@ const post = (body: unknown) =>
   });
 
 describe('POST /translate', () => {
-  it('translates and logs the request', async () => {
-    const log = vi.spyOn(console, 'info').mockImplementation(() => {});
+  it('returns the translation', async () => {
     const res = await post({ text: 'Hello', targetLang: 'de' });
 
     expect(res.status).toBe(200);
     await expect(res.json()).resolves.toEqual({ text: '[de] Hello' });
-    expect(log.mock.calls[0]?.[0]).toMatch(/^\[translate] \d{4}-\d\d-\d\dT.+ → "de": Hello$/);
-    log.mockRestore();
   });
 
   it.each([

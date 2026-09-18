@@ -6,3 +6,4 @@
 graphify-out
 extension
 !extension/package.json
+**/.env

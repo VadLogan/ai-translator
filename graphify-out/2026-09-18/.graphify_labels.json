@@ -1,5 +1,5 @@
 {
-  "0": "background.ts",
+  "0": "main",
   "1": "content.ts",
   "2": "scripts",
   "3": "CLAUDE.md",
@@ -19,5 +19,7 @@
   "17": "TranslatorWidget",
   "18": "app.ts",
   "19": "compilerOptions",
-  "20": "Selection Snapshot and isSelectionUnchanged Check"
+  "20": "Selection Snapshot and isSelectionUnchanged Check",
+  "21": "AI Translator API",
+  "24": "start-api.sh"
 }

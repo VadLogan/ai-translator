@@ -3,5 +3,6 @@ services:
     build:
       context: .
       dockerfile: api/Dockerfile
+    env_file: api/.env # OPENAI_API_KEY etc., read at runtime, not baked into the image
     ports:
       - "127.0.0.1:8787:8787" # matches the extension's default WXT_API_URL and host_permissions

@@ -1,5 +1,6 @@
 import type { TranslateBody, TranslateOk } from '../../shared/contract.ts';
 import OpenAI from "openai";
+import { randomUUID } from 'node:crypto';
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -11,7 +12,23 @@ const client = new OpenAI({
  * the key stays here, server-side.
  */
 export async function translate(translateBody: TranslateBody): Promise<TranslateOk> {
-  console.info(`[translateBody]: ${new Date().toISOString()}`, JSON.stringify(translateBody, null, 3));
+  // Same id on the request, response, and failure lines so they can be matched up.
+  const id = randomUUID().slice(0, 8);
+  const started = performance.now();
+  const elapsed = () => `${Math.round(performance.now() - started)}ms`;
+
+  console.info(`[translate ${id}] → ${new Date().toISOString()}`, JSON.stringify(translateBody, null, 2));
+  try {
+    const parsed = await callOpenAI(translateBody);
+    console.info(`[translate ${id}] ← ${elapsed()}`, JSON.stringify(parsed, null, 2));
+    return parsed;
+  } catch (error) {
+    console.error(`[translate ${id}] ✗ ${elapsed()}`, error);
+    throw error;
+  }
+}
+
+async function callOpenAI(translateBody: TranslateBody): Promise<TranslateOk> {
   const response = await client.responses.create({
     model: process.env.OPENAI_MODEL ?? "gpt-5.6-luna",
     instructions: AGENT_INSTRUCTION,
@@ -40,11 +57,7 @@ export async function translate(translateBody: TranslateBody): Promise<Translate
       },
     },
   })
-  const parsed: TranslateOk = JSON.parse(response.output_text) 
-
-  console.info(`[parsed] ${new Date().toISOString()}`, JSON.stringify(parsed, null, 3));
-
-  return parsed
+  return JSON.parse(response.output_text) as TranslateOk;
 }
 
 
