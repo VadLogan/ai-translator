@@ -1,5 +1,5 @@
 {
-  "0": "main",
+  "0": "storage-settings.ts",
   "1": "content.ts",
   "2": "scripts",
   "3": "CLAUDE.md",
@@ -17,9 +17,10 @@
   "15": "graphify reference: transcribe video and audio",
   "16": "extraction-spec.md",
   "17": "TranslatorWidget",
-  "18": "app.ts",
+  "18": "translate.ts",
   "19": "compilerOptions",
   "20": "Selection Snapshot and isSelectionUnchanged Check",
   "21": "AI Translator API",
+  "22": "app.ts",
   "24": "start-api.sh"
 }

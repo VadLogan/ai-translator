@@ -13,6 +13,7 @@ Root commands fan out to both workspaces (`npm test`, `npm run compile`, `npm ru
 - `npm run dev` (root): API + extension dev browser + playground together
 - `npm run dev:playground -w extension`: extension + `playground/` on http://127.0.0.1:5555 (opened via `webExt.startUrls` in `extension/wxt.config.ts`); the manual test environment
 - `npm run dev -w api`: API only on :8787, `node --watch` (Node 24 runs the TS directly — no build step, so keep API code erasable: no enums, no parameter properties)
+- `npm run migrate -w api`: applies pending `api/migrations/*.sql` to `DATABASE_URL` (from `api/.env`), each in a transaction, tracked in `schema_migrations`. New change = next numbered file; don't edit applied ones.
 - `./start-api.sh`: API only, in Docker, logs in the foreground; Ctrl+C stops and removes the container
 - `docker compose up --build`: API in a container on 127.0.0.1:8787 (same address as `npm run dev -w api`, so don't run both). Build context is the repo root; `api/Dockerfile` installs from the lockfile.
 - `npm run build`: production build into `extension/output/chrome-mv3`. Load it unpacked from `chrome://extensions`.
@@ -33,7 +34,13 @@ Extension layout:
 - `src/settings/` stores only `favoriteLanguages` in `chrome.storage`; the options page edits it.
 - `src/core/languages.ts` is the static language list.
 
-**API** (`api/`): `app.ts` is the Hono app (routes, CORS, in-memory rate limit, boundary validation); `translate.ts` is the swappable provider call plus the per-request log. `server.ts` only starts it, so tests hit `app.request()` with no port. Error bodies are `{error:{message, code}}` and `src/api.ts` surfaces the message; keep the codes in sync with `shared/contract.ts`.
+**API** (`api/`): `app.ts` is the Hono app (routes, CORS, in-memory rate limit, boundary validation); `translate.ts` is only the provider call (OpenAI): `TranslateBody` in, `TranslateOk` out, no logging or saving. The `POST /translate` handler in `app.ts` owns the request id, timing, `→ ← ✗` log lines, and saving via the repository. `server.ts` only starts it, so tests hit `app.request()` with no port. Error bodies are `{error:{message, code}}` and `src/api.ts` surfaces the message; keep the codes in sync with `shared/contract.ts`. `repositories/translations.ts` (`translationsRepository`, mapping app records to columns) saves every translation, failures included, to the Supabase Postgres table `translations` (created by the migrations in `api/migrations/`) when `DATABASE_URL` is set; a row's id starts with the request's log id. `db.ts` only holds the shared connection and `checkDb()`. New tables get their own repository file. The save is fire-and-forget and never fails a translation.
+
+API rules:
+- `server.ts` imports `dotenv/config` on its first line. ES imports run in order, and `translate.ts`/`db.ts` read `process.env` when they load. Don't move it into `app.ts`.
+- Secrets live in git-ignored `api/.env` (template: `api/.env.example`). Docker receives them at runtime through compose `env_file`; `.dockerignore` excludes `**/.env` so they never enter the image.
+- `app.test.ts` mocks `translate.ts`, `db.ts` and the repository, so API tests need no key, DB or network. Mock any new module that opens a connection when it loads.
+- `GET /health` returns 503 only when `DATABASE_URL` is set and `select 1` fails (5 s connect timeout); `db: "disabled"` is still 200.
 
 **Runtime flow**: The content script and the options page talk to the background worker only through the typed protocol in `src/messaging/messages.ts` (`translate`, `open-options`). Responses are `{ ok, data } | { ok: false, error }`, because `Error` objects don't survive messaging. When adding a message type, update both `Message` and `ResponseMap`. The API call must stay in the background worker: `host_permissions` exempt it from page CORS, and on HTTPS pages a content-script fetch to an `http://` API would be blocked as mixed content.
 

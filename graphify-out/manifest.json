@@ -6,9 +6,9 @@
     "semantic_hash": ""
   },
   "CLAUDE.md": {
-    "mtime": 1789721912.6732025,
-    "seen": 1789726641.4868648,
-    "ast_hash": "676d4e4e362bf023fef785a4e1511fa3",
+    "mtime": 1789733478.3967113,
+    "seen": 1789733479.7717938,
+    "ast_hash": "949d415caae6a3756559352a4e17d088",
     "semantic_hash": ""
   },
   ".claude/settings.json": {
@@ -78,33 +78,33 @@
     "semantic_hash": ""
   },
   "api/package.json": {
-    "mtime": 1789725504.8255894,
-    "seen": 1789726641.4868338,
-    "ast_hash": "04008b5609bf6ff834bc29caf3a839bd",
+    "mtime": 1789732030.9047377,
+    "seen": 1789732075.428333,
+    "ast_hash": "986a83911033a68c237c13b1aff147de",
     "semantic_hash": ""
   },
   "api/src/app.test.ts": {
-    "mtime": 1789726604.828909,
-    "seen": 1789726641.486835,
-    "ast_hash": "267cedb83d5d8a4a231cf2f1779ac471",
+    "mtime": 1789732641.8499975,
+    "seen": 1789732669.731626,
+    "ast_hash": "2765a7ac4639089a0db254d074a5a6c4",
     "semantic_hash": ""
   },
   "api/src/app.ts": {
-    "mtime": 1789728079.1716223,
-    "seen": 1789728097.9263868,
-    "ast_hash": "3161e91309f1f7ff7e149b84daa97b17",
+    "mtime": 1789732641.8355753,
+    "seen": 1789732669.731627,
+    "ast_hash": "a13c9a527261d57e9fcfbef0479d6e52",
     "semantic_hash": ""
   },
   "api/src/server.ts": {
-    "mtime": 1789667909.7386913,
-    "seen": 1789668127.837153,
-    "ast_hash": "9abc6b22bba634cca199b69571f41a9e",
+    "mtime": 1789729129.924937,
+    "seen": 1789729150.278498,
+    "ast_hash": "d20d403621376b35897aeb4b4576340d",
     "semantic_hash": ""
   },
   "api/src/translate.ts": {
-    "mtime": 1789728069.7216678,
-    "seen": 1789728097.926389,
-    "ast_hash": "428d0c349c5543135ed2fd4c8ef43dec",
+    "mtime": 1789732641.8243856,
+    "seen": 1789732669.731742,
+    "ast_hash": "1b68dd5349fe5ce15db2ffa0f4d51c7b",
     "semantic_hash": ""
   },
   "api/tsconfig.json": {
@@ -252,9 +252,9 @@
     "semantic_hash": ""
   },
   "api/README.md": {
-    "mtime": 1789726634.2549133,
-    "seen": 1789726641.486866,
-    "ast_hash": "9744f2ea8c7fd7829a15c2f882a9d24e",
+    "mtime": 1789732071.797996,
+    "seen": 1789732075.42899,
+    "ast_hash": "5577e0c739be7d23f9262f99d328fddb",
     "semantic_hash": ""
   },
   "docker-compose.yml": {
@@ -291,6 +291,30 @@
     "mtime": 1789718953.102038,
     "seen": 1789720797.492437,
     "ast_hash": "6dc4fa2ee6015ea50378f6456a706440",
+    "semantic_hash": ""
+  },
+  "api/src/db.ts": {
+    "mtime": 1789732306.4437962,
+    "seen": 1789732327.1662369,
+    "ast_hash": "e240eda0136a5ade3839ff70eefb2215",
+    "semantic_hash": ""
+  },
+  "api/src/migrate.ts": {
+    "mtime": 1789732030.8105772,
+    "seen": 1789732075.428393,
+    "ast_hash": "ebb27370326d3645c32c043008532cd5",
+    "semantic_hash": ""
+  },
+  "api/src/repositories/translations.test.ts": {
+    "mtime": 1789732306.4734225,
+    "seen": 1789732327.166254,
+    "ast_hash": "d3bf7a2a789e538c3bea65ccf57bd379",
+    "semantic_hash": ""
+  },
+  "api/src/repositories/translations.ts": {
+    "mtime": 1789732306.4622374,
+    "seen": 1789732327.166255,
+    "ast_hash": "b90a6073ba754d6dcbf39adf06b51f2e",
     "semantic_hash": ""
   }
 }

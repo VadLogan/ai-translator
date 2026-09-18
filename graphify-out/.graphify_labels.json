@@ -17,9 +17,10 @@
   "15": "graphify reference: transcribe video and audio",
   "16": "extraction-spec.md",
   "17": "TranslatorWidget",
-  "18": "app.ts",
+  "18": "background.ts",
   "19": "compilerOptions",
   "20": "Selection Snapshot and isSelectionUnchanged Check",
   "21": "AI Translator API",
+  "22": "app.ts",
   "24": "start-api.sh"
 }

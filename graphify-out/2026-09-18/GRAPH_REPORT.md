@@ -1,22 +1,22 @@
 # Graph Report - ai-translator-ext  (2026-09-18)
 
 ## Corpus Check
-- 41 files · ~18,060 words
+- 46 files · ~19,129 words
 - Verdict: corpus is large enough that graph structure adds value.
-- Unclassified: 6 file(s) not represented in the graph (top: (none) 4, .example 1, .css 1)
+- Unclassified: 8 file(s) not represented in the graph (top: (none) 6, .example 1, .css 1)
 
 ## Summary
-- 277 nodes · 370 edges · 23 communities (18 shown, 5 thin omitted)
-- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 12 edges (avg confidence: 0.82)
+- 296 nodes · 406 edges · 24 communities (19 shown, 5 thin omitted)
+- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 13 edges (avg confidence: 0.82)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `31744e9f`
+- Built from commit: `68545507`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- main
+- storage-settings.ts
 - content.ts
 - scripts
 - CLAUDE.md
@@ -34,10 +34,11 @@
 - graphify reference: transcribe video and audio
 - extraction-spec.md
 - TranslatorWidget
-- app.ts
+- translate.ts
 - compilerOptions
 - Selection Snapshot and isSelectionUnchanged Check
 - AI Translator API
+- app.ts
 - start-api.sh
 
 ## God Nodes (most connected - your core abstractions)
@@ -55,10 +56,10 @@
 ## Surprising Connections (you probably didn't know these)
 - `ResponseMap` --references--> `TranslateOk`  [EXTRACTED]
   extension/src/messaging/messages.ts → shared/contract.ts
-- `translate()` --calls--> `replaceSelection()`  [EXTRACTED]
-  extension/src/entrypoints/content.ts → extension/src/content/replace.ts
-- `translate()` --calls--> `isSelectionUnchanged()`  [EXTRACTED]
-  extension/src/entrypoints/content.ts → extension/src/content/selection.ts
+- `TranslationRecord` --references--> `TranslateBody`  [EXTRACTED]
+  api/src/repositories/translations.ts → shared/contract.ts
+- `TranslationRecord` --references--> `TranslateOk`  [EXTRACTED]
+  api/src/repositories/translations.ts → shared/contract.ts
 - `main()` --calls--> `TranslatorWidget`  [EXTRACTED]
   extension/src/entrypoints/content.ts → extension/src/content/ui/translator-widget.ts
 - `showLanguages()` --indirect_call--> `findLanguage()`  [INFERRED]
@@ -70,15 +71,15 @@
 ## Hyperedges (group relationships)
 - **Content Script Selection-to-Replacement Flow** — claude_selection_snapshot, claude_closed_shadow_root_widget, claude_requestid_stale_response_guard, claude_execcommand_insert_text_replacement [EXTRACTED 1.00]
 
-## Communities (23 total, 5 thin omitted)
+## Communities (24 total, 5 thin omitted)
 
-### Community 0 - "main"
-Cohesion: 0.43
-Nodes (6): findLanguage(), main(), close(), showLanguages(), translate(), sendMessage()
+### Community 0 - "storage-settings.ts"
+Cohesion: 0.24
+Nodes (6): LANGUAGES, DEFAULT_SETTINGS, Settings, settingsItem, storageSettings, ref_wxt_utils_storage
 
 ### Community 1 - "content.ts"
-Cohesion: 0.11
-Nodes (25): dispatchInput(), replaceInContentEditable(), replaceInTextControl(), replaceSelection(), tryInsertText(), tryPaste(), deepActiveElement(), EditableSelection (+17 more)
+Cohesion: 0.12
+Nodes (27): dispatchInput(), replaceInContentEditable(), replaceInTextControl(), replaceSelection(), tryInsertText(), tryPaste(), deepActiveElement(), EditableSelection (+19 more)
 
 ### Community 2 - "scripts"
 Cohesion: 0.15
@@ -98,7 +99,7 @@ Nodes (24): For /graphify add and --watch, For /graphify query, For the commit h
 
 ### Community 6 - "api/package.json"
 Cohesion: 0.08
-Nodes (24): dependencies, dotenv, hono, @hono/node-server, openai, devDependencies, @types/node, typescript (+16 more)
+Nodes (25): dependencies, dotenv, hono, @hono/node-server, openai, postgres, devDependencies, @types/node (+17 more)
 
 ### Community 7 - "extension/tsconfig.json"
 Cohesion: 0.33
@@ -125,12 +126,12 @@ Cohesion: 0.50
 Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphify reference: incremental update and cluster-only
 
 ### Community 17 - "TranslatorWidget"
-Cohesion: 0.15
-Nodes (7): Anchor, WIDGET_CSS, clamp(), TranslatorWidget, WidgetCallbacks, Language, ref_assets_translate_icon_svg_raw
+Cohesion: 0.19
+Nodes (4): Anchor, clamp(), TranslatorWidget, WidgetCallbacks
 
-### Community 18 - "app.ts"
-Cohesion: 0.09
-Nodes (22): app, hits, port, client, createInput(), translate(), translate(), handle() (+14 more)
+### Community 18 - "translate.ts"
+Cohesion: 0.11
+Nodes (22): request, toRow(), TranslationRecord, translationsRepository, callOpenAI(), client, createInput(), translate() (+14 more)
 
 ### Community 19 - "compilerOptions"
 Cohesion: 0.14
@@ -141,28 +142,32 @@ Cohesion: 0.40
 Nodes (5): CDP DOM.getDocument pierce for Closed Shadow Root Automation, Closed Shadow Root Translator Widget, execCommand insertText Replacement Strategy, requestId Stale Response Guard, Selection Snapshot and isSelectionUnchanged Check
 
 ### Community 21 - "AI Translator API"
-Cohesion: 0.33
-Nodes (5): AI Translator API, Configuration, Errors, `GET /health`, `POST /translate`
+Cohesion: 0.29
+Nodes (6): AI Translator API, Configuration, Errors, `GET /health`, Migrations, `POST /translate`
+
+### Community 22 - "app.ts"
+Cohesion: 0.11
+Nodes (14): app, hits, checkDb(), sql, dir, sql, port, ref_dotenv_config (+6 more)
 
 ## Knowledge Gaps
-- **124 isolated node(s):** `name`, `private`, `version`, `type`, `dev` (+119 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 157 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **130 isolated node(s):** `name`, `private`, `version`, `type`, `dev` (+125 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 164 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **5 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `TranslatorWidget` connect `TranslatorWidget` to `main`, `content.ts`?**
-  _High betweenness centrality (0.051) - this node is a cross-community bridge._
-- **Why does `openai` connect `api/package.json` to `app.ts`?**
-  _High betweenness centrality (0.034) - this node is a cross-community bridge._
-- **Why does `hono` connect `api/package.json` to `app.ts`?**
-  _High betweenness centrality (0.029) - this node is a cross-community bridge._
+- **Why does `TranslatorWidget` connect `TranslatorWidget` to `content.ts`?**
+  _High betweenness centrality (0.052) - this node is a cross-community bridge._
+- **Why does `openai` connect `translate.ts` to `api/package.json`?**
+  _High betweenness centrality (0.035) - this node is a cross-community bridge._
 - **What connects `name`, `private`, `version` to the rest of the system?**
-  _124 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _130 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `content.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.10793650793650794 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.11861861861861862 - nodes in this community are weakly interconnected._
 - **Should `extension/package.json` be split into smaller, more focused modules?**
   _Cohesion score 0.07407407407407407 - nodes in this community are weakly interconnected._
 - **Should `What You Must Do When Invoked` be split into smaller, more focused modules?**
   _Cohesion score 0.08 - nodes in this community are weakly interconnected._
+- **Should `api/package.json` be split into smaller, more focused modules?**
+  _Cohesion score 0.07692307692307693 - nodes in this community are weakly interconnected._

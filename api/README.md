@@ -6,11 +6,13 @@ Run it with `./start-api.sh` from the repo root (Docker) or `npm run dev -w api`
 
 ## `GET /health`
 
-Liveness check.
+Checks the API and its database connection.
 
-```json
-{ "ok": true }
-```
+| Status | Body                              | When                                  |
+|--------|-----------------------------------|---------------------------------------|
+| 200    | `{ "ok": true, "db": "ok" }`       | Database reachable                    |
+| 200    | `{ "ok": true, "db": "disabled" }` | `DATABASE_URL` not set                |
+| 503    | `{ "ok": false, "db": "down" }`    | Database unreachable (5 s connect timeout) |
 
 ## `POST /translate`
 
@@ -53,6 +55,17 @@ Every error has the same shape:
 | 429    | `rate-limited`    | More than 60 requests per minute from one IP |
 | 502    | `provider-failed` | The translation provider threw               |
 
+## Migrations
+
+SQL files in [`migrations/`](migrations/) run in name order, once each, each in its own transaction. Applied names are recorded in `schema_migrations`. Add a change as the next numbered file (`002_….sql`); never edit one that has already been applied.
+
+```bash
+npm run migrate -w api                                    # from the host, uses api/.env
+docker compose run --rm api node api/src/migrate.ts       # or inside the API image
+```
+
+A failing migration rolls back and the command exits non-zero; later files are not run.
+
 ## Configuration
 
 Put these in `api/.env` (git-ignored; start from [`.env.example`](.env.example)). `npm run dev -w api` loads it with dotenv, and `docker compose` / `./start-api.sh` pass it to the container at runtime.
@@ -60,6 +73,7 @@ Put these in `api/.env` (git-ignored; start from [`.env.example`](.env.example))
 | Env var           | Default | Meaning                                                                 |
 |-------------------|---------|-------------------------------------------------------------------------|
 | `OPENAI_API_KEY`  | —       | Required. The API fails to start without it                             |
+| `DATABASE_URL`    | unset   | Postgres (Supabase session-pooler) URL. Every translation, including failures, is saved to the `translations` table (create it with `npm run migrate -w api`). Unset = nothing is saved |
 | `OPENAI_MODEL`    | `gpt-5.6-luna` | Model used for translation                                       |
 | `PORT`            | `8787`  | Listen port                                                             |
 | `ALLOWED_ORIGINS` | unset   | Comma-separated CORS allowlist, e.g. `chrome-extension://<id>`. Unset allows any origin (dev only). |

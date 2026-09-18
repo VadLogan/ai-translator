@@ -21,6 +21,19 @@
   },
   "nodes": [
     {
+      "id": "extension_src_settings_settings_settings",
+      "label": "Settings",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "storage-settings.ts",
+      "file_type": "code",
+      "norm_label": "settings",
+      "source_file": "extension/src/settings/settings.ts",
+      "source_location": "L1"
+    },
+    {
       "id": "extension_src_content_selection_editableselection",
       "label": "EditableSelection",
       "_callable": true,
@@ -34,16 +47,16 @@
       "source_location": "L1"
     },
     {
-      "id": "extension_src_settings_settings_settings",
-      "label": "Settings",
+      "id": "extension_src_core_languages_language",
+      "label": "Language",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
       "community": 1,
       "community_name": "content.ts",
       "file_type": "code",
-      "norm_label": "settings",
-      "source_file": "extension/src/settings/settings.ts",
+      "norm_label": "language",
+      "source_file": "extension/src/core/languages.ts",
       "source_location": "L1"
     },
     {
@@ -86,17 +99,17 @@
       "source_location": "L6"
     },
     {
-      "id": "extension_src_core_languages_language",
-      "label": "Language",
+      "id": "api_src_repositories_translations_translationrecord",
+      "label": "TranslationRecord",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 17,
-      "community_name": "TranslatorWidget",
+      "community": 18,
+      "community_name": "translate.ts",
       "file_type": "code",
-      "norm_label": "language",
-      "source_file": "extension/src/core/languages.ts",
-      "source_location": "L1"
+      "norm_label": "translationrecord",
+      "source_file": "api/src/repositories/translations.ts",
+      "source_location": "L5"
     },
     {
       "id": "extension_src_messaging_messages_message",
@@ -105,7 +118,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "file_type": "code",
       "norm_label": "message",
       "source_file": "extension/src/messaging/messages.ts",
@@ -118,7 +131,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "file_type": "code",
       "norm_label": "response",
       "source_file": "extension/src/messaging/messages.ts",
@@ -131,24 +144,11 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "file_type": "code",
       "norm_label": "responsemap",
       "source_file": "extension/src/messaging/messages.ts",
       "source_location": "L6"
-    },
-    {
-      "id": "shared_contract_apierrorcode",
-      "label": "ApiErrorCode",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 18,
-      "community_name": "app.ts",
-      "file_type": "code",
-      "norm_label": "apierrorcode",
-      "source_file": "shared/contract.ts",
-      "source_location": "L16"
     },
     {
       "id": "shared_contract_translatebody",
@@ -157,7 +157,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "file_type": "code",
       "norm_label": "translatebody",
       "source_file": "shared/contract.ts",
@@ -170,7 +170,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "file_type": "code",
       "norm_label": "translateerr",
       "source_file": "shared/contract.ts",
@@ -183,107 +183,48 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "file_type": "code",
       "norm_label": "translateok",
       "source_file": "shared/contract.ts",
       "source_location": "L11"
     },
     {
-      "id": "extension_src_content_ui_translator_widget_translatorwidget_destroy",
-      "label": ".destroy()",
+      "id": "shared_contract_apierrorcode",
+      "label": "ApiErrorCode",
       "_callable": true,
+      "_callable_class": true,
       "_origin": "ast",
-      "community": 0,
-      "community_name": "main",
+      "community": 22,
+      "community_name": "app.ts",
       "file_type": "code",
-      "norm_label": ".destroy()",
-      "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L66"
+      "norm_label": "apierrorcode",
+      "source_file": "shared/contract.ts",
+      "source_location": "L16"
     },
     {
-      "id": "extension_src_content_ui_translator_widget_translatorwidget_owns",
-      "label": ".owns()",
+      "id": "extension_src_entrypoints_options_main_init",
+      "label": "init()",
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "main",
+      "community_name": "storage-settings.ts",
       "file_type": "code",
-      "norm_label": ".owns()",
-      "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L78"
+      "norm_label": "init()",
+      "source_file": "extension/src/entrypoints/options/main.ts",
+      "source_location": "L13"
     },
     {
-      "id": "extension_src_core_languages_findlanguage",
-      "label": "findLanguage()",
+      "id": "extension_src_entrypoints_options_main_setstatus",
+      "label": "setStatus()",
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "main",
+      "community_name": "storage-settings.ts",
       "file_type": "code",
-      "norm_label": "findlanguage()",
-      "source_file": "extension/src/core/languages.ts",
-      "source_location": "L40"
-    },
-    {
-      "id": "extension_src_entrypoints_content_main",
-      "label": "main()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "main",
-      "file_type": "code",
-      "norm_label": "main()",
-      "source_file": "extension/src/entrypoints/content.ts",
-      "source_location": "L19"
-    },
-    {
-      "id": "extension_src_entrypoints_content_main_close",
-      "label": "close()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "main",
-      "file_type": "code",
-      "norm_label": "close()",
-      "source_file": "extension/src/entrypoints/content.ts",
-      "source_location": "L35"
-    },
-    {
-      "id": "extension_src_entrypoints_content_main_showlanguages",
-      "label": "showLanguages()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "main",
-      "file_type": "code",
-      "norm_label": "showlanguages()",
-      "source_file": "extension/src/entrypoints/content.ts",
-      "source_location": "L55"
-    },
-    {
-      "id": "extension_src_entrypoints_content_main_translate",
-      "label": "translate()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "main",
-      "file_type": "code",
-      "norm_label": "translate()",
-      "source_file": "extension/src/entrypoints/content.ts",
-      "source_location": "L65"
-    },
-    {
-      "id": "extension_src_messaging_messages_sendmessage",
-      "label": "sendMessage()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 0,
-      "community_name": "main",
-      "file_type": "code",
-      "norm_label": "sendmessage()",
-      "source_file": "extension/src/messaging/messages.ts",
-      "source_location": "L18"
+      "norm_label": "setstatus()",
+      "source_file": "extension/src/entrypoints/options/main.ts",
+      "source_location": "L8"
     },
     {
       "id": "extension_src_content_replace_dispatchinput",
@@ -454,6 +395,66 @@
       "source_location": "L106"
     },
     {
+      "id": "extension_src_content_ui_translator_widget_translatorwidget_destroy",
+      "label": ".destroy()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "content.ts",
+      "file_type": "code",
+      "norm_label": ".destroy()",
+      "source_file": "extension/src/content/ui/translator-widget.ts",
+      "source_location": "L66"
+    },
+    {
+      "id": "extension_src_content_ui_translator_widget_translatorwidget_owns",
+      "label": ".owns()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "content.ts",
+      "file_type": "code",
+      "norm_label": ".owns()",
+      "source_file": "extension/src/content/ui/translator-widget.ts",
+      "source_location": "L78"
+    },
+    {
+      "id": "extension_src_core_languages_findlanguage",
+      "label": "findLanguage()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "content.ts",
+      "file_type": "code",
+      "norm_label": "findlanguage()",
+      "source_file": "extension/src/core/languages.ts",
+      "source_location": "L40"
+    },
+    {
+      "id": "extension_src_entrypoints_content_main",
+      "label": "main()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "content.ts",
+      "file_type": "code",
+      "norm_label": "main()",
+      "source_file": "extension/src/entrypoints/content.ts",
+      "source_location": "L19"
+    },
+    {
+      "id": "extension_src_entrypoints_content_main_close",
+      "label": "close()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "content.ts",
+      "file_type": "code",
+      "norm_label": "close()",
+      "source_file": "extension/src/entrypoints/content.ts",
+      "source_location": "L35"
+    },
+    {
       "id": "extension_src_entrypoints_content_main_refresh",
       "label": "refresh()",
       "_callable": true,
@@ -466,28 +467,40 @@
       "source_location": "L41"
     },
     {
-      "id": "extension_src_entrypoints_options_main_init",
-      "label": "init()",
+      "id": "extension_src_entrypoints_content_main_showlanguages",
+      "label": "showLanguages()",
       "_callable": true,
       "_origin": "ast",
       "community": 1,
       "community_name": "content.ts",
       "file_type": "code",
-      "norm_label": "init()",
-      "source_file": "extension/src/entrypoints/options/main.ts",
-      "source_location": "L13"
+      "norm_label": "showlanguages()",
+      "source_file": "extension/src/entrypoints/content.ts",
+      "source_location": "L55"
     },
     {
-      "id": "extension_src_entrypoints_options_main_setstatus",
-      "label": "setStatus()",
+      "id": "extension_src_entrypoints_content_main_translate",
+      "label": "translate()",
       "_callable": true,
       "_origin": "ast",
       "community": 1,
       "community_name": "content.ts",
       "file_type": "code",
-      "norm_label": "setstatus()",
-      "source_file": "extension/src/entrypoints/options/main.ts",
-      "source_location": "L8"
+      "norm_label": "translate()",
+      "source_file": "extension/src/entrypoints/content.ts",
+      "source_location": "L65"
+    },
+    {
+      "id": "extension_src_messaging_messages_sendmessage",
+      "label": "sendMessage()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "content.ts",
+      "file_type": "code",
+      "norm_label": "sendmessage()",
+      "source_file": "extension/src/messaging/messages.ts",
+      "source_location": "L18"
     },
     {
       "id": "extension_src_content_ui_translator_widget_clamp",
@@ -718,52 +731,28 @@
       "source_location": "L9"
     },
     {
-      "id": "api_src_app_fail",
-      "label": "fail()",
+      "id": "api_src_repositories_translations_torow",
+      "label": "toRow()",
       "_callable": true,
       "_origin": "ast",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "file_type": "code",
-      "norm_label": "fail()",
-      "source_file": "api/src/app.ts",
-      "source_location": "L64"
+      "norm_label": "torow()",
+      "source_file": "api/src/repositories/translations.ts",
+      "source_location": "L13"
     },
     {
-      "id": "api_src_app_isratelimited",
-      "label": "isRateLimited()",
+      "id": "api_src_translate_callopenai",
+      "label": "callOpenAI()",
       "_callable": true,
       "_origin": "ast",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "file_type": "code",
-      "norm_label": "isratelimited()",
-      "source_file": "api/src/app.ts",
-      "source_location": "L11"
-    },
-    {
-      "id": "api_src_app_parsebody",
-      "label": "parseBody()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 18,
-      "community_name": "app.ts",
-      "file_type": "code",
-      "norm_label": "parsebody()",
-      "source_file": "api/src/app.ts",
-      "source_location": "L21"
-    },
-    {
-      "id": "api_src_app_test_post",
-      "label": "post()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 18,
-      "community_name": "app.ts",
-      "file_type": "code",
-      "norm_label": "post()",
-      "source_file": "api/src/app.test.ts",
-      "source_location": "L9"
+      "norm_label": "callopenai()",
+      "source_file": "api/src/translate.ts",
+      "source_location": "L41"
     },
     {
       "id": "api_src_translate_createinput",
@@ -771,11 +760,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "file_type": "code",
       "norm_label": "createinput()",
       "source_file": "api/src/translate.ts",
-      "source_location": "L74"
+      "source_location": "L97"
     },
     {
       "id": "api_src_translate_translate",
@@ -783,11 +772,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "file_type": "code",
       "norm_label": "translate()",
       "source_file": "api/src/translate.ts",
-      "source_location": "L13"
+      "source_location": "L15"
     },
     {
       "id": "extension_src_api_test_reply",
@@ -795,7 +784,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "file_type": "code",
       "norm_label": "reply()",
       "source_file": "extension/src/api.test.ts",
@@ -807,7 +796,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "file_type": "code",
       "norm_label": "translate()",
       "source_file": "extension/src/api.ts",
@@ -819,7 +808,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "file_type": "code",
       "norm_label": "handle()",
       "source_file": "extension/src/entrypoints/background.ts",
@@ -831,7 +820,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "file_type": "code",
       "norm_label": "reloadplaygroundwhenready()",
       "source_file": "extension/src/entrypoints/background.ts",
@@ -843,11 +832,148 @@
       "_callable": true,
       "_origin": "ast",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "file_type": "code",
       "norm_label": "ismessage()",
       "source_file": "extension/src/messaging/messages.ts",
       "source_location": "L14"
+    },
+    {
+      "id": "api_src_app_fail",
+      "label": "fail()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "fail()",
+      "source_file": "api/src/app.ts",
+      "source_location": "L67"
+    },
+    {
+      "id": "api_src_app_isratelimited",
+      "label": "isRateLimited()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "isratelimited()",
+      "source_file": "api/src/app.ts",
+      "source_location": "L11"
+    },
+    {
+      "id": "api_src_app_parsebody",
+      "label": "parseBody()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "parsebody()",
+      "source_file": "api/src/app.ts",
+      "source_location": "L21"
+    },
+    {
+      "id": "api_src_app_test_post",
+      "label": "post()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "post()",
+      "source_file": "api/src/app.test.ts",
+      "source_location": "L11"
+    },
+    {
+      "id": "api_src_db_checkdb",
+      "label": "checkDb()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "checkdb()",
+      "source_file": "api/src/db.ts",
+      "source_location": "L7"
+    },
+    {
+      "id": "extension_src_core_languages_languages",
+      "label": "LANGUAGES",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "storage-settings.ts",
+      "file_type": "code",
+      "norm_label": "languages",
+      "source_file": "extension/src/core/languages.ts",
+      "source_location": "L6"
+    },
+    {
+      "id": "extension_src_entrypoints_options_main",
+      "label": "main.ts",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "storage-settings.ts",
+      "file_type": "code",
+      "norm_label": "main.ts",
+      "source_file": "extension/src/entrypoints/options/main.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_settings_settings",
+      "label": "settings.ts",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "storage-settings.ts",
+      "file_type": "code",
+      "norm_label": "settings.ts",
+      "source_file": "extension/src/settings/settings.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_settings_settings_default_settings",
+      "label": "DEFAULT_SETTINGS",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "storage-settings.ts",
+      "file_type": "code",
+      "norm_label": "default_settings",
+      "source_file": "extension/src/settings/settings.ts",
+      "source_location": "L6"
+    },
+    {
+      "id": "extension_src_settings_storage_settings",
+      "label": "storage-settings.ts",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "storage-settings.ts",
+      "file_type": "code",
+      "norm_label": "storage-settings.ts",
+      "source_file": "extension/src/settings/storage-settings.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_settings_storage_settings_settingsitem",
+      "label": "settingsItem",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "storage-settings.ts",
+      "file_type": "code",
+      "norm_label": "settingsitem",
+      "source_file": "extension/src/settings/storage-settings.ts",
+      "source_location": "L4"
+    },
+    {
+      "id": "extension_src_settings_storage_settings_storagesettings",
+      "label": "storageSettings",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "storage-settings.ts",
+      "file_type": "code",
+      "norm_label": "storagesettings",
+      "source_file": "extension/src/settings/storage-settings.ts",
+      "source_location": "L8"
     },
     {
       "id": "extension_src_content_replace",
@@ -905,6 +1031,39 @@
       "source_location": "L1"
     },
     {
+      "id": "extension_src_content_ui_styles",
+      "label": "styles.ts",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "content.ts",
+      "file_type": "code",
+      "norm_label": "styles.ts",
+      "source_file": "extension/src/content/ui/styles.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_content_ui_styles_widget_css",
+      "label": "WIDGET_CSS",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "content.ts",
+      "file_type": "code",
+      "norm_label": "widget_css",
+      "source_file": "extension/src/content/ui/styles.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_content_ui_translator_widget",
+      "label": "translator-widget.ts",
+      "_origin": "ast",
+      "community": 1,
+      "community_name": "content.ts",
+      "file_type": "code",
+      "norm_label": "translator-widget.ts",
+      "source_file": "extension/src/content/ui/translator-widget.ts",
+      "source_location": "L1"
+    },
+    {
       "id": "extension_src_core_languages",
       "label": "languages.ts",
       "_origin": "ast",
@@ -916,17 +1075,6 @@
       "source_location": "L1"
     },
     {
-      "id": "extension_src_core_languages_languages",
-      "label": "LANGUAGES",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "languages",
-      "source_file": "extension/src/core/languages.ts",
-      "source_location": "L6"
-    },
-    {
       "id": "extension_src_entrypoints_content",
       "label": "content.ts",
       "_origin": "ast",
@@ -936,72 +1084,6 @@
       "norm_label": "content.ts",
       "source_file": "extension/src/entrypoints/content.ts",
       "source_location": "L1"
-    },
-    {
-      "id": "extension_src_entrypoints_options_main",
-      "label": "main.ts",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "main.ts",
-      "source_file": "extension/src/entrypoints/options/main.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_settings_settings",
-      "label": "settings.ts",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "settings.ts",
-      "source_file": "extension/src/settings/settings.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_settings_settings_default_settings",
-      "label": "DEFAULT_SETTINGS",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "default_settings",
-      "source_file": "extension/src/settings/settings.ts",
-      "source_location": "L6"
-    },
-    {
-      "id": "extension_src_settings_storage_settings",
-      "label": "storage-settings.ts",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "storage-settings.ts",
-      "source_file": "extension/src/settings/storage-settings.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_settings_storage_settings_settingsitem",
-      "label": "settingsItem",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "settingsitem",
-      "source_file": "extension/src/settings/storage-settings.ts",
-      "source_location": "L4"
-    },
-    {
-      "id": "extension_src_settings_storage_settings_storagesettings",
-      "label": "storageSettings",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "storagesettings",
-      "source_file": "extension/src/settings/storage-settings.ts",
-      "source_location": "L8"
     },
     {
       "id": "claude_skills_graphify_references_query",
@@ -1316,110 +1398,55 @@
       "source_location": "L1"
     },
     {
-      "id": "extension_src_content_ui_styles",
-      "label": "styles.ts",
+      "id": "api_src_repositories_translations",
+      "label": "translations.ts",
       "_origin": "ast",
-      "community": 17,
-      "community_name": "TranslatorWidget",
+      "community": 18,
+      "community_name": "translate.ts",
       "file_type": "code",
-      "norm_label": "styles.ts",
-      "source_file": "extension/src/content/ui/styles.ts",
+      "norm_label": "translations.ts",
+      "source_file": "api/src/repositories/translations.ts",
       "source_location": "L1"
     },
     {
-      "id": "extension_src_content_ui_styles_widget_css",
-      "label": "WIDGET_CSS",
+      "id": "api_src_repositories_translations_test",
+      "label": "translations.test.ts",
       "_origin": "ast",
-      "community": 17,
-      "community_name": "TranslatorWidget",
+      "community": 18,
+      "community_name": "translate.ts",
       "file_type": "code",
-      "norm_label": "widget_css",
-      "source_file": "extension/src/content/ui/styles.ts",
+      "norm_label": "translations.test.ts",
+      "source_file": "api/src/repositories/translations.test.ts",
       "source_location": "L1"
     },
     {
-      "id": "extension_src_content_ui_translator_widget",
-      "label": "translator-widget.ts",
-      "_origin": "ast",
-      "community": 17,
-      "community_name": "TranslatorWidget",
-      "file_type": "code",
-      "norm_label": "translator-widget.ts",
-      "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "api_src_app",
-      "label": "app.ts",
+      "id": "api_src_repositories_translations_test_request",
+      "label": "request",
       "_origin": "ast",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "file_type": "code",
-      "norm_label": "app.ts",
-      "source_file": "api/src/app.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "api_src_app_app",
-      "label": "app",
-      "_origin": "ast",
-      "community": 18,
-      "community_name": "app.ts",
-      "file_type": "code",
-      "norm_label": "app",
-      "source_file": "api/src/app.ts",
-      "source_location": "L30"
-    },
-    {
-      "id": "api_src_app_hits",
-      "label": "hits",
-      "_origin": "ast",
-      "community": 18,
-      "community_name": "app.ts",
-      "file_type": "code",
-      "norm_label": "hits",
-      "source_file": "api/src/app.ts",
-      "source_location": "L9"
-    },
-    {
-      "id": "api_src_app_test",
-      "label": "app.test.ts",
-      "_origin": "ast",
-      "community": 18,
-      "community_name": "app.ts",
-      "file_type": "code",
-      "norm_label": "app.test.ts",
-      "source_file": "api/src/app.test.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "api_src_server",
-      "label": "server.ts",
-      "_origin": "ast",
-      "community": 18,
-      "community_name": "app.ts",
-      "file_type": "code",
-      "norm_label": "server.ts",
-      "source_file": "api/src/server.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "api_src_server_port",
-      "label": "port",
-      "_origin": "ast",
-      "community": 18,
-      "community_name": "app.ts",
-      "file_type": "code",
-      "norm_label": "port",
-      "source_file": "api/src/server.ts",
+      "norm_label": "request",
+      "source_file": "api/src/repositories/translations.test.ts",
       "source_location": "L4"
+    },
+    {
+      "id": "api_src_repositories_translations_translationsrepository",
+      "label": "translationsRepository",
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "translate.ts",
+      "file_type": "code",
+      "norm_label": "translationsrepository",
+      "source_file": "api/src/repositories/translations.ts",
+      "source_location": "L26"
     },
     {
       "id": "api_src_translate",
       "label": "translate.ts",
       "_origin": "ast",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "file_type": "code",
       "norm_label": "translate.ts",
       "source_file": "api/src/translate.ts",
@@ -1430,18 +1457,18 @@
       "label": "client",
       "_origin": "ast",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "file_type": "code",
       "norm_label": "client",
       "source_file": "api/src/translate.ts",
-      "source_location": "L4"
+      "source_location": "L6"
     },
     {
       "id": "extension_src_api",
       "label": "api.ts",
       "_origin": "ast",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "file_type": "code",
       "norm_label": "api.ts",
       "source_file": "extension/src/api.ts",
@@ -1452,7 +1479,7 @@
       "label": "api.test.ts",
       "_origin": "ast",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "file_type": "code",
       "norm_label": "api.test.ts",
       "source_file": "extension/src/api.test.ts",
@@ -1463,7 +1490,7 @@
       "label": "background.ts",
       "_origin": "ast",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "file_type": "code",
       "norm_label": "background.ts",
       "source_file": "extension/src/entrypoints/background.ts",
@@ -1474,7 +1501,7 @@
       "label": "messages.ts",
       "_origin": "ast",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "file_type": "code",
       "norm_label": "messages.ts",
       "source_file": "extension/src/messaging/messages.ts",
@@ -1485,33 +1512,22 @@
       "label": "contract.ts",
       "_origin": "ast",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "file_type": "code",
       "norm_label": "contract.ts",
       "source_file": "shared/contract.ts",
       "source_location": "L1"
     },
     {
-      "id": "shared_contract_max_text_length",
-      "label": "MAX_TEXT_LENGTH",
+      "id": "ref_openai",
+      "label": "openai",
       "_origin": "ast",
       "community": 18,
-      "community_name": "app.ts",
-      "file_type": "code",
-      "norm_label": "max_text_length",
-      "source_file": "shared/contract.ts",
-      "source_location": "L22"
-    },
-    {
-      "id": "ref_hono_node_server",
-      "label": "@hono/node-server",
-      "_origin": "ast",
-      "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "file_type": "concept",
-      "norm_label": "@hono/node-server",
+      "norm_label": "openai",
       "source_file": "api/package.json",
-      "source_location": "L13"
+      "source_location": "L17"
     },
     {
       "id": "api_tsconfig",
@@ -1844,7 +1860,7 @@
       "node_kind": "heading",
       "norm_label": "configuration",
       "source_file": "api/README.md",
-      "source_location": "L56"
+      "source_location": "L69"
     },
     {
       "id": "api_readme_errors",
@@ -1856,7 +1872,7 @@
       "node_kind": "heading",
       "norm_label": "errors",
       "source_file": "api/README.md",
-      "source_location": "L41"
+      "source_location": "L43"
     },
     {
       "id": "api_readme_get_health",
@@ -1871,6 +1887,18 @@
       "source_location": "L7"
     },
     {
+      "id": "api_readme_migrations",
+      "label": "Migrations",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "AI Translator API",
+      "file_type": "document",
+      "node_kind": "heading",
+      "norm_label": "migrations",
+      "source_file": "api/README.md",
+      "source_location": "L58"
+    },
+    {
       "id": "api_readme_post_translate",
       "label": "`POST /translate`",
       "_origin": "ast",
@@ -1880,7 +1908,161 @@
       "node_kind": "heading",
       "norm_label": "`post /translate`",
       "source_file": "api/README.md",
-      "source_location": "L15"
+      "source_location": "L17"
+    },
+    {
+      "id": "api_src_app",
+      "label": "app.ts",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "app.ts",
+      "source_file": "api/src/app.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "api_src_app_app",
+      "label": "app",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "app",
+      "source_file": "api/src/app.ts",
+      "source_location": "L30"
+    },
+    {
+      "id": "api_src_app_hits",
+      "label": "hits",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "hits",
+      "source_file": "api/src/app.ts",
+      "source_location": "L9"
+    },
+    {
+      "id": "api_src_app_test",
+      "label": "app.test.ts",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "app.test.ts",
+      "source_file": "api/src/app.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "api_src_db",
+      "label": "db.ts",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "db.ts",
+      "source_file": "api/src/db.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "api_src_db_sql",
+      "label": "sql",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "sql",
+      "source_file": "api/src/db.ts",
+      "source_location": "L4"
+    },
+    {
+      "id": "api_src_migrate",
+      "label": "migrate.ts",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "migrate.ts",
+      "source_file": "api/src/migrate.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "api_src_migrate_dir",
+      "label": "dir",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "dir",
+      "source_file": "api/src/migrate.ts",
+      "source_location": "L13"
+    },
+    {
+      "id": "api_src_migrate_sql",
+      "label": "sql",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "sql",
+      "source_file": "api/src/migrate.ts",
+      "source_location": "L14"
+    },
+    {
+      "id": "api_src_server",
+      "label": "server.ts",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "server.ts",
+      "source_file": "api/src/server.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "api_src_server_port",
+      "label": "port",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "port",
+      "source_file": "api/src/server.ts",
+      "source_location": "L5"
+    },
+    {
+      "id": "shared_contract_max_text_length",
+      "label": "MAX_TEXT_LENGTH",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "max_text_length",
+      "source_file": "shared/contract.ts",
+      "source_location": "L22"
+    },
+    {
+      "id": "ref_hono_node_server",
+      "label": "@hono/node-server",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "app.ts",
+      "file_type": "concept",
+      "norm_label": "@hono/node-server",
+      "source_file": "api/package.json",
+      "source_location": "L14"
+    },
+    {
+      "id": "ref_postgres",
+      "label": "postgres",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "app.ts",
+      "file_type": "concept",
+      "norm_label": "postgres",
+      "source_file": "api/package.json",
+      "source_location": "L18"
     },
     {
       "id": "start_api",
@@ -2557,7 +2739,7 @@
       "file_type": "code",
       "norm_label": "dependencies",
       "source_file": "api/package.json",
-      "source_location": "L12"
+      "source_location": "L13"
     },
     {
       "id": "api_package_dependencies_dotenv",
@@ -2568,7 +2750,7 @@
       "file_type": "code",
       "norm_label": "dotenv",
       "source_file": "api/package.json",
-      "source_location": "L14"
+      "source_location": "L15"
     },
     {
       "id": "api_package_dependencies_hono",
@@ -2579,7 +2761,7 @@
       "file_type": "code",
       "norm_label": "hono",
       "source_file": "api/package.json",
-      "source_location": "L15"
+      "source_location": "L16"
     },
     {
       "id": "api_package_dependencies_hono_node_server",
@@ -2590,7 +2772,7 @@
       "file_type": "code",
       "norm_label": "@hono/node-server",
       "source_file": "api/package.json",
-      "source_location": "L13"
+      "source_location": "L14"
     },
     {
       "id": "api_package_dependencies_openai",
@@ -2601,7 +2783,18 @@
       "file_type": "code",
       "norm_label": "openai",
       "source_file": "api/package.json",
-      "source_location": "L16"
+      "source_location": "L17"
+    },
+    {
+      "id": "api_package_dependencies_postgres",
+      "label": "postgres",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "api/package.json",
+      "file_type": "code",
+      "norm_label": "postgres",
+      "source_file": "api/package.json",
+      "source_location": "L18"
     },
     {
       "id": "api_package_devdependencies",
@@ -2612,7 +2805,7 @@
       "file_type": "code",
       "norm_label": "devdependencies",
       "source_file": "api/package.json",
-      "source_location": "L18"
+      "source_location": "L20"
     },
     {
       "id": "api_package_devdependencies_types_node",
@@ -2623,7 +2816,7 @@
       "file_type": "code",
       "norm_label": "@types/node",
       "source_file": "api/package.json",
-      "source_location": "L19"
+      "source_location": "L21"
     },
     {
       "id": "api_package_devdependencies_typescript",
@@ -2634,7 +2827,7 @@
       "file_type": "code",
       "norm_label": "typescript",
       "source_file": "api/package.json",
-      "source_location": "L20"
+      "source_location": "L22"
     },
     {
       "id": "api_package_devdependencies_vitest",
@@ -2645,7 +2838,7 @@
       "file_type": "code",
       "norm_label": "vitest",
       "source_file": "api/package.json",
-      "source_location": "L21"
+      "source_location": "L23"
     },
     {
       "id": "api_package_name",
@@ -2703,6 +2896,17 @@
       "source_location": "L7"
     },
     {
+      "id": "api_package_scripts_migrate",
+      "label": "migrate",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "api/package.json",
+      "file_type": "code",
+      "norm_label": "migrate",
+      "source_file": "api/package.json",
+      "source_location": "L11"
+    },
+    {
       "id": "api_package_scripts_start",
       "label": "start",
       "_origin": "ast",
@@ -2755,7 +2959,7 @@
       "file_type": "concept",
       "norm_label": "typescript",
       "source_file": "api/package.json",
-      "source_location": "L20"
+      "source_location": "L22"
     },
     {
       "id": "api_package_json_ref_vitest",
@@ -2766,7 +2970,7 @@
       "file_type": "concept",
       "norm_label": "vitest",
       "source_file": "api/package.json",
-      "source_location": "L21"
+      "source_location": "L23"
     },
     {
       "id": "ref_dotenv",
@@ -2777,7 +2981,7 @@
       "file_type": "concept",
       "norm_label": "dotenv",
       "source_file": "api/package.json",
-      "source_location": "L14"
+      "source_location": "L15"
     },
     {
       "id": "ref_hono",
@@ -2787,17 +2991,6 @@
       "community_name": "api/package.json",
       "file_type": "concept",
       "norm_label": "hono",
-      "source_file": "api/package.json",
-      "source_location": "L15"
-    },
-    {
-      "id": "ref_openai",
-      "label": "openai",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "api/package.json",
-      "file_type": "concept",
-      "norm_label": "openai",
       "source_file": "api/package.json",
       "source_location": "L16"
     },
@@ -2810,7 +3003,7 @@
       "file_type": "concept",
       "norm_label": "@types/node",
       "source_file": "api/package.json",
-      "source_location": "L19"
+      "source_location": "L21"
     },
     {
       "id": "extension_tsconfig",
@@ -3186,14 +3379,26 @@
       "source_url": null
     },
     {
-      "id": "ref_vitest",
-      "label": "ref_vitest",
+      "id": "ref_wxt_utils_storage",
+      "label": "ref_wxt_utils_storage",
+      "_origin": "semantic",
+      "community": 0,
+      "community_name": "storage-settings.ts",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "ref_wxt_utils_storage",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "ref_assets_translate_icon_svg_raw",
+      "label": "ref_assets_translate_icon_svg_raw",
       "_origin": "semantic",
       "community": 1,
       "community_name": "content.ts",
       "external": true,
       "file_type": "concept",
-      "norm_label": "ref_vitest",
+      "norm_label": "ref_assets_translate_icon_svg_raw",
       "source_file": "",
       "type": "external"
     },
@@ -3210,38 +3415,26 @@
       "type": "external"
     },
     {
-      "id": "ref_wxt_utils_storage",
-      "label": "ref_wxt_utils_storage",
-      "_origin": "semantic",
-      "community": 1,
-      "community_name": "content.ts",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "ref_wxt_utils_storage",
-      "source_file": "",
-      "type": "external"
-    },
-    {
-      "id": "ref_assets_translate_icon_svg_raw",
-      "label": "ref_assets_translate_icon_svg_raw",
-      "_origin": "semantic",
-      "community": 17,
-      "community_name": "TranslatorWidget",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "ref_assets_translate_icon_svg_raw",
-      "source_file": "",
-      "type": "external"
-    },
-    {
-      "id": "ref_hono_cors",
-      "label": "ref_hono_cors",
+      "id": "ref_node_crypto",
+      "label": "ref_node_crypto",
       "_origin": "semantic",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "external": true,
       "file_type": "concept",
-      "norm_label": "ref_hono_cors",
+      "norm_label": "ref_node_crypto",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "ref_vitest",
+      "label": "ref_vitest",
+      "_origin": "semantic",
+      "community": 18,
+      "community_name": "translate.ts",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "ref_vitest",
       "source_file": "",
       "type": "external"
     },
@@ -3250,7 +3443,7 @@
       "label": "ref_wxt_browser",
       "_origin": "semantic",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "external": true,
       "file_type": "concept",
       "norm_label": "ref_wxt_browser",
@@ -3262,10 +3455,46 @@
       "label": "ref_wxt_utils_define_background",
       "_origin": "semantic",
       "community": 18,
-      "community_name": "app.ts",
+      "community_name": "translate.ts",
       "external": true,
       "file_type": "concept",
       "norm_label": "ref_wxt_utils_define_background",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "ref_dotenv_config",
+      "label": "ref_dotenv_config",
+      "_origin": "semantic",
+      "community": 22,
+      "community_name": "app.ts",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "ref_dotenv_config",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "ref_hono_cors",
+      "label": "ref_hono_cors",
+      "_origin": "semantic",
+      "community": 22,
+      "community_name": "app.ts",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "ref_hono_cors",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "ref_node_fs_promises",
+      "label": "ref_node_fs_promises",
+      "_origin": "semantic",
+      "community": 22,
+      "community_name": "app.ts",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "ref_node_fs_promises",
       "source_file": "",
       "type": "external"
     },
@@ -3280,22 +3509,23 @@
       "norm_label": "ref_vitest_config",
       "source_file": "",
       "type": "external"
-    },
-    {
-      "id": "ref_dotenv_config",
-      "label": "ref_dotenv_config",
-      "community": 18,
-      "community_name": "app.ts",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "ref_dotenv_config",
-      "source_file": "",
-      "type": "external"
     }
   ],
   "links": [
     {
-      "source": "api_src_translate_translate",
+      "source": "api_src_db_checkdb",
+      "target": "api_src_db_sql",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "api/src/db.ts",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_translate_callopenai",
       "target": "api_src_translate_createinput",
       "relation": "calls",
       "_origin": "ast",
@@ -3303,7 +3533,19 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "api/src/translate.ts",
-      "source_location": "L18",
+      "source_location": "L45",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_translate_translate",
+      "target": "api_src_translate_callopenai",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "api/src/translate.ts",
+      "source_location": "L30",
       "weight": 1.0
     },
     {
@@ -3891,7 +4133,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "api/src/app.ts",
-      "source_location": "L64",
+      "source_location": "L67",
       "weight": 1.0
     },
     {
@@ -3903,7 +4145,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "api/src/app.test.ts",
-      "source_location": "L9",
+      "source_location": "L11",
       "weight": 1.0
     },
     {
@@ -3991,6 +4233,30 @@
       "weight": 1.0
     },
     {
+      "source": "api_src_repositories_translations_translationrecord",
+      "target": "shared_contract_translatebody",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "api/src/repositories/translations.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_repositories_translations_translationrecord",
+      "target": "shared_contract_translateok",
+      "relation": "references",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "field",
+      "source_file": "api/src/repositories/translations.ts",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
       "source": "extension_src_content_ui_translator_widget_translatorwidget",
       "target": "extension_src_content_selection_anchor",
       "relation": "references",
@@ -4035,7 +4301,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "api/package.json",
-      "source_location": "L13",
+      "source_location": "L14",
       "weight": 1.0
     },
     {
@@ -4047,7 +4313,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "api/package.json",
-      "source_location": "L14",
+      "source_location": "L15",
       "weight": 1.0
     },
     {
@@ -4059,7 +4325,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "api/package.json",
-      "source_location": "L15",
+      "source_location": "L16",
       "weight": 1.0
     },
     {
@@ -4071,7 +4337,19 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "api/package.json",
-      "source_location": "L16",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "api_package",
+      "target": "ref_postgres",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/package.json",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -4083,7 +4361,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "api/package.json",
-      "source_location": "L19",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -4095,7 +4373,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "api/package.json",
-      "source_location": "L20",
+      "source_location": "L22",
       "weight": 1.0
     },
     {
@@ -4107,7 +4385,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "api/package.json",
-      "source_location": "L21",
+      "source_location": "L23",
       "weight": 1.0
     },
     {
@@ -4159,6 +4437,18 @@
       "weight": 1.0
     },
     {
+      "source": "api_src_app",
+      "target": "api_src_db_checkdb",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/app.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
       "source": "api_src_app_test",
       "target": "api_src_app_app",
       "relation": "imports",
@@ -4171,6 +4461,54 @@
       "weight": 1.0
     },
     {
+      "source": "api_src_repositories_translations",
+      "target": "shared_contract_translatebody",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/repositories/translations.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_repositories_translations",
+      "target": "shared_contract_translateok",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/repositories/translations.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_repositories_translations",
+      "target": "api_src_db_sql",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/repositories/translations.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_repositories_translations_test",
+      "target": "api_src_repositories_translations_torow",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/repositories/translations.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
       "source": "api_src_server",
       "target": "api_src_app_app",
       "relation": "imports",
@@ -4179,7 +4517,7 @@
       "confidence_score": 1.0,
       "context": "import",
       "source_file": "api/src/server.ts",
-      "source_location": "L2",
+      "source_location": "L3",
       "weight": 1.0
     },
     {
@@ -4204,6 +4542,18 @@
       "context": "import",
       "source_file": "api/src/translate.ts",
       "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_translate",
+      "target": "api_src_repositories_translations_translationsrepository",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/translate.ts",
+      "source_location": "L4",
       "weight": 1.0
     },
     {
@@ -4688,7 +5038,7 @@
     },
     {
       "source": "api_src_app",
-      "target": "ref_dotenv_config",
+      "target": "api_src_db",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -4723,8 +5073,117 @@
       "weight": 1.0
     },
     {
+      "source": "api_src_app_test",
+      "target": "api_src_db",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/app.test.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_db",
+      "target": "ref_postgres",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/db.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_migrate",
+      "target": "ref_dotenv_config",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/migrate.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_migrate",
+      "target": "ref_node_fs_promises",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/migrate.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_migrate",
+      "target": "ref_postgres",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/migrate.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_repositories_translations",
+      "target": "shared_contract",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/repositories/translations.ts",
+      "source_location": "L1",
+      "type_only": true,
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_repositories_translations",
+      "target": "api_src_db",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/repositories/translations.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_repositories_translations_test",
+      "target": "ref_vitest",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/repositories/translations.test.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_repositories_translations_test",
+      "target": "api_src_repositories_translations",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/repositories/translations.test.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
       "source": "api_src_server",
-      "target": "ref_hono_node_server",
+      "target": "ref_dotenv_config",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -4736,7 +5195,7 @@
     },
     {
       "source": "api_src_server",
-      "target": "api_src_app",
+      "target": "ref_hono_node_server",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -4744,6 +5203,18 @@
       "context": "import",
       "source_file": "api/src/server.ts",
       "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_server",
+      "target": "api_src_app",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/server.ts",
+      "source_location": "L3",
       "weight": 1.0
     },
     {
@@ -4769,6 +5240,30 @@
       "context": "import",
       "source_file": "api/src/translate.ts",
       "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_translate",
+      "target": "ref_node_crypto",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/translate.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_translate",
+      "target": "api_src_repositories_translations",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/translate.ts",
+      "source_location": "L4",
       "weight": 1.0
     },
     {
@@ -5192,18 +5687,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/package.json",
-      "source_location": "L12",
-      "weight": 1.0
-    },
-    {
-      "source": "api_package",
-      "target": "api_package_devdependencies",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "api/package.json",
-      "source_location": "L18",
+      "source_location": "L13",
       "weight": 1.0
     },
     {
@@ -5215,6 +5699,17 @@
       "confidence_score": 1.0,
       "source_file": "api/package.json",
       "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "api_package",
+      "target": "api_package_devdependencies",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/package.json",
+      "source_location": "L20",
       "weight": 1.0
     },
     {
@@ -5269,7 +5764,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/package.json",
-      "source_location": "L13",
+      "source_location": "L14",
       "weight": 1.0
     },
     {
@@ -5280,7 +5775,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/package.json",
-      "source_location": "L14",
+      "source_location": "L15",
       "weight": 1.0
     },
     {
@@ -5291,7 +5786,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/package.json",
-      "source_location": "L15",
+      "source_location": "L16",
       "weight": 1.0
     },
     {
@@ -5302,7 +5797,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/package.json",
-      "source_location": "L16",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "api_package_dependencies",
+      "target": "api_package_dependencies_postgres",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/package.json",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -5313,7 +5819,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/package.json",
-      "source_location": "L19",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -5324,7 +5830,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/package.json",
-      "source_location": "L20",
+      "source_location": "L22",
       "weight": 1.0
     },
     {
@@ -5335,7 +5841,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/package.json",
-      "source_location": "L21",
+      "source_location": "L23",
       "weight": 1.0
     },
     {
@@ -5347,6 +5853,17 @@
       "confidence_score": 1.0,
       "source_file": "api/package.json",
       "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "api_package_scripts",
+      "target": "api_package_scripts_migrate",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/package.json",
+      "source_location": "L11",
       "weight": 1.0
     },
     {
@@ -5401,7 +5918,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/README.md",
-      "source_location": "L15",
+      "source_location": "L17",
       "weight": 1.0
     },
     {
@@ -5412,7 +5929,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/README.md",
-      "source_location": "L41",
+      "source_location": "L43",
+      "weight": 1.0
+    },
+    {
+      "source": "api_readme_ai_translator_api",
+      "target": "api_readme_migrations",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/README.md",
+      "source_location": "L58",
       "weight": 1.0
     },
     {
@@ -5423,7 +5951,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/README.md",
-      "source_location": "L56",
+      "source_location": "L69",
       "weight": 1.0
     },
     {
@@ -5460,6 +5988,94 @@
       "weight": 1.0
     },
     {
+      "source": "api_src_db",
+      "target": "api_src_db_sql",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/src/db.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_db",
+      "target": "api_src_db_checkdb",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/src/db.ts",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_migrate",
+      "target": "api_src_migrate_dir",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/src/migrate.ts",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_migrate",
+      "target": "api_src_migrate_sql",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/src/migrate.ts",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_repositories_translations",
+      "target": "api_src_repositories_translations_torow",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/src/repositories/translations.ts",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_repositories_translations",
+      "target": "api_src_repositories_translations_translationsrepository",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/src/repositories/translations.ts",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_repositories_translations",
+      "target": "api_src_repositories_translations_translationrecord",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/src/repositories/translations.ts",
+      "source_location": "L5",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_repositories_translations_test",
+      "target": "api_src_repositories_translations_test_request",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/src/repositories/translations.test.ts",
+      "source_location": "L4",
+      "weight": 1.0
+    },
+    {
       "source": "api_src_server",
       "target": "api_src_server_port",
       "relation": "contains",
@@ -5467,7 +6083,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/src/server.ts",
-      "source_location": "L4",
+      "source_location": "L5",
       "weight": 1.0
     },
     {
@@ -5478,7 +6094,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/src/translate.ts",
-      "source_location": "L13",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_translate",
+      "target": "api_src_translate_callopenai",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/src/translate.ts",
+      "source_location": "L41",
       "weight": 1.0
     },
     {
@@ -5489,7 +6116,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/src/translate.ts",
-      "source_location": "L4",
+      "source_location": "L6",
       "weight": 1.0
     },
     {
@@ -5500,7 +6127,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/src/translate.ts",
-      "source_location": "L74",
+      "source_location": "L97",
       "weight": 1.0
     },
     {
@@ -7379,6 +8006,18 @@
       "weight": 1.0
     },
     {
+      "source": "api_src_app_test",
+      "target": "api_src_db_checkdb",
+      "relation": "indirect_call",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "argument",
+      "source_file": "api/src/app.test.ts",
+      "source_location": "L64",
+      "weight": 1.0
+    },
+    {
       "source": "extension_src_entrypoints_content_main_showlanguages",
       "target": "extension_src_core_languages_findlanguage",
       "relation": "indirect_call",
@@ -7551,5 +8190,5 @@
       "source_file": "CLAUDE.md"
     }
   ],
-  "built_at_commit": "31744e9f1e9c76cbf4ae34f50aeabeef0da3c3e5"
+  "built_at_commit": "685455070822de377c8dfef1f8c57f7498b5c4ef"
 }

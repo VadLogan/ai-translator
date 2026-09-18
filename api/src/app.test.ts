@@ -1,10 +1,16 @@
 import { describe, expect, it, vi } from 'vitest';
 import { app } from './app.ts';
+import { checkDb } from './db.ts';
+import { translate } from './translate.ts';
+import { translationsRepository } from './repositories/translations.ts';
 
 // The real provider calls OpenAI; tests only cover the HTTP layer.
 vi.mock('./translate.ts', () => ({
   translate: vi.fn(async ({ text, targetLang }) => ({ text: `[${targetLang}] ${text}` })),
 }));
+vi.mock('./db.ts', () => ({ checkDb: vi.fn() }));
+vi.mock('./repositories/translations.ts', () => ({ translationsRepository: { save: vi.fn(async () => {}) } }));
+vi.spyOn(console, 'info').mockImplementation(() => {});
 
 const post = (body: unknown) =>
   app.request('/translate', {
@@ -14,11 +20,31 @@ const post = (body: unknown) =>
   });
 
 describe('POST /translate', () => {
-  it('returns the translation', async () => {
+  it('returns the translation and saves it', async () => {
     const res = await post({ text: 'Hello', targetLang: 'de' });
 
     expect(res.status).toBe(200);
     await expect(res.json()).resolves.toEqual({ text: '[de] Hello' });
+    expect(translationsRepository.save).toHaveBeenLastCalledWith(
+      expect.objectContaining({ request: { text: 'Hello', targetLang: 'de' }, result: { text: '[de] Hello' } }),
+    );
+  });
+
+  it('502s when the provider fails and saves the error', async () => {
+    const boom = new Error('provider down');
+    vi.mocked(translate).mockRejectedValueOnce(boom);
+    vi.spyOn(console, 'error').mockImplementationOnce(() => {});
+    const res = await post({ text: 'Hello', targetLang: 'de' });
+
+    expect(res.status).toBe(502);
+    await expect(res.json()).resolves.toMatchObject({ error: { code: 'provider-failed' } });
+    expect(translationsRepository.save).toHaveBeenLastCalledWith(expect.objectContaining({ error: boom }));
+  });
+
+  it('still answers when saving fails', async () => {
+    vi.mocked(translationsRepository.save).mockRejectedValueOnce(new Error('db down'));
+    vi.spyOn(console, 'error').mockImplementationOnce(() => {});
+    expect((await post({ text: 'Hello', targetLang: 'de' })).status).toBe(200);
   });
 
   it.each([
@@ -56,6 +82,20 @@ it('404s unknown routes', async () => {
   await expect(res.json()).resolves.toMatchObject({ error: { code: 'not-found' } });
 });
 
-it('reports health', async () => {
-  await expect((await app.request('/health')).json()).resolves.toEqual({ ok: true });
+describe('GET /health', () => {
+  it('is ok when the database is ok or not configured', async () => {
+    for (const db of ['ok', 'disabled'] as const) {
+      vi.mocked(checkDb).mockResolvedValueOnce(db);
+      const res = await app.request('/health');
+      expect(res.status).toBe(200);
+      await expect(res.json()).resolves.toEqual({ ok: true, db });
+    }
+  });
+
+  it('503s when the database is down', async () => {
+    vi.mocked(checkDb).mockResolvedValueOnce('down');
+    const res = await app.request('/health');
+    expect(res.status).toBe(503);
+    await expect(res.json()).resolves.toEqual({ ok: false, db: 'down' });
+  });
 });

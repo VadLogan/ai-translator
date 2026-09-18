@@ -1,34 +1,12 @@
 import type { TranslateBody, TranslateOk } from '../../shared/contract.ts';
 import OpenAI from "openai";
-import { randomUUID } from 'node:crypto';
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-/**
- * Stand-in for a real provider: returns the same test message the extension's
- * mock used to produce. Swap the body for an API call when a provider is picked;
- * the key stays here, server-side.
- */
+/** Translation only: TranslateBody in, TranslateOk out. Logging and saving live in the route (app.ts). */
 export async function translate(translateBody: TranslateBody): Promise<TranslateOk> {
-  // Same id on the request, response, and failure lines so they can be matched up.
-  const id = randomUUID().slice(0, 8);
-  const started = performance.now();
-  const elapsed = () => `${Math.round(performance.now() - started)}ms`;
-
-  console.info(`[translate ${id}] → ${new Date().toISOString()}`, JSON.stringify(translateBody, null, 2));
-  try {
-    const parsed = await callOpenAI(translateBody);
-    console.info(`[translate ${id}] ← ${elapsed()}`, JSON.stringify(parsed, null, 2));
-    return parsed;
-  } catch (error) {
-    console.error(`[translate ${id}] ✗ ${elapsed()}`, error);
-    throw error;
-  }
-}
-
-async function callOpenAI(translateBody: TranslateBody): Promise<TranslateOk> {
   const response = await client.responses.create({
     model: process.env.OPENAI_MODEL ?? "gpt-5.6-luna",
     instructions: AGENT_INSTRUCTION,

@@ -1,8 +1,10 @@
 import { Hono, type Context } from 'hono';
 import { cors } from 'hono/cors';
-import { MAX_TEXT_LENGTH, type ApiErrorCode, type TranslateBody } from '../../shared/contract.ts';
+import { MAX_TEXT_LENGTH, type ApiErrorCode, type TranslateBody, type TranslateOk } from '../../shared/contract.ts';
 import { translate } from './translate.ts';
-import "dotenv/config";
+import { checkDb } from './db.ts';
+import { translationsRepository } from './repositories/translations.ts';
+import { randomUUID } from 'node:crypto';
 
 const RATE_LIMIT = 60; // requests per minute per IP
 // ponytail: in-memory, per-instance; move to Redis if this ever runs on more than one box.
@@ -41,7 +43,11 @@ app.use(
   }),
 );
 
-app.get('/health', (c) => c.json({ ok: true }));
+// 503 when the database is configured but unreachable, so a load balancer stops routing here.
+app.get('/health', async (c) => {
+  const db = await checkDb();
+  return c.json({ ok: db !== 'down', db }, db === 'down' ? 503 : 200);
+});
 
 app.post('/translate', async (c) => {
   const ip = c.req.header('x-forwarded-for')?.split(',')[0]?.trim() ?? 'local';
@@ -51,9 +57,26 @@ app.post('/translate', async (c) => {
   const parsed = parseBody(body);
   if (typeof parsed === 'string') return fail(c, 400, 'invalid-input', parsed);
 
+  // The log id (same on the →, ←, ✗ lines) is the first 8 chars of the saved row's id.
+  const rowId = randomUUID();
+  const id = rowId.slice(0, 8);
+  const started = performance.now();
+  const ms = () => Math.round(performance.now() - started);
+  const save = (outcome: { result?: TranslateOk; error?: unknown }) =>
+    // Not awaited: saving must not slow down or fail the translation.
+    translationsRepository
+      .save({ id: rowId, request: parsed, ...outcome, durationMs: ms() })
+      .catch((dbError) => console.error(`[translate ${id}] db save failed`, dbError));
+
+  console.info(`[translate ${id}] → ${new Date().toISOString()}`, JSON.stringify(parsed, null, 2));
   try {
-    return c.json(await translate(parsed));
-  } catch {
+    const result = await translate(parsed);
+    console.info(`[translate ${id}] ← ${ms()}ms`, JSON.stringify(result, null, 2));
+    save({ result });
+    return c.json(result);
+  } catch (error) {
+    console.error(`[translate ${id}] ✗ ${ms()}ms`, error);
+    save({ error });
     return fail(c, 502, 'provider-failed', 'Translation provider failed');
   }
 });

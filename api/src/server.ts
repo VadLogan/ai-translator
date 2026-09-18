@@ -1,3 +1,4 @@
+import 'dotenv/config'; // first, so api/.env is loaded before any module reads process.env
 import { serve } from '@hono/node-server';
 import { app } from './app.ts';
 
