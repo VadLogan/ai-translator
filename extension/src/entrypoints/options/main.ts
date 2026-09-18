@@ -1,8 +1,6 @@
 import { LANGUAGES } from '../../core/languages';
-import { sendMessage } from '../../messaging/messages';
 import { storageSettings } from '../../settings/storage-settings';
 
-const providerSelect = document.querySelector<HTMLSelectElement>('#provider')!;
 const languagesContainer = document.querySelector<HTMLDivElement>('#languages')!;
 const saveButton = document.querySelector<HTMLButtonElement>('#save')!;
 const status = document.querySelector<HTMLSpanElement>('#status')!;
@@ -13,19 +11,7 @@ function setStatus(message: string, isError = false): void {
 }
 
 async function init(): Promise<void> {
-  const [settings, providers] = await Promise.all([
-    storageSettings.get(),
-    sendMessage({ type: 'list-providers' }),
-  ]);
-
-  if (!providers.ok) {
-    setStatus(providers.error.message, true);
-    return;
-  }
-  providerSelect.replaceChildren(
-    ...providers.data.map(({ id, displayName }) => new Option(displayName, id, false, id === settings.activeProviderId)),
-  );
-
+  const settings = await storageSettings.get();
   const favorites = new Set(settings.favoriteLanguages);
   languagesContainer.replaceChildren(
     ...LANGUAGES.map(({ code, name }) => {
@@ -49,7 +35,7 @@ saveButton.addEventListener('click', async () => {
     ...checked.filter((code) => !previous.includes(code)),
   ];
 
-  await storageSettings.update({ activeProviderId: providerSelect.value, favoriteLanguages });
+  await storageSettings.update({ favoriteLanguages });
   setStatus('Saved');
   setTimeout(() => setStatus(''), 2000);
 });

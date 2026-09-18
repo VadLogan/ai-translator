@@ -1,22 +1,15 @@
 import { browser } from 'wxt/browser';
-import type { ProviderInfo } from '../core/registry';
-import type { TranslateResult, TranslationErrorCode } from '../core/translator';
+import type { TranslateOk } from '../../../shared/contract';
 
-export type Message =
-  | { type: 'translate'; text: string; targetLang: string }
-  | { type: 'list-providers' }
-  | { type: 'open-options' };
+export type Message = { type: 'translate'; text: string; targetLang: string } | { type: 'open-options' };
 
 export interface ResponseMap {
-  translate: TranslateResult;
-  'list-providers': ProviderInfo[];
+  translate: TranslateOk;
   'open-options': void;
 }
 
 /** Errors don't survive structured cloning, so they travel as plain data. */
-export type Response<T> =
-  | { ok: true; data: T }
-  | { ok: false; error: { message: string; code?: TranslationErrorCode } };
+export type Response<T> = { ok: true; data: T } | { ok: false; error: { message: string } };
 
 export function isMessage(value: unknown): value is Message {
   return typeof value === 'object' && value !== null && typeof (value as { type?: unknown }).type === 'string';

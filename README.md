@@ -59,46 +59,14 @@ To load the build manually, go to `chrome://extensions`, turn on Developer mode,
 
 ```
 content script (UI)  ──message──▶  background worker  ──HTTP──▶  api/  ──▶  provider
-  detect selection                   TranslationService            translate()
-  icon + language menu                 └─ TranslatorRegistry         + request log
-  replace selected text                     └─ ApiTranslator
+  detect selection                   src/api.ts translate()        translate()
+  icon + language menu                                             + request log
+  replace selected text
 ```
 
-- `extension/src/core` holds the abstractions and has no browser or provider dependencies: the `Translator` interface, the registry, and the service.
-- `src/providers` contains the concrete engines: `api` (the backend, default) and `mock` (offline fallback). Only `src/entrypoints/background.ts` wires them in, through `registerProviders`.
+- The extension is frontend only. It has no translation engines or provider settings; its only setting is the favorite-languages list.
 - The API base URL comes from `WXT_API_URL` at build time, defaulting to `http://127.0.0.1:8787`. Its origin must also be in `host_permissions` in `wxt.config.ts`.
 
 ## Adding a translation provider
 
-A real provider belongs in `api/src/translate.ts`, where its key is safe. The steps below are for adding another engine *inside the extension*, which only makes sense for keyless or on-device translation.
-
-1. Create `extension/src/providers/<name>/<name>-translator.ts`:
-
-   ```ts
-   import { TranslationError, type Translator, type TranslatorFactory } from '../../core/translator';
-
-   interface DeepLConfig { apiKey: string }
-
-   class DeepLTranslator implements Translator {
-     constructor(private readonly config: DeepLConfig) {}
-     async translate({ text, targetLang }) {
-       // call the API with this.config.apiKey ...
-       return { text: translated };
-     }
-   }
-
-   export const deeplTranslatorFactory: TranslatorFactory<DeepLConfig> = {
-     id: 'deepl',
-     displayName: 'DeepL',
-     create: (config) => {
-       if (!config?.apiKey) throw new TranslationError('Add your DeepL API key in settings', 'provider-failed');
-       return new DeepLTranslator(config);
-     },
-   };
-   ```
-
-2. Register it in `extension/src/providers/index.ts`: `registry.register(deeplTranslatorFactory)`.
-3. Add the API host to `host_permissions` in `extension/wxt.config.ts`, for example `https://api-free.deepl.com/*`.
-4. Add config inputs (such as an API key) to the options page and save them to `settings.providerConfigs[<id>]`.
-
-The provider then appears automatically in the options page's provider dropdown.
+Providers live only in the API. Replace the body of `api/src/translate.ts` with the real provider call, and keep the key in the API's environment. The extension needs no change.

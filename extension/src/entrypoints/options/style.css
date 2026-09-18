@@ -30,16 +30,6 @@ h2 { margin: 0 0 8px; font-size: 15px; }
 section { margin-top: 28px; }
 .hint { margin: 0 0 8px; color: var(--muted); }
 
-select {
-  min-width: 240px;
-  padding: 6px 8px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--bg);
-  color: inherit;
-  font: inherit;
-}
-
 .languages {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));

@@ -1,32 +1,20 @@
 import { browser } from 'wxt/browser';
 import { defineBackground } from 'wxt/utils/define-background';
-import { TranslatorRegistry } from '../core/registry';
-import { TranslationError } from '../core/translator';
-import { TranslationService } from '../core/translation-service';
+import { translate } from '../api';
 import { isMessage, type Message, type Response } from '../messaging/messages';
-import { registerProviders } from '../providers';
-import { storageSettings } from '../settings/storage-settings';
 
 export default defineBackground(() => {
-  // Composition root: the only place concrete providers and storage are wired in.
-  const registry = registerProviders(new TranslatorRegistry());
-  const translationService = new TranslationService(registry, storageSettings);
-
   async function handle(message: Message): Promise<Response<unknown>> {
     try {
       switch (message.type) {
         case 'translate':
-          return { ok: true, data: await translationService.translate(message.text, message.targetLang) };
-        case 'list-providers':
-          return { ok: true, data: registry.list() };
+          // Fetched here, not in the content script: host_permissions exempt the worker from page CORS.
+          return { ok: true, data: await translate({ text: message.text, targetLang: message.targetLang }) };
         case 'open-options':
           await browser.runtime.openOptionsPage();
           return { ok: true, data: undefined };
       }
     } catch (error) {
-      if (error instanceof TranslationError) {
-        return { ok: false, error: { message: error.message, code: error.code } };
-      }
       return { ok: false, error: { message: error instanceof Error ? error.message : String(error) } };
     }
   }
