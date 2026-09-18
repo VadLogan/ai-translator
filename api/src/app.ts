@@ -2,6 +2,7 @@ import { Hono, type Context } from 'hono';
 import { cors } from 'hono/cors';
 import { MAX_TEXT_LENGTH, type ApiErrorCode, type TranslateBody } from '../../shared/contract.ts';
 import { translate } from './translate.ts';
+import "dotenv/config";
 
 const RATE_LIMIT = 60; // requests per minute per IP
 // ponytail: in-memory, per-instance; move to Redis if this ever runs on more than one box.
