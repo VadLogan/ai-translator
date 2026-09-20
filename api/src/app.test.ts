@@ -13,7 +13,7 @@ vi.mock('./repositories/translations.ts', () => ({ translationsRepository: { sav
 vi.spyOn(console, 'info').mockImplementation(() => {});
 
 const post = (body: unknown) =>
-  app.request('/translate', {
+  app.request('/api/translate', {
     method: 'POST',
     headers: { 'content-type': 'application/json', 'x-forwarded-for': `10.0.0.${Math.random()}` },
     body: JSON.stringify(body),
@@ -60,7 +60,7 @@ describe('POST /translate', () => {
 
   it('rate limits a noisy client', async () => {
     const send = () =>
-      app.request('/translate', {
+      app.request('/api/translate', {
         method: 'POST',
         headers: { 'content-type': 'application/json', 'x-forwarded-for': '1.2.3.4' },
         body: JSON.stringify({ text: 'Hello', targetLang: 'de' }),
@@ -86,7 +86,7 @@ describe('GET /health', () => {
   it('is ok when the database is ok or not configured', async () => {
     for (const db of ['ok', 'disabled'] as const) {
       vi.mocked(checkDb).mockResolvedValueOnce(db);
-      const res = await app.request('/health');
+      const res = await app.request('/api/health');
       expect(res.status).toBe(200);
       await expect(res.json()).resolves.toEqual({ ok: true, db });
     }
@@ -94,7 +94,7 @@ describe('GET /health', () => {
 
   it('503s when the database is down', async () => {
     vi.mocked(checkDb).mockResolvedValueOnce('down');
-    const res = await app.request('/health');
+    const res = await app.request('/api/health');
     expect(res.status).toBe(503);
     await expect(res.json()).resolves.toEqual({ ok: false, db: 'down' });
   });

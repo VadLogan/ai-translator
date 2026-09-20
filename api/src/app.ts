@@ -4,10 +4,11 @@ import { MAX_TEXT_LENGTH, type ApiErrorCode, type TranslateBody, type TranslateO
 import { translate } from './translate.ts';
 import { checkDb } from './db.ts';
 import { translationsRepository } from './repositories/translations.ts';
-import { randomUUID } from 'node:crypto';
+import { env } from './env.ts';
 
 const RATE_LIMIT = 60; // requests per minute per IP
-// ponytail: in-memory, per-instance; move to Redis if this ever runs on more than one box.
+// ponytail: per-isolate Map, so the real ceiling is 60/min x live instances.
+// Move to a shared store only if abuse actually shows up in the logs.
 const hits = new Map<string, { count: number; resetAt: number }>();
 
 function isRateLimited(ip: string, now = Date.now()): boolean {
@@ -29,14 +30,15 @@ function parseBody(body: unknown): TranslateBody | string {
   return { text, targetLang, ...(typeof sourceLang === 'string' ? { sourceLang } : {}) };
 }
 
-export const app = new Hono();
+// basePath matches the function name: Supabase strips /functions/v1 and the app sees /api/*.
+export const app = new Hono().basePath('/api');
 
 // Requests come from the extension's background worker (chrome-extension://<id>).
 app.use(
   '*',
   cors({
     origin: (origin) => {
-      const allowed = process.env.ALLOWED_ORIGINS?.split(',').map((o) => o.trim());
+      const allowed = env('ALLOWED_ORIGINS')?.split(',').map((o) => o.trim());
       if (!allowed?.length) return origin; // dev default: reflect any origin
       return allowed.includes(origin) ? origin : null;
     },
@@ -58,7 +60,7 @@ app.post('/translate', async (c) => {
   if (typeof parsed === 'string') return fail(c, 400, 'invalid-input', parsed);
 
   // The log id (same on the →, ←, ✗ lines) is the first 8 chars of the saved row's id.
-  const rowId = randomUUID();
+  const rowId = crypto.randomUUID();
   const id = rowId.slice(0, 8);
   const started = performance.now();
   const ms = () => Math.round(performance.now() - started);
@@ -72,16 +74,22 @@ app.post('/translate', async (c) => {
   try {
     const result = await translate(parsed);
     console.info(`[translate ${id}] ← ${ms()}ms`, JSON.stringify(result, null, 2));
-    save({ result });
+    waitUntil(save({ result }));
     return c.json(result);
   } catch (error) {
     console.error(`[translate ${id}] ✗ ${ms()}ms`, error);
-    save({ error });
+    waitUntil(save({ error }));
     return fail(c, 502, 'provider-failed', 'Translation provider failed');
   }
 });
 
 app.notFound((c) => fail(c, 404, 'not-found', `No route for ${c.req.method} ${c.req.path}`));
+
+// Supabase freezes the isolate once the response is returned; waitUntil keeps it alive
+// until the insert lands. No-op under vitest, where the promise just runs to completion.
+function waitUntil(promise: Promise<unknown>) {
+  (globalThis as { EdgeRuntime?: { waitUntil(p: Promise<unknown>): void } }).EdgeRuntime?.waitUntil(promise);
+}
 
 function fail(c: Context, status: 400 | 404 | 429 | 502, code: ApiErrorCode, message: string) {
   return c.json({ error: { message, code } }, status);

@@ -1,14 +1,15 @@
 import type { TranslateBody, TranslateOk } from '../../shared/contract.ts';
 import OpenAI from "openai";
+import { env } from "./env.ts";
 
 const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: env('OPENAI_API_KEY'),
 });
 
 /** Translation only: TranslateBody in, TranslateOk out. Logging and saving live in the route (app.ts). */
 export async function translate(translateBody: TranslateBody): Promise<TranslateOk> {
   const response = await client.responses.create({
-    model: process.env.OPENAI_MODEL ?? "gpt-5.6-luna",
+    model: env('OPENAI_MODEL') ?? "gpt-5.6-luna",
     instructions: AGENT_INSTRUCTION,
     input: createInput(translateBody),
       text: {

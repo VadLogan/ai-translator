@@ -21,6 +21,19 @@
   },
   "nodes": [
     {
+      "id": "extension_src_core_languages_language",
+      "label": "Language",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "storage-settings.ts",
+      "file_type": "code",
+      "norm_label": "language",
+      "source_file": "extension/src/core/languages.ts",
+      "source_location": "L1"
+    },
+    {
       "id": "extension_src_settings_settings_settings",
       "label": "Settings",
       "_callable": true,
@@ -44,19 +57,6 @@
       "file_type": "code",
       "norm_label": "editableselection",
       "source_file": "extension/src/content/selection.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_core_languages_language",
-      "label": "Language",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "language",
-      "source_file": "extension/src/core/languages.ts",
       "source_location": "L1"
     },
     {
@@ -125,6 +125,19 @@
       "source_location": "L12"
     },
     {
+      "id": "extension_src_messaging_messages_responsemap",
+      "label": "ResponseMap",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 18,
+      "community_name": "background.ts",
+      "file_type": "code",
+      "norm_label": "responsemap",
+      "source_file": "extension/src/messaging/messages.ts",
+      "source_location": "L6"
+    },
+    {
       "id": "api_src_repositories_translations_translationrecord",
       "label": "TranslationRecord",
       "_callable": true,
@@ -136,19 +149,6 @@
       "norm_label": "translationrecord",
       "source_file": "api/src/repositories/translations.ts",
       "source_location": "L5"
-    },
-    {
-      "id": "extension_src_messaging_messages_responsemap",
-      "label": "ResponseMap",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 22,
-      "community_name": "app.ts",
-      "file_type": "code",
-      "norm_label": "responsemap",
-      "source_file": "extension/src/messaging/messages.ts",
-      "source_location": "L6"
     },
     {
       "id": "shared_contract_apierrorcode",
@@ -800,7 +800,7 @@
       "file_type": "code",
       "norm_label": "fail()",
       "source_file": "api/src/app.ts",
-      "source_location": "L94"
+      "source_location": "L86"
     },
     {
       "id": "api_src_app_isratelimited",
@@ -812,7 +812,7 @@
       "file_type": "code",
       "norm_label": "isratelimited()",
       "source_file": "api/src/app.ts",
-      "source_location": "L14"
+      "source_location": "L13"
     },
     {
       "id": "api_src_app_parsebody",
@@ -824,7 +824,7 @@
       "file_type": "code",
       "norm_label": "parsebody()",
       "source_file": "api/src/app.ts",
-      "source_location": "L24"
+      "source_location": "L23"
     },
     {
       "id": "api_src_app_test_post",
@@ -839,18 +839,6 @@
       "source_location": "L15"
     },
     {
-      "id": "api_src_app_waituntil",
-      "label": "waitUntil()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 22,
-      "community_name": "app.ts",
-      "file_type": "code",
-      "norm_label": "waituntil()",
-      "source_file": "api/src/app.ts",
-      "source_location": "L90"
-    },
-    {
       "id": "api_src_db_checkdb",
       "label": "checkDb()",
       "_callable": true,
@@ -860,42 +848,6 @@
       "file_type": "code",
       "norm_label": "checkdb()",
       "source_file": "api/src/db.ts",
-      "source_location": "L12"
-    },
-    {
-      "id": "api_src_env_env",
-      "label": "env()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 22,
-      "community_name": "app.ts",
-      "file_type": "code",
-      "norm_label": "env()",
-      "source_file": "api/src/env.ts",
-      "source_location": "L4"
-    },
-    {
-      "id": "api_src_env_get",
-      "label": "get()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 22,
-      "community_name": "app.ts",
-      "file_type": "code",
-      "norm_label": "get()",
-      "source_file": "api/src/env.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "api_src_index_serve",
-      "label": "serve()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 22,
-      "community_name": "app.ts",
-      "file_type": "code",
-      "norm_label": "serve()",
-      "source_file": "api/src/index.ts",
       "source_location": "L7"
     },
     {
@@ -920,7 +872,7 @@
       "file_type": "code",
       "norm_label": "createinput()",
       "source_file": "api/src/translate.ts",
-      "source_location": "L66"
+      "source_location": "L65"
     },
     {
       "id": "api_src_translate_translate",
@@ -932,7 +884,18 @@
       "file_type": "code",
       "norm_label": "translate()",
       "source_file": "api/src/translate.ts",
-      "source_location": "L10"
+      "source_location": "L9"
+    },
+    {
+      "id": "extension_src_core_languages",
+      "label": "languages.ts",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "storage-settings.ts",
+      "file_type": "code",
+      "norm_label": "languages.ts",
+      "source_file": "extension/src/core/languages.ts",
+      "source_location": "L1"
     },
     {
       "id": "extension_src_core_languages_languages",
@@ -1064,50 +1027,6 @@
       "file_type": "code",
       "norm_label": "selection.test.ts",
       "source_file": "extension/src/content/selection.test.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_content_ui_styles",
-      "label": "styles.ts",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "styles.ts",
-      "source_file": "extension/src/content/ui/styles.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_content_ui_styles_widget_css",
-      "label": "WIDGET_CSS",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "widget_css",
-      "source_file": "extension/src/content/ui/styles.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_content_ui_translator_widget",
-      "label": "translator-widget.ts",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "translator-widget.ts",
-      "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_core_languages",
-      "label": "languages.ts",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "languages.ts",
-      "source_file": "extension/src/core/languages.ts",
       "source_location": "L1"
     },
     {
@@ -1434,6 +1353,39 @@
       "source_location": "L1"
     },
     {
+      "id": "extension_src_content_ui_styles",
+      "label": "styles.ts",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "TranslatorWidget",
+      "file_type": "code",
+      "norm_label": "styles.ts",
+      "source_file": "extension/src/content/ui/styles.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_content_ui_styles_widget_css",
+      "label": "WIDGET_CSS",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "TranslatorWidget",
+      "file_type": "code",
+      "norm_label": "widget_css",
+      "source_file": "extension/src/content/ui/styles.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_content_ui_translator_widget",
+      "label": "translator-widget.ts",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "TranslatorWidget",
+      "file_type": "code",
+      "norm_label": "translator-widget.ts",
+      "source_file": "extension/src/content/ui/translator-widget.ts",
+      "source_location": "L1"
+    },
+    {
       "id": "extension_src_api_test",
       "label": "api.test.ts",
       "_origin": "ast",
@@ -1625,40 +1577,18 @@
       "label": "package.json",
       "_origin": "ast",
       "community": 2,
-      "community_name": "package.json",
+      "community_name": "scripts",
       "file_type": "code",
       "norm_label": "package.json",
       "source_file": "package.json",
       "source_location": "L1"
     },
     {
-      "id": "package_devdependencies",
-      "label": "devDependencies",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "package.json",
-      "file_type": "code",
-      "norm_label": "devdependencies",
-      "source_file": "package.json",
-      "source_location": "L19"
-    },
-    {
-      "id": "package_devdependencies_supabase",
-      "label": "supabase",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "package.json",
-      "file_type": "code",
-      "norm_label": "supabase",
-      "source_file": "package.json",
-      "source_location": "L20"
-    },
-    {
       "id": "package_name",
       "label": "name",
       "_origin": "ast",
       "community": 2,
-      "community_name": "package.json",
+      "community_name": "scripts",
       "file_type": "code",
       "norm_label": "name",
       "source_file": "package.json",
@@ -1669,7 +1599,7 @@
       "label": "private",
       "_origin": "ast",
       "community": 2,
-      "community_name": "package.json",
+      "community_name": "scripts",
       "file_type": "code",
       "norm_label": "private",
       "source_file": "package.json",
@@ -1680,95 +1610,84 @@
       "label": "scripts",
       "_origin": "ast",
       "community": 2,
-      "community_name": "package.json",
+      "community_name": "scripts",
       "file_type": "code",
       "norm_label": "scripts",
       "source_file": "package.json",
-      "source_location": "L10"
+      "source_location": "L7"
     },
     {
       "id": "package_scripts_build",
       "label": "build",
       "_origin": "ast",
       "community": 2,
-      "community_name": "package.json",
+      "community_name": "scripts",
       "file_type": "code",
       "norm_label": "build",
       "source_file": "package.json",
-      "source_location": "L14"
+      "source_location": "L11"
     },
     {
       "id": "package_scripts_compile",
       "label": "compile",
       "_origin": "ast",
       "community": 2,
-      "community_name": "package.json",
+      "community_name": "scripts",
       "file_type": "code",
       "norm_label": "compile",
       "source_file": "package.json",
-      "source_location": "L15"
-    },
-    {
-      "id": "package_scripts_db",
-      "label": "db",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "package.json",
-      "file_type": "code",
-      "norm_label": "db",
-      "source_file": "package.json",
-      "source_location": "L17"
+      "source_location": "L12"
     },
     {
       "id": "package_scripts_dev",
       "label": "dev",
       "_origin": "ast",
       "community": 2,
-      "community_name": "package.json",
+      "community_name": "scripts",
       "file_type": "code",
       "norm_label": "dev",
       "source_file": "package.json",
-      "source_location": "L11"
+      "source_location": "L8"
     },
     {
       "id": "package_scripts_dev_api",
       "label": "dev:api",
       "_origin": "ast",
       "community": 2,
-      "community_name": "package.json",
+      "community_name": "scripts",
       "file_type": "code",
       "norm_label": "dev:api",
       "source_file": "package.json",
-      "source_location": "L12"
+      "source_location": "L9"
     },
     {
       "id": "package_scripts_dev_extension",
       "label": "dev:extension",
       "_origin": "ast",
       "community": 2,
-      "community_name": "package.json",
+      "community_name": "scripts",
       "file_type": "code",
       "norm_label": "dev:extension",
       "source_file": "package.json",
-      "source_location": "L13"
+      "source_location": "L10"
     },
     {
       "id": "package_scripts_test",
       "label": "test",
       "_origin": "ast",
       "community": 2,
-      "community_name": "package.json",
+      "community_name": "scripts",
       "file_type": "code",
       "norm_label": "test",
       "source_file": "package.json",
-      "source_location": "L16"
+      "source_location": "L13"
     },
     {
       "id": "package_type",
       "label": "type",
       "_origin": "ast",
       "community": 2,
-      "community_name": "package.json",
+      "community_name": "scripts",
       "file_type": "code",
       "norm_label": "type",
       "source_file": "package.json",
@@ -1779,7 +1698,7 @@
       "label": "version",
       "_origin": "ast",
       "community": 2,
-      "community_name": "package.json",
+      "community_name": "scripts",
       "file_type": "code",
       "norm_label": "version",
       "source_file": "package.json",
@@ -1790,22 +1709,11 @@
       "label": "workspaces",
       "_origin": "ast",
       "community": 2,
-      "community_name": "package.json",
+      "community_name": "scripts",
       "file_type": "code",
       "norm_label": "workspaces",
       "source_file": "package.json",
       "source_location": "L6"
-    },
-    {
-      "id": "ref_supabase",
-      "label": "supabase",
-      "_origin": "ast",
-      "community": 2,
-      "community_name": "package.json",
-      "file_type": "concept",
-      "norm_label": "supabase",
-      "source_file": "package.json",
-      "source_location": "L20"
     },
     {
       "id": "api_readme",
@@ -1841,19 +1749,7 @@
       "node_kind": "heading",
       "norm_label": "configuration",
       "source_file": "api/README.md",
-      "source_location": "L92"
-    },
-    {
-      "id": "api_readme_dependencies",
-      "label": "Dependencies",
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "AI Translator API",
-      "file_type": "document",
-      "node_kind": "heading",
-      "norm_label": "dependencies",
-      "source_file": "api/README.md",
-      "source_location": "L86"
+      "source_location": "L69"
     },
     {
       "id": "api_readme_errors",
@@ -1865,7 +1761,7 @@
       "node_kind": "heading",
       "norm_label": "errors",
       "source_file": "api/README.md",
-      "source_location": "L57"
+      "source_location": "L43"
     },
     {
       "id": "api_readme_get_health",
@@ -1877,7 +1773,7 @@
       "node_kind": "heading",
       "norm_label": "`get /health`",
       "source_file": "api/README.md",
-      "source_location": "L23"
+      "source_location": "L7"
     },
     {
       "id": "api_readme_migrations",
@@ -1889,7 +1785,7 @@
       "node_kind": "heading",
       "norm_label": "migrations",
       "source_file": "api/README.md",
-      "source_location": "L76"
+      "source_location": "L58"
     },
     {
       "id": "api_readme_post_translate",
@@ -1901,19 +1797,7 @@
       "node_kind": "heading",
       "norm_label": "`post /translate`",
       "source_file": "api/README.md",
-      "source_location": "L33"
-    },
-    {
-      "id": "api_readme_running_it",
-      "label": "Running it",
-      "_origin": "ast",
-      "community": 21,
-      "community_name": "AI Translator API",
-      "file_type": "document",
-      "node_kind": "heading",
-      "norm_label": "running it",
-      "source_file": "api/README.md",
-      "source_location": "L16"
+      "source_location": "L17"
     },
     {
       "id": "api_src_app",
@@ -1935,7 +1819,7 @@
       "file_type": "code",
       "norm_label": "app",
       "source_file": "api/src/app.ts",
-      "source_location": "L34"
+      "source_location": "L32"
     },
     {
       "id": "api_src_app_hits",
@@ -1946,7 +1830,7 @@
       "file_type": "code",
       "norm_label": "hits",
       "source_file": "api/src/app.ts",
-      "source_location": "L12"
+      "source_location": "L11"
     },
     {
       "id": "api_src_app_test",
@@ -1979,29 +1863,7 @@
       "file_type": "code",
       "norm_label": "sql",
       "source_file": "api/src/db.ts",
-      "source_location": "L9"
-    },
-    {
-      "id": "api_src_env",
-      "label": "env.ts",
-      "_origin": "ast",
-      "community": 22,
-      "community_name": "app.ts",
-      "file_type": "code",
-      "norm_label": "env.ts",
-      "source_file": "api/src/env.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "api_src_index",
-      "label": "index.ts",
-      "_origin": "ast",
-      "community": 22,
-      "community_name": "app.ts",
-      "file_type": "code",
-      "norm_label": "index.ts",
-      "source_file": "api/src/index.ts",
-      "source_location": "L1"
+      "source_location": "L4"
     },
     {
       "id": "api_src_repositories_translations",
@@ -2048,6 +1910,28 @@
       "source_location": "L26"
     },
     {
+      "id": "api_src_server",
+      "label": "server.ts",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "server.ts",
+      "source_file": "api/src/server.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "api_src_server_port",
+      "label": "port",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "port",
+      "source_file": "api/src/server.ts",
+      "source_location": "L5"
+    },
+    {
       "id": "api_src_translate",
       "label": "translate.ts",
       "_origin": "ast",
@@ -2067,7 +1951,7 @@
       "file_type": "code",
       "norm_label": "client",
       "source_file": "api/src/translate.ts",
-      "source_location": "L5"
+      "source_location": "L4"
     },
     {
       "id": "extension_src_api",
@@ -2103,81 +1987,45 @@
       "source_location": "L22"
     },
     {
-      "id": "ref_openai",
-      "label": "openai",
+      "id": "ref_hono_node_server",
+      "label": "@hono/node-server",
       "_origin": "ast",
       "community": 22,
       "community_name": "app.ts",
       "file_type": "concept",
-      "norm_label": "openai",
-      "source_file": "api/package.json",
-      "source_location": "L13"
-    },
-    {
-      "id": "ref_postgres",
-      "label": "postgres",
-      "_origin": "ast",
-      "community": 22,
-      "community_name": "app.ts",
-      "file_type": "concept",
-      "norm_label": "postgres",
+      "norm_label": "@hono/node-server",
       "source_file": "api/package.json",
       "source_location": "L14"
     },
     {
-      "id": "api_deno",
-      "label": "deno.json",
+      "id": "start_api",
+      "label": "start-api.sh",
       "_origin": "ast",
-      "community": 23,
-      "community_name": "imports",
+      "community": 24,
+      "community_name": "start-api.sh",
       "file_type": "code",
-      "norm_label": "deno.json",
-      "source_file": "api/deno.json",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "norm_label": "start-api.sh",
+      "source_file": "start-api.sh",
       "source_location": "L1"
     },
     {
-      "id": "api_deno_imports",
-      "label": "imports",
+      "id": "start_api_sh__entry",
+      "label": "start-api.sh script",
       "_origin": "ast",
-      "community": 23,
-      "community_name": "imports",
+      "community": 24,
+      "community_name": "start-api.sh",
       "file_type": "code",
-      "norm_label": "imports",
-      "source_file": "api/deno.json",
-      "source_location": "L2"
-    },
-    {
-      "id": "api_deno_imports_hono",
-      "label": "hono",
-      "_origin": "ast",
-      "community": 23,
-      "community_name": "imports",
-      "file_type": "code",
-      "norm_label": "hono",
-      "source_file": "api/deno.json",
-      "source_location": "L3"
-    },
-    {
-      "id": "api_deno_imports_openai",
-      "label": "openai",
-      "_origin": "ast",
-      "community": 23,
-      "community_name": "imports",
-      "file_type": "code",
-      "norm_label": "openai",
-      "source_file": "api/deno.json",
-      "source_location": "L5"
-    },
-    {
-      "id": "api_deno_imports_postgres",
-      "label": "postgres",
-      "_origin": "ast",
-      "community": 23,
-      "community_name": "imports",
-      "file_type": "code",
-      "norm_label": "postgres",
-      "source_file": "api/deno.json",
-      "source_location": "L6"
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "norm_label": "start-api.sh script",
+      "source_file": "start-api.sh",
+      "source_location": "L1"
     },
     {
       "id": "claude_claude",
@@ -2816,6 +2664,72 @@
       "source_location": "L1"
     },
     {
+      "id": "api_package_dependencies",
+      "label": "dependencies",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "api/package.json",
+      "file_type": "code",
+      "norm_label": "dependencies",
+      "source_file": "api/package.json",
+      "source_location": "L13"
+    },
+    {
+      "id": "api_package_dependencies_dotenv",
+      "label": "dotenv",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "api/package.json",
+      "file_type": "code",
+      "norm_label": "dotenv",
+      "source_file": "api/package.json",
+      "source_location": "L15"
+    },
+    {
+      "id": "api_package_dependencies_hono",
+      "label": "hono",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "api/package.json",
+      "file_type": "code",
+      "norm_label": "hono",
+      "source_file": "api/package.json",
+      "source_location": "L16"
+    },
+    {
+      "id": "api_package_dependencies_hono_node_server",
+      "label": "@hono/node-server",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "api/package.json",
+      "file_type": "code",
+      "norm_label": "@hono/node-server",
+      "source_file": "api/package.json",
+      "source_location": "L14"
+    },
+    {
+      "id": "api_package_dependencies_openai",
+      "label": "openai",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "api/package.json",
+      "file_type": "code",
+      "norm_label": "openai",
+      "source_file": "api/package.json",
+      "source_location": "L17"
+    },
+    {
+      "id": "api_package_dependencies_postgres",
+      "label": "postgres",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "api/package.json",
+      "file_type": "code",
+      "norm_label": "postgres",
+      "source_file": "api/package.json",
+      "source_location": "L18"
+    },
+    {
       "id": "api_package_devdependencies",
       "label": "devDependencies",
       "_origin": "ast",
@@ -2824,40 +2738,7 @@
       "file_type": "code",
       "norm_label": "devdependencies",
       "source_file": "api/package.json",
-      "source_location": "L10"
-    },
-    {
-      "id": "api_package_devdependencies_hono",
-      "label": "hono",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "api/package.json",
-      "file_type": "code",
-      "norm_label": "hono",
-      "source_file": "api/package.json",
-      "source_location": "L12"
-    },
-    {
-      "id": "api_package_devdependencies_openai",
-      "label": "openai",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "api/package.json",
-      "file_type": "code",
-      "norm_label": "openai",
-      "source_file": "api/package.json",
-      "source_location": "L13"
-    },
-    {
-      "id": "api_package_devdependencies_postgres",
-      "label": "postgres",
-      "_origin": "ast",
-      "community": 6,
-      "community_name": "api/package.json",
-      "file_type": "code",
-      "norm_label": "postgres",
-      "source_file": "api/package.json",
-      "source_location": "L14"
+      "source_location": "L20"
     },
     {
       "id": "api_package_devdependencies_types_node",
@@ -2868,7 +2749,7 @@
       "file_type": "code",
       "norm_label": "@types/node",
       "source_file": "api/package.json",
-      "source_location": "L11"
+      "source_location": "L21"
     },
     {
       "id": "api_package_devdependencies_typescript",
@@ -2879,7 +2760,7 @@
       "file_type": "code",
       "norm_label": "typescript",
       "source_file": "api/package.json",
-      "source_location": "L15"
+      "source_location": "L22"
     },
     {
       "id": "api_package_devdependencies_vitest",
@@ -2890,7 +2771,7 @@
       "file_type": "code",
       "norm_label": "vitest",
       "source_file": "api/package.json",
-      "source_location": "L16"
+      "source_location": "L23"
     },
     {
       "id": "api_package_name",
@@ -2934,7 +2815,40 @@
       "file_type": "code",
       "norm_label": "compile",
       "source_file": "api/package.json",
+      "source_location": "L9"
+    },
+    {
+      "id": "api_package_scripts_dev",
+      "label": "dev",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "api/package.json",
+      "file_type": "code",
+      "norm_label": "dev",
+      "source_file": "api/package.json",
       "source_location": "L7"
+    },
+    {
+      "id": "api_package_scripts_migrate",
+      "label": "migrate",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "api/package.json",
+      "file_type": "code",
+      "norm_label": "migrate",
+      "source_file": "api/package.json",
+      "source_location": "L11"
+    },
+    {
+      "id": "api_package_scripts_start",
+      "label": "start",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "api/package.json",
+      "file_type": "code",
+      "norm_label": "start",
+      "source_file": "api/package.json",
+      "source_location": "L8"
     },
     {
       "id": "api_package_scripts_test",
@@ -2945,7 +2859,7 @@
       "file_type": "code",
       "norm_label": "test",
       "source_file": "api/package.json",
-      "source_location": "L8"
+      "source_location": "L10"
     },
     {
       "id": "api_package_type",
@@ -2970,6 +2884,39 @@
       "source_location": "L4"
     },
     {
+      "id": "api_src_migrate",
+      "label": "migrate.ts",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "api/package.json",
+      "file_type": "code",
+      "norm_label": "migrate.ts",
+      "source_file": "api/src/migrate.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "api_src_migrate_dir",
+      "label": "dir",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "api/package.json",
+      "file_type": "code",
+      "norm_label": "dir",
+      "source_file": "api/src/migrate.ts",
+      "source_location": "L13"
+    },
+    {
+      "id": "api_src_migrate_sql",
+      "label": "sql",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "api/package.json",
+      "file_type": "code",
+      "norm_label": "sql",
+      "source_file": "api/src/migrate.ts",
+      "source_location": "L14"
+    },
+    {
       "id": "api_package_json_ref_typescript",
       "label": "typescript",
       "_origin": "ast",
@@ -2978,7 +2925,7 @@
       "file_type": "concept",
       "norm_label": "typescript",
       "source_file": "api/package.json",
-      "source_location": "L15"
+      "source_location": "L22"
     },
     {
       "id": "api_package_json_ref_vitest",
@@ -2989,7 +2936,18 @@
       "file_type": "concept",
       "norm_label": "vitest",
       "source_file": "api/package.json",
-      "source_location": "L16"
+      "source_location": "L23"
+    },
+    {
+      "id": "ref_dotenv",
+      "label": "dotenv",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "api/package.json",
+      "file_type": "concept",
+      "norm_label": "dotenv",
+      "source_file": "api/package.json",
+      "source_location": "L15"
     },
     {
       "id": "ref_hono",
@@ -3000,7 +2958,29 @@
       "file_type": "concept",
       "norm_label": "hono",
       "source_file": "api/package.json",
-      "source_location": "L12"
+      "source_location": "L16"
+    },
+    {
+      "id": "ref_openai",
+      "label": "openai",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "api/package.json",
+      "file_type": "concept",
+      "norm_label": "openai",
+      "source_file": "api/package.json",
+      "source_location": "L17"
+    },
+    {
+      "id": "ref_postgres",
+      "label": "postgres",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "api/package.json",
+      "file_type": "concept",
+      "norm_label": "postgres",
+      "source_file": "api/package.json",
+      "source_location": "L18"
     },
     {
       "id": "ref_types_node",
@@ -3011,7 +2991,7 @@
       "file_type": "concept",
       "norm_label": "@types/node",
       "source_file": "api/package.json",
-      "source_location": "L11"
+      "source_location": "L21"
     },
     {
       "id": "extension_tsconfig",
@@ -3399,18 +3379,6 @@
       "type": "external"
     },
     {
-      "id": "ref_assets_translate_icon_svg_raw",
-      "label": "ref_assets_translate_icon_svg_raw",
-      "_origin": "semantic",
-      "community": 1,
-      "community_name": "content.ts",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "ref_assets_translate_icon_svg_raw",
-      "source_file": "",
-      "type": "external"
-    },
-    {
       "id": "ref_vitest",
       "label": "ref_vitest",
       "_origin": "semantic",
@@ -3431,6 +3399,18 @@
       "external": true,
       "file_type": "concept",
       "norm_label": "ref_wxt_utils_define_content_script",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "ref_assets_translate_icon_svg_raw",
+      "label": "ref_assets_translate_icon_svg_raw",
+      "_origin": "semantic",
+      "community": 17,
+      "community_name": "TranslatorWidget",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "ref_assets_translate_icon_svg_raw",
       "source_file": "",
       "type": "external"
     },
@@ -3471,23 +3451,11 @@
       "type": "external"
     },
     {
-      "id": "ref_dotenv_config",
-      "label": "ref_dotenv_config",
-      "_origin": "semantic",
-      "community": 24,
-      "community_name": "ref_dotenv_config",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "ref_dotenv_config",
-      "source_file": "",
-      "type": "external"
-    },
-    {
       "id": "ref_node_crypto",
       "label": "ref_node_crypto",
       "_origin": "semantic",
-      "community": 25,
-      "community_name": "ref_node_crypto",
+      "community": 22,
+      "community_name": "app.ts",
       "external": true,
       "file_type": "concept",
       "norm_label": "ref_node_crypto",
@@ -3495,11 +3463,23 @@
       "type": "external"
     },
     {
+      "id": "ref_dotenv_config",
+      "label": "ref_dotenv_config",
+      "_origin": "semantic",
+      "community": 6,
+      "community_name": "api/package.json",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "ref_dotenv_config",
+      "source_file": "",
+      "type": "external"
+    },
+    {
       "id": "ref_node_fs_promises",
       "label": "ref_node_fs_promises",
       "_origin": "semantic",
-      "community": 26,
-      "community_name": "ref_node_fs_promises",
+      "community": 6,
+      "community_name": "api/package.json",
       "external": true,
       "file_type": "concept",
       "norm_label": "ref_node_fs_promises",
@@ -3521,18 +3501,6 @@
   ],
   "links": [
     {
-      "source": "api_src_app_waituntil",
-      "target": "api_src_app_waituntil",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "api/src/app.ts",
-      "source_location": "L91",
-      "weight": 1.0
-    },
-    {
       "source": "api_src_db_checkdb",
       "target": "api_src_db_sql",
       "relation": "calls",
@@ -3541,31 +3509,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "api/src/db.ts",
-      "source_location": "L15",
-      "weight": 1.0
-    },
-    {
-      "source": "api_src_env_env",
-      "target": "api_src_env_get",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "api/src/env.ts",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "api_src_translate_translate",
-      "target": "api_src_env_env",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "api/src/translate.ts",
-      "source_location": "L12",
+      "source_location": "L10",
       "weight": 1.0
     },
     {
@@ -3577,7 +3521,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "api/src/translate.ts",
-      "source_location": "L14",
+      "source_location": "L13",
       "weight": 1.0
     },
     {
@@ -4141,7 +4085,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "api/src/app.ts",
-      "source_location": "L14",
+      "source_location": "L13",
       "weight": 1.0
     },
     {
@@ -4153,19 +4097,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "api/src/app.ts",
-      "source_location": "L24",
-      "weight": 1.0
-    },
-    {
-      "source": "api_src_app",
-      "target": "api_src_app_waituntil",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "api/src/app.ts",
-      "source_location": "L90",
+      "source_location": "L23",
       "weight": 1.0
     },
     {
@@ -4177,7 +4109,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "api/src/app.ts",
-      "source_location": "L94",
+      "source_location": "L86",
       "weight": 1.0
     },
     {
@@ -4338,43 +4270,7 @@
     },
     {
       "source": "api_package",
-      "target": "ref_types_node",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "api/package.json",
-      "source_location": "L11",
-      "weight": 1.0
-    },
-    {
-      "source": "api_package",
-      "target": "ref_hono",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "api/package.json",
-      "source_location": "L12",
-      "weight": 1.0
-    },
-    {
-      "source": "api_package",
-      "target": "ref_openai",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "api/package.json",
-      "source_location": "L13",
-      "weight": 1.0
-    },
-    {
-      "source": "api_package",
-      "target": "ref_postgres",
+      "target": "ref_hono_node_server",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -4386,7 +4282,7 @@
     },
     {
       "source": "api_package",
-      "target": "api_package_json_ref_typescript",
+      "target": "ref_dotenv",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -4398,7 +4294,7 @@
     },
     {
       "source": "api_package",
-      "target": "api_package_json_ref_vitest",
+      "target": "ref_hono",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -4406,6 +4302,66 @@
       "context": "import",
       "source_file": "api/package.json",
       "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "api_package",
+      "target": "ref_openai",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/package.json",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "api_package",
+      "target": "ref_postgres",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/package.json",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
+      "source": "api_package",
+      "target": "ref_types_node",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/package.json",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "api_package",
+      "target": "api_package_json_ref_typescript",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/package.json",
+      "source_location": "L22",
+      "weight": 1.0
+    },
+    {
+      "source": "api_package",
+      "target": "api_package_json_ref_vitest",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/package.json",
+      "source_location": "L23",
       "weight": 1.0
     },
     {
@@ -4493,18 +4449,6 @@
       "weight": 1.0
     },
     {
-      "source": "api_src_app",
-      "target": "api_src_env_env",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "api/src/app.ts",
-      "source_location": "L7",
-      "weight": 1.0
-    },
-    {
       "source": "api_src_app_test",
       "target": "api_src_app_app",
       "relation": "imports",
@@ -4526,30 +4470,6 @@
       "context": "import",
       "source_file": "api/src/app.test.ts",
       "source_location": "L5",
-      "weight": 1.0
-    },
-    {
-      "source": "api_src_db",
-      "target": "api_src_env_env",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "api/src/db.ts",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "api_src_index",
-      "target": "api_src_app_app",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "api/src/index.ts",
-      "source_location": "L4",
       "weight": 1.0
     },
     {
@@ -4601,6 +4521,18 @@
       "weight": 1.0
     },
     {
+      "source": "api_src_server",
+      "target": "api_src_app_app",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/server.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
       "source": "api_src_translate",
       "target": "shared_contract_translatebody",
       "relation": "imports",
@@ -4622,18 +4554,6 @@
       "context": "import",
       "source_file": "api/src/translate.ts",
       "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "api_src_translate",
-      "target": "api_src_env_env",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "api/src/translate.ts",
-      "source_location": "L3",
       "weight": 1.0
     },
     {
@@ -5069,18 +4989,6 @@
       "weight": 1.0
     },
     {
-      "source": "package",
-      "target": "ref_supabase",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "package.json",
-      "source_location": "L20",
-      "weight": 1.0
-    },
-    {
       "source": "api_src_app",
       "target": "ref_hono",
       "relation": "imports_from",
@@ -5154,7 +5062,7 @@
     },
     {
       "source": "api_src_app",
-      "target": "api_src_env",
+      "target": "ref_node_crypto",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -5237,27 +5145,39 @@
       "weight": 1.0
     },
     {
-      "source": "api_src_db",
-      "target": "api_src_env",
+      "source": "api_src_migrate",
+      "target": "ref_dotenv_config",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "import",
-      "source_file": "api/src/db.ts",
-      "source_location": "L2",
+      "source_file": "api/src/migrate.ts",
+      "source_location": "L3",
       "weight": 1.0
     },
     {
-      "source": "api_src_index",
-      "target": "api_src_app",
+      "source": "api_src_migrate",
+      "target": "ref_node_fs_promises",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "import",
-      "source_file": "api/src/index.ts",
+      "source_file": "api/src/migrate.ts",
       "source_location": "L4",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_migrate",
+      "target": "ref_postgres",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/migrate.ts",
+      "source_location": "L5",
       "weight": 1.0
     },
     {
@@ -5310,6 +5230,42 @@
       "weight": 1.0
     },
     {
+      "source": "api_src_server",
+      "target": "ref_dotenv_config",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/server.ts",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_server",
+      "target": "ref_hono_node_server",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/server.ts",
+      "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_server",
+      "target": "api_src_app",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/server.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
       "source": "api_src_translate",
       "target": "shared_contract",
       "relation": "imports_from",
@@ -5332,18 +5288,6 @@
       "context": "import",
       "source_file": "api/src/translate.ts",
       "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "api_src_translate",
-      "target": "api_src_env",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "api/src/translate.ts",
-      "source_location": "L3",
       "weight": 1.0
     },
     {
@@ -5760,58 +5704,14 @@
       "weight": 1.0
     },
     {
-      "source": "api_deno",
-      "target": "api_deno_imports",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "api/deno.json",
-      "source_location": "L2",
-      "weight": 1.0
-    },
-    {
-      "source": "api_deno_imports",
-      "target": "api_deno_imports_hono",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "api/deno.json",
-      "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "api_deno_imports",
-      "target": "api_deno_imports_openai",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "api/deno.json",
-      "source_location": "L5",
-      "weight": 1.0
-    },
-    {
-      "source": "api_deno_imports",
-      "target": "api_deno_imports_postgres",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "api/deno.json",
-      "source_location": "L6",
-      "weight": 1.0
-    },
-    {
       "source": "api_package",
-      "target": "api_package_devdependencies",
+      "target": "api_package_dependencies",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/package.json",
-      "source_location": "L10",
+      "source_location": "L13",
       "weight": 1.0
     },
     {
@@ -5823,6 +5723,17 @@
       "confidence_score": 1.0,
       "source_file": "api/package.json",
       "source_location": "L2",
+      "weight": 1.0
+    },
+    {
+      "source": "api_package",
+      "target": "api_package_devdependencies",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/package.json",
+      "source_location": "L20",
       "weight": 1.0
     },
     {
@@ -5870,6 +5781,61 @@
       "weight": 1.0
     },
     {
+      "source": "api_package_dependencies",
+      "target": "api_package_dependencies_hono_node_server",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/package.json",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "api_package_dependencies",
+      "target": "api_package_dependencies_dotenv",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/package.json",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "api_package_dependencies",
+      "target": "api_package_dependencies_hono",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/package.json",
+      "source_location": "L16",
+      "weight": 1.0
+    },
+    {
+      "source": "api_package_dependencies",
+      "target": "api_package_dependencies_openai",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/package.json",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "api_package_dependencies",
+      "target": "api_package_dependencies_postgres",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/package.json",
+      "source_location": "L18",
+      "weight": 1.0
+    },
+    {
       "source": "api_package_devdependencies",
       "target": "api_package_devdependencies_types_node",
       "relation": "contains",
@@ -5877,40 +5843,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/package.json",
-      "source_location": "L11",
-      "weight": 1.0
-    },
-    {
-      "source": "api_package_devdependencies",
-      "target": "api_package_devdependencies_hono",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "api/package.json",
-      "source_location": "L12",
-      "weight": 1.0
-    },
-    {
-      "source": "api_package_devdependencies",
-      "target": "api_package_devdependencies_openai",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "api/package.json",
-      "source_location": "L13",
-      "weight": 1.0
-    },
-    {
-      "source": "api_package_devdependencies",
-      "target": "api_package_devdependencies_postgres",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "api/package.json",
-      "source_location": "L14",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
@@ -5921,7 +5854,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/package.json",
-      "source_location": "L15",
+      "source_location": "L22",
       "weight": 1.0
     },
     {
@@ -5932,18 +5865,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/package.json",
-      "source_location": "L16",
-      "weight": 1.0
-    },
-    {
-      "source": "api_package_scripts",
-      "target": "api_package_scripts_compile",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "api/package.json",
-      "source_location": "L7",
+      "source_location": "L23",
       "weight": 1.0
     },
     {
@@ -5954,7 +5876,51 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/package.json",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "api_package_scripts",
+      "target": "api_package_scripts_migrate",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/package.json",
+      "source_location": "L11",
+      "weight": 1.0
+    },
+    {
+      "source": "api_package_scripts",
+      "target": "api_package_scripts_dev",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/package.json",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "api_package_scripts",
+      "target": "api_package_scripts_start",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/package.json",
       "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "api_package_scripts",
+      "target": "api_package_scripts_compile",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/package.json",
+      "source_location": "L9",
       "weight": 1.0
     },
     {
@@ -5970,35 +5936,13 @@
     },
     {
       "source": "api_readme_ai_translator_api",
-      "target": "api_readme_running_it",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "api/README.md",
-      "source_location": "L16",
-      "weight": 1.0
-    },
-    {
-      "source": "api_readme_ai_translator_api",
-      "target": "api_readme_get_health",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "api/README.md",
-      "source_location": "L23",
-      "weight": 1.0
-    },
-    {
-      "source": "api_readme_ai_translator_api",
       "target": "api_readme_post_translate",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/README.md",
-      "source_location": "L33",
+      "source_location": "L17",
       "weight": 1.0
     },
     {
@@ -6009,7 +5953,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/README.md",
-      "source_location": "L57",
+      "source_location": "L43",
       "weight": 1.0
     },
     {
@@ -6020,18 +5964,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/README.md",
-      "source_location": "L76",
-      "weight": 1.0
-    },
-    {
-      "source": "api_readme_ai_translator_api",
-      "target": "api_readme_dependencies",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "api/README.md",
-      "source_location": "L86",
+      "source_location": "L58",
       "weight": 1.0
     },
     {
@@ -6042,7 +5975,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/README.md",
-      "source_location": "L92",
+      "source_location": "L69",
+      "weight": 1.0
+    },
+    {
+      "source": "api_readme_ai_translator_api",
+      "target": "api_readme_get_health",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/README.md",
+      "source_location": "L7",
       "weight": 1.0
     },
     {
@@ -6053,7 +5997,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/src/app.ts",
-      "source_location": "L12",
+      "source_location": "L11",
       "weight": 1.0
     },
     {
@@ -6064,18 +6008,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/src/app.ts",
-      "source_location": "L34",
-      "weight": 1.0
-    },
-    {
-      "source": "api_src_db",
-      "target": "api_src_db_checkdb",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "api/src/db.ts",
-      "source_location": "L12",
+      "source_location": "L32",
       "weight": 1.0
     },
     {
@@ -6086,40 +6019,40 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/src/db.ts",
-      "source_location": "L9",
-      "weight": 1.0
-    },
-    {
-      "source": "api_src_env",
-      "target": "api_src_env_get",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "api/src/env.ts",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "api_src_env",
-      "target": "api_src_env_env",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "api/src/env.ts",
       "source_location": "L4",
       "weight": 1.0
     },
     {
-      "source": "api_src_index",
-      "target": "api_src_index_serve",
+      "source": "api_src_db",
+      "target": "api_src_db_checkdb",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "api/src/index.ts",
+      "source_file": "api/src/db.ts",
       "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_migrate",
+      "target": "api_src_migrate_dir",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/src/migrate.ts",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_migrate",
+      "target": "api_src_migrate_sql",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/src/migrate.ts",
+      "source_location": "L14",
       "weight": 1.0
     },
     {
@@ -6167,14 +6100,14 @@
       "weight": 1.0
     },
     {
-      "source": "api_src_translate",
-      "target": "api_src_translate_translate",
+      "source": "api_src_server",
+      "target": "api_src_server_port",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "api/src/translate.ts",
-      "source_location": "L10",
+      "source_file": "api/src/server.ts",
+      "source_location": "L5",
       "weight": 1.0
     },
     {
@@ -6185,7 +6118,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/src/translate.ts",
-      "source_location": "L5",
+      "source_location": "L4",
       "weight": 1.0
     },
     {
@@ -6196,7 +6129,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/src/translate.ts",
-      "source_location": "L66",
+      "source_location": "L65",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_translate",
+      "target": "api_src_translate_translate",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "api/src/translate.ts",
+      "source_location": "L9",
       "weight": 1.0
     },
     {
@@ -7598,28 +7542,6 @@
     },
     {
       "source": "package",
-      "target": "package_scripts",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "package.json",
-      "source_location": "L10",
-      "weight": 1.0
-    },
-    {
-      "source": "package",
-      "target": "package_devdependencies",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "package.json",
-      "source_location": "L19",
-      "weight": 1.0
-    },
-    {
-      "source": "package",
       "target": "package_name",
       "relation": "contains",
       "_origin": "ast",
@@ -7674,36 +7596,14 @@
       "weight": 1.0
     },
     {
-      "source": "package_devdependencies",
-      "target": "package_devdependencies_supabase",
+      "source": "package",
+      "target": "package_scripts",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "package.json",
-      "source_location": "L20",
-      "weight": 1.0
-    },
-    {
-      "source": "package_scripts",
-      "target": "package_scripts_dev",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "package.json",
-      "source_location": "L11",
-      "weight": 1.0
-    },
-    {
-      "source": "package_scripts",
-      "target": "package_scripts_dev_api",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "package.json",
-      "source_location": "L12",
+      "source_location": "L7",
       "weight": 1.0
     },
     {
@@ -7714,7 +7614,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "package.json",
-      "source_location": "L13",
+      "source_location": "L10",
       "weight": 1.0
     },
     {
@@ -7725,7 +7625,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "package.json",
-      "source_location": "L14",
+      "source_location": "L11",
       "weight": 1.0
     },
     {
@@ -7736,7 +7636,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "package.json",
-      "source_location": "L15",
+      "source_location": "L12",
       "weight": 1.0
     },
     {
@@ -7747,18 +7647,29 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "package.json",
-      "source_location": "L16",
+      "source_location": "L13",
       "weight": 1.0
     },
     {
       "source": "package_scripts",
-      "target": "package_scripts_db",
+      "target": "package_scripts_dev",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "package.json",
-      "source_location": "L17",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "package_scripts",
+      "target": "package_scripts_dev_api",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "package.json",
+      "source_location": "L9",
       "weight": 1.0
     },
     {
@@ -7814,6 +7725,17 @@
       "confidence_score": 1.0,
       "source_file": "shared/contract.ts",
       "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "start_api",
+      "target": "start_api_sh__entry",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "start-api.sh",
+      "source_location": "L1",
       "weight": 1.0
     },
     {
@@ -8293,5 +8215,5 @@
       "source_file": "CLAUDE.md"
     }
   ],
-  "built_at_commit": "b2559cafe5f6e7e97171b9f7ff95a5367eb4a260"
+  "built_at_commit": "685455070822de377c8dfef1f8c57f7498b5c4ef"
 }

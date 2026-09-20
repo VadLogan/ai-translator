@@ -1,9 +1,0 @@
-**/node_modules
-**/.output
-**/output
-**/.wxt
-.git
-graphify-out
-extension
-!extension/package.json
-**/.env

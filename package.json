@@ -3,13 +3,20 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "workspaces": ["api", "extension"],
+  "workspaces": [
+    "api",
+    "extension"
+  ],
   "scripts": {
     "dev": "npm run dev:api & npm run dev:extension",
-    "dev:api": "npm run dev -w api",
+    "dev:api": "supabase functions serve api --env-file supabase/functions/.env",
     "dev:extension": "npm run dev:playground -w extension",
     "build": "npm run build --workspaces --if-present",
     "compile": "npm run compile --workspaces --if-present",
-    "test": "npm test --workspaces --if-present"
+    "test": "npm test --workspaces --if-present",
+    "db": "supabase start"
+  },
+  "devDependencies": {
+    "supabase": "^2.117.0"
   }
 }

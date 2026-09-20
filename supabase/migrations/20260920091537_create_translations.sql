@@ -1,4 +1,4 @@
--- Applied by `npm run migrate -w api`. Idempotent, so it is safe on a DB where schema.sql was already run by hand.
+-- Every translation attempt, successes and provider failures alike.
 create table if not exists translations (
   id                   uuid primary key,
   created_at           timestamptz not null default now(),
@@ -10,3 +10,6 @@ create table if not exists translations (
   duration_ms          integer not null,
   error                text           -- null on success
 );
+
+-- Bookkeeping for the old hand-rolled runner (api/src/migrate.ts); the Supabase CLI owns migrations now.
+drop table if exists schema_migrations;

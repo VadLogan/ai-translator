@@ -8,8 +8,9 @@ export default defineConfig({
     name: 'AI Translator',
     description: 'Select text in any input field and translate it in place.',
     permissions: ['storage'],
-    // The backend API. Add the production origin here when hosting is chosen.
-    host_permissions: ['http://127.0.0.1:8787/*'],
+    // The backend API: the local Supabase stack, plus the deployed edge function.
+    // Swap <project-ref> for the real one; WXT_API_URL must point at the same origin.
+    host_permissions: ['http://127.0.0.1:54321/*', 'https://<project-ref>.supabase.co/*'],
     action: { default_title: 'AI Translator settings' },
   },
   // Pinned so a dev build always points at the same reload socket; WXT otherwise
