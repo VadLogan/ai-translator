@@ -6,11 +6,22 @@ export interface TranslateBody {
   targetLang: string;
   /** Omit to let the provider auto-detect. */
   sourceLang?: string;
+  /** Page the extension was used on. The background worker fills it from the sender tab. */
+  url?: string;
 }
 
 export interface TranslateOk {
   text: string;
   detectedSourceLang?: string;
+  /** What the translation cost. Absent if the provider didn't report it. */
+  usage?: TokenUsage;
+}
+
+export interface TokenUsage {
+  inputTokens: number;
+  outputTokens: number;
+  /** Input + output, as the provider reports it. */
+  totalTokens: number;
 }
 
 export type ApiErrorCode = 'invalid-input' | 'rate-limited' | 'not-found' | 'provider-failed';
@@ -20,3 +31,4 @@ export interface TranslateErr {
 }
 
 export const MAX_TEXT_LENGTH = 5000;
+export const MAX_URL_LENGTH = 2048;

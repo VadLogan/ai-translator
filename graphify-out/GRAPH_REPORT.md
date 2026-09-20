@@ -1,17 +1,17 @@
 # Graph Report - ai-translator-ext  (2026-09-20)
 
 ## Corpus Check
-- 46 files · ~19,606 words
+- 47 files · ~20,101 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 8 file(s) not represented in the graph (top: (none) 5, .css 1, .toml 1)
 
 ## Summary
-- 297 nodes · 414 edges · 27 communities (20 shown, 7 thin omitted)
+- 299 nodes · 417 edges · 27 communities (20 shown, 7 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 14 edges (avg confidence: 0.83)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `b2559caf`
+- Built from commit: `ff98faf4`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -77,12 +77,12 @@
 ## Communities (27 total, 7 thin omitted)
 
 ### Community 0 - "storage-settings.ts"
-Cohesion: 0.24
+Cohesion: 0.23
 Nodes (6): LANGUAGES, DEFAULT_SETTINGS, Settings, settingsItem, storageSettings, ref_wxt_utils_storage
 
 ### Community 1 - "content.ts"
-Cohesion: 0.12
-Nodes (28): dispatchInput(), replaceInContentEditable(), replaceInTextControl(), replaceSelection(), tryInsertText(), tryPaste(), deepActiveElement(), EditableSelection (+20 more)
+Cohesion: 0.14
+Nodes (25): dispatchInput(), replaceInContentEditable(), replaceInTextControl(), replaceSelection(), tryInsertText(), tryPaste(), deepActiveElement(), EditableSelection (+17 more)
 
 ### Community 2 - "package.json"
 Cohesion: 0.12
@@ -129,8 +129,8 @@ Cohesion: 0.50
 Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphify reference: incremental update and cluster-only
 
 ### Community 17 - "TranslatorWidget"
-Cohesion: 0.19
-Nodes (4): Anchor, clamp(), TranslatorWidget, WidgetCallbacks
+Cohesion: 0.15
+Nodes (7): Anchor, WIDGET_CSS, clamp(), TranslatorWidget, WidgetCallbacks, Language, ref_assets_translate_icon_svg_raw
 
 ### Community 18 - "background.ts"
 Cohesion: 0.24
@@ -149,16 +149,16 @@ Cohesion: 0.22
 Nodes (8): AI Translator API, Configuration, Dependencies, Errors, `GET /health`, Migrations, `POST /translate`, Running it
 
 ### Community 22 - "app.ts"
-Cohesion: 0.11
-Nodes (23): app, hits, waitUntil(), checkDb(), sql, env(), get(), request (+15 more)
+Cohesion: 0.10
+Nodes (25): app, hits, waitUntil(), checkDb(), sql, env(), get(), request (+17 more)
 
 ### Community 23 - "imports"
 Cohesion: 0.40
 Nodes (4): imports, hono, openai, postgres
 
 ## Knowledge Gaps
-- **128 isolated node(s):** `hono`, `openai`, `postgres`, `name`, `private` (+123 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 164 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **129 isolated node(s):** `hono`, `openai`, `postgres`, `name`, `private` (+124 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 165 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **7 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
@@ -167,13 +167,13 @@ _Questions this graph is uniquely positioned to answer:_
 - **Why does `TranslatorWidget` connect `TranslatorWidget` to `content.ts`?**
   _High betweenness centrality (0.047) - this node is a cross-community bridge._
 - **Why does `TranslateOk` connect `app.ts` to `background.ts`?**
-  _High betweenness centrality (0.039) - this node is a cross-community bridge._
+  _High betweenness centrality (0.038) - this node is a cross-community bridge._
 - **Why does `hono` connect `api/package.json` to `app.ts`?**
   _High betweenness centrality (0.025) - this node is a cross-community bridge._
 - **What connects `hono`, `openai`, `postgres` to the rest of the system?**
-  _128 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _129 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `content.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.11522048364153627 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.13911290322580644 - nodes in this community are weakly interconnected._
 - **Should `package.json` be split into smaller, more focused modules?**
   _Cohesion score 0.11764705882352941 - nodes in this community are weakly interconnected._
 - **Should `extension/package.json` be split into smaller, more focused modules?**

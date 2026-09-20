@@ -16,8 +16,12 @@ export function toRow({ id, request, result, error, durationMs }: TranslationRec
     text: request.text,
     target_lang: request.targetLang,
     source_lang: request.sourceLang ?? null,
+    url: request.url ?? null,
     result: result?.text ?? null,
     detected_source_lang: result?.detectedSourceLang ?? null,
+    input_tokens: result?.usage?.inputTokens ?? null,
+    output_tokens: result?.usage?.outputTokens ?? null,
+    total_tokens: result?.usage?.totalTokens ?? null,
     duration_ms: durationMs,
     error: error === undefined ? null : String(error),
   };

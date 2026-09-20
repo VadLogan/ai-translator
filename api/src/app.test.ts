@@ -30,6 +30,14 @@ describe('POST /translate', () => {
     );
   });
 
+  it('passes the page url through to the saved row', async () => {
+    await post({ text: 'Hello', targetLang: 'de', url: 'https://teams.microsoft.com/chat' });
+
+    expect(translationsRepository.save).toHaveBeenLastCalledWith(
+      expect.objectContaining({ request: expect.objectContaining({ url: 'https://teams.microsoft.com/chat' }) }),
+    );
+  });
+
   it('502s when the provider fails and saves the error', async () => {
     const boom = new Error('provider down');
     vi.mocked(translate).mockRejectedValueOnce(boom);
@@ -52,6 +60,8 @@ describe('POST /translate', () => {
     ['missing text', { targetLang: 'de' }],
     ['bad targetLang', { text: 'Hello', targetLang: 'deutsch!' }],
     ['too long', { text: 'x'.repeat(5001), targetLang: 'de' }],
+    ['non-string url', { text: 'Hello', targetLang: 'de', url: 42 }],
+    ['oversized url', { text: 'Hello', targetLang: 'de', url: `https://e.com/${'x'.repeat(2048)}` }],
   ])('rejects %s with 400', async (_name, body) => {
     const res = await post(body);
     expect(res.status).toBe(400);

@@ -1,6 +1,6 @@
 import { Hono, type Context } from 'hono';
 import { cors } from 'hono/cors';
-import { MAX_TEXT_LENGTH, type ApiErrorCode, type TranslateBody, type TranslateOk } from '../../shared/contract.ts';
+import { MAX_TEXT_LENGTH, MAX_URL_LENGTH, type ApiErrorCode, type TranslateBody, type TranslateOk } from '../../shared/contract.ts';
 import { translate } from './translate.ts';
 import { checkDb } from './db.ts';
 import { translationsRepository } from './repositories/translations.ts';
@@ -23,11 +23,18 @@ function isRateLimited(ip: string, now = Date.now()): boolean {
 
 function parseBody(body: unknown): TranslateBody | string {
   if (typeof body !== 'object' || body === null) return 'Body must be a JSON object';
-  const { text, targetLang, sourceLang } = body as Record<string, unknown>;
+  const { text, targetLang, sourceLang, url } = body as Record<string, unknown>;
   if (typeof text !== 'string' || !text.trim()) return 'text is required';
   if (text.length > MAX_TEXT_LENGTH) return `text must be at most ${MAX_TEXT_LENGTH} characters`;
   if (typeof targetLang !== 'string' || !/^[a-zA-Z-]{2,8}$/.test(targetLang)) return 'targetLang is invalid';
-  return { text, targetLang, ...(typeof sourceLang === 'string' ? { sourceLang } : {}) };
+  // The endpoint is public, so bound the url rather than trusting the caller; content is not parsed.
+  if (url !== undefined && (typeof url !== 'string' || url.length > MAX_URL_LENGTH)) return 'url is invalid';
+  return {
+    text,
+    targetLang,
+    ...(typeof sourceLang === 'string' ? { sourceLang } : {}),
+    ...(typeof url === 'string' ? { url } : {}),
+  };
 }
 
 // basePath matches the function name: Supabase strips /functions/v1 and the app sees /api/*.

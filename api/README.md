@@ -39,14 +39,20 @@ Request body (JSON):
 | `text`       | string | yes      | Non-empty, at most 5000 characters         |
 | `targetLang` | string | yes      | Language code, 2–8 letters/dashes: `de`, `pt-BR` |
 | `sourceLang` | string | no       | Omit to let the provider auto-detect       |
+| `url`        | string | no       | Page the extension was used on, at most 2048 chars. Stored, never parsed. The extension's background worker fills it from the sender tab |
 
 Response `200`:
 
 ```json
-{ "text": "[de] hello", "detectedSourceLang": "en" }
+{
+  "text": "[de] hello",
+  "detectedSourceLang": "en",
+  "usage": { "inputTokens": 257, "outputTokens": 25, "totalTokens": 282 }
+}
 ```
 
-`detectedSourceLang` is optional. Translation is done by OpenAI ([`src/translate.ts`](src/translate.ts)).
+`detectedSourceLang` and `usage` are both optional — `usage` is absent when the provider
+doesn't report it. Both, plus `url`, are saved as columns on `translations`. Translation is done by OpenAI ([`src/translate.ts`](src/translate.ts)).
 
 ```bash
 curl -X POST http://127.0.0.1:54321/functions/v1/api/translate \

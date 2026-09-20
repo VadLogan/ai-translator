@@ -1,15 +1,20 @@
-import { browser } from 'wxt/browser';
+import { browser, type Browser } from 'wxt/browser';
 import { defineBackground } from 'wxt/utils/define-background';
 import { translate } from '../api';
 import { isMessage, type Message, type Response } from '../messaging/messages';
 
 export default defineBackground(() => {
-  async function handle(message: Message): Promise<Response<unknown>> {
+  async function handle(message: Message, sender: Browser.runtime.MessageSender): Promise<Response<unknown>> {
     try {
       switch (message.type) {
         case 'translate':
           // Fetched here, not in the content script: host_permissions exempt the worker from page CORS.
-          return { ok: true, data: await translate({ text: message.text, targetLang: message.targetLang }) };
+          return {
+            ok: true,
+            // The url comes from the sender, not the message: the browser fills it in, so a
+            // compromised page can't forge where the extension was used.
+            data: await translate({ text: message.text, targetLang: message.targetLang, url: sender.tab?.url ?? sender.url }),
+          };
         case 'open-options':
           await browser.runtime.openOptionsPage();
           return { ok: true, data: undefined };
@@ -19,9 +24,9 @@ export default defineBackground(() => {
     }
   }
 
-  browser.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (!isMessage(message)) return;
-    handle(message).then(sendResponse);
+    handle(message, sender).then(sendResponse);
     return true; // keep the channel open for the async response
   });
 

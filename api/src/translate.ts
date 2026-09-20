@@ -36,7 +36,17 @@ export async function translate(translateBody: TranslateBody): Promise<Translate
       },
     },
   })
-  return JSON.parse(response.output_text) as TranslateOk;
+  const { usage } = response;
+  return {
+    ...(JSON.parse(response.output_text) as TranslateOk),
+    ...(usage && {
+      usage: {
+        inputTokens: usage.input_tokens,
+        outputTokens: usage.output_tokens,
+        totalTokens: usage.total_tokens,
+      },
+    }),
+  };
 }
 
 

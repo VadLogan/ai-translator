@@ -47,19 +47,6 @@
       "source_location": "L1"
     },
     {
-      "id": "extension_src_core_languages_language",
-      "label": "Language",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "language",
-      "source_file": "extension/src/core/languages.ts",
-      "source_location": "L1"
-    },
-    {
       "id": "extension_src_content_selection_anchor",
       "label": "Anchor",
       "_callable": true,
@@ -97,6 +84,19 @@
       "norm_label": "widgetcallbacks",
       "source_file": "extension/src/content/ui/translator-widget.ts",
       "source_location": "L6"
+    },
+    {
+      "id": "extension_src_core_languages_language",
+      "label": "Language",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "TranslatorWidget",
+      "file_type": "code",
+      "norm_label": "language",
+      "source_file": "extension/src/core/languages.ts",
+      "source_location": "L1"
     },
     {
       "id": "extension_src_messaging_messages_message",
@@ -161,7 +161,20 @@
       "file_type": "code",
       "norm_label": "apierrorcode",
       "source_file": "shared/contract.ts",
-      "source_location": "L16"
+      "source_location": "L27"
+    },
+    {
+      "id": "shared_contract_tokenusage",
+      "label": "TokenUsage",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "tokenusage",
+      "source_file": "shared/contract.ts",
+      "source_location": "L20"
     },
     {
       "id": "shared_contract_translatebody",
@@ -187,7 +200,7 @@
       "file_type": "code",
       "norm_label": "translateerr",
       "source_file": "shared/contract.ts",
-      "source_location": "L18"
+      "source_location": "L29"
     },
     {
       "id": "shared_contract_translateok",
@@ -200,7 +213,7 @@
       "file_type": "code",
       "norm_label": "translateok",
       "source_file": "shared/contract.ts",
-      "source_location": "L11"
+      "source_location": "L13"
     },
     {
       "id": "extension_src_entrypoints_options_main_init",
@@ -776,7 +789,7 @@
       "file_type": "code",
       "norm_label": "reloadplaygroundwhenready()",
       "source_file": "extension/src/entrypoints/background.ts",
-      "source_location": "L39"
+      "source_location": "L44"
     },
     {
       "id": "extension_src_messaging_messages_ismessage",
@@ -800,7 +813,7 @@
       "file_type": "code",
       "norm_label": "fail()",
       "source_file": "api/src/app.ts",
-      "source_location": "L94"
+      "source_location": "L101"
     },
     {
       "id": "api_src_app_isratelimited",
@@ -848,7 +861,7 @@
       "file_type": "code",
       "norm_label": "waituntil()",
       "source_file": "api/src/app.ts",
-      "source_location": "L90"
+      "source_location": "L97"
     },
     {
       "id": "api_src_db_checkdb",
@@ -920,7 +933,7 @@
       "file_type": "code",
       "norm_label": "createinput()",
       "source_file": "api/src/translate.ts",
-      "source_location": "L66"
+      "source_location": "L76"
     },
     {
       "id": "api_src_translate_translate",
@@ -933,6 +946,17 @@
       "norm_label": "translate()",
       "source_file": "api/src/translate.ts",
       "source_location": "L10"
+    },
+    {
+      "id": "extension_src_core_languages",
+      "label": "languages.ts",
+      "_origin": "ast",
+      "community": 0,
+      "community_name": "storage-settings.ts",
+      "file_type": "code",
+      "norm_label": "languages.ts",
+      "source_file": "extension/src/core/languages.ts",
+      "source_location": "L1"
     },
     {
       "id": "extension_src_core_languages_languages",
@@ -1064,50 +1088,6 @@
       "file_type": "code",
       "norm_label": "selection.test.ts",
       "source_file": "extension/src/content/selection.test.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_content_ui_styles",
-      "label": "styles.ts",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "styles.ts",
-      "source_file": "extension/src/content/ui/styles.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_content_ui_styles_widget_css",
-      "label": "WIDGET_CSS",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "widget_css",
-      "source_file": "extension/src/content/ui/styles.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_content_ui_translator_widget",
-      "label": "translator-widget.ts",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "translator-widget.ts",
-      "source_file": "extension/src/content/ui/translator-widget.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_core_languages",
-      "label": "languages.ts",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "content.ts",
-      "file_type": "code",
-      "norm_label": "languages.ts",
-      "source_file": "extension/src/core/languages.ts",
       "source_location": "L1"
     },
     {
@@ -1431,6 +1411,39 @@
       "node_kind": "heading",
       "norm_label": "graphify reference: extraction subagent prompt",
       "source_file": ".claude/skills/graphify/references/extraction-spec.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_content_ui_styles",
+      "label": "styles.ts",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "TranslatorWidget",
+      "file_type": "code",
+      "norm_label": "styles.ts",
+      "source_file": "extension/src/content/ui/styles.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_content_ui_styles_widget_css",
+      "label": "WIDGET_CSS",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "TranslatorWidget",
+      "file_type": "code",
+      "norm_label": "widget_css",
+      "source_file": "extension/src/content/ui/styles.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_content_ui_translator_widget",
+      "label": "translator-widget.ts",
+      "_origin": "ast",
+      "community": 17,
+      "community_name": "TranslatorWidget",
+      "file_type": "code",
+      "norm_label": "translator-widget.ts",
+      "source_file": "extension/src/content/ui/translator-widget.ts",
       "source_location": "L1"
     },
     {
@@ -1841,7 +1854,7 @@
       "node_kind": "heading",
       "norm_label": "configuration",
       "source_file": "api/README.md",
-      "source_location": "L92"
+      "source_location": "L98"
     },
     {
       "id": "api_readme_dependencies",
@@ -1853,7 +1866,7 @@
       "node_kind": "heading",
       "norm_label": "dependencies",
       "source_file": "api/README.md",
-      "source_location": "L86"
+      "source_location": "L92"
     },
     {
       "id": "api_readme_errors",
@@ -1865,7 +1878,7 @@
       "node_kind": "heading",
       "norm_label": "errors",
       "source_file": "api/README.md",
-      "source_location": "L57"
+      "source_location": "L63"
     },
     {
       "id": "api_readme_get_health",
@@ -1889,7 +1902,7 @@
       "node_kind": "heading",
       "norm_label": "migrations",
       "source_file": "api/README.md",
-      "source_location": "L76"
+      "source_location": "L82"
     },
     {
       "id": "api_readme_post_translate",
@@ -1935,7 +1948,7 @@
       "file_type": "code",
       "norm_label": "app",
       "source_file": "api/src/app.ts",
-      "source_location": "L34"
+      "source_location": "L41"
     },
     {
       "id": "api_src_app_hits",
@@ -2045,7 +2058,7 @@
       "file_type": "code",
       "norm_label": "translationsrepository",
       "source_file": "api/src/repositories/translations.ts",
-      "source_location": "L26"
+      "source_location": "L30"
     },
     {
       "id": "api_src_translate",
@@ -2100,7 +2113,18 @@
       "file_type": "code",
       "norm_label": "max_text_length",
       "source_file": "shared/contract.ts",
-      "source_location": "L22"
+      "source_location": "L33"
+    },
+    {
+      "id": "shared_contract_max_url_length",
+      "label": "MAX_URL_LENGTH",
+      "_origin": "ast",
+      "community": 22,
+      "community_name": "app.ts",
+      "file_type": "code",
+      "norm_label": "max_url_length",
+      "source_file": "shared/contract.ts",
+      "source_location": "L34"
     },
     {
       "id": "ref_openai",
@@ -3399,18 +3423,6 @@
       "type": "external"
     },
     {
-      "id": "ref_assets_translate_icon_svg_raw",
-      "label": "ref_assets_translate_icon_svg_raw",
-      "_origin": "semantic",
-      "community": 1,
-      "community_name": "content.ts",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "ref_assets_translate_icon_svg_raw",
-      "source_file": "",
-      "type": "external"
-    },
-    {
       "id": "ref_vitest",
       "label": "ref_vitest",
       "_origin": "semantic",
@@ -3431,6 +3443,18 @@
       "external": true,
       "file_type": "concept",
       "norm_label": "ref_wxt_utils_define_content_script",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "ref_assets_translate_icon_svg_raw",
+      "label": "ref_assets_translate_icon_svg_raw",
+      "_origin": "semantic",
+      "community": 17,
+      "community_name": "TranslatorWidget",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "ref_assets_translate_icon_svg_raw",
       "source_file": "",
       "type": "external"
     },
@@ -3529,7 +3553,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "api/src/app.ts",
-      "source_location": "L91",
+      "source_location": "L98",
       "weight": 1.0
     },
     {
@@ -3973,7 +3997,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/background.ts",
-      "source_location": "L12",
+      "source_location": "L16",
       "weight": 1.0
     },
     {
@@ -4134,6 +4158,18 @@
     },
     {
       "source": "api_src_app",
+      "target": "api_src_app_fail",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "api/src/app.ts",
+      "source_location": "L101",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_app",
       "target": "api_src_app_isratelimited",
       "relation": "contains",
       "_origin": "ast",
@@ -4165,19 +4201,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "api/src/app.ts",
-      "source_location": "L90",
-      "weight": 1.0
-    },
-    {
-      "source": "api_src_app",
-      "target": "api_src_app_fail",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "api/src/app.ts",
-      "source_location": "L94",
+      "source_location": "L97",
       "weight": 1.0
     },
     {
@@ -4423,6 +4447,18 @@
     {
       "source": "api_src_app",
       "target": "shared_contract_max_text_length",
+      "relation": "imports",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "api/src/app.ts",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "api_src_app",
+      "target": "shared_contract_max_url_length",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -6009,7 +6045,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/README.md",
-      "source_location": "L57",
+      "source_location": "L63",
       "weight": 1.0
     },
     {
@@ -6020,7 +6056,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/README.md",
-      "source_location": "L76",
+      "source_location": "L82",
       "weight": 1.0
     },
     {
@@ -6031,7 +6067,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/README.md",
-      "source_location": "L86",
+      "source_location": "L92",
       "weight": 1.0
     },
     {
@@ -6042,7 +6078,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/README.md",
-      "source_location": "L92",
+      "source_location": "L98",
       "weight": 1.0
     },
     {
@@ -6064,7 +6100,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/src/app.ts",
-      "source_location": "L34",
+      "source_location": "L41",
       "weight": 1.0
     },
     {
@@ -6141,7 +6177,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/src/repositories/translations.ts",
-      "source_location": "L26",
+      "source_location": "L30",
       "weight": 1.0
     },
     {
@@ -6196,7 +6232,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "api/src/translate.ts",
-      "source_location": "L66",
+      "source_location": "L76",
       "weight": 1.0
     },
     {
@@ -7428,7 +7464,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/background.ts",
-      "source_location": "L39",
+      "source_location": "L44",
       "weight": 1.0
     },
     {
@@ -7769,7 +7805,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "shared/contract.ts",
-      "source_location": "L11",
+      "source_location": "L13",
+      "weight": 1.0
+    },
+    {
+      "source": "shared_contract",
+      "target": "shared_contract_tokenusage",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "shared/contract.ts",
+      "source_location": "L20",
       "weight": 1.0
     },
     {
@@ -7780,7 +7827,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "shared/contract.ts",
-      "source_location": "L16",
+      "source_location": "L27",
       "weight": 1.0
     },
     {
@@ -7791,18 +7838,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "shared/contract.ts",
-      "source_location": "L18",
-      "weight": 1.0
-    },
-    {
-      "source": "shared_contract",
-      "target": "shared_contract_max_text_length",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "shared/contract.ts",
-      "source_location": "L22",
+      "source_location": "L29",
       "weight": 1.0
     },
     {
@@ -7814,6 +7850,28 @@
       "confidence_score": 1.0,
       "source_file": "shared/contract.ts",
       "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "shared_contract",
+      "target": "shared_contract_max_text_length",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "shared/contract.ts",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
+      "source": "shared_contract",
+      "target": "shared_contract_max_url_length",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "shared/contract.ts",
+      "source_location": "L34",
       "weight": 1.0
     },
     {
@@ -8105,7 +8163,7 @@
       "confidence_score": 0.85,
       "context": "argument",
       "source_file": "api/src/app.test.ts",
-      "source_location": "L35",
+      "source_location": "L43",
       "weight": 1.0
     },
     {
@@ -8117,7 +8175,7 @@
       "confidence_score": 0.85,
       "context": "argument",
       "source_file": "api/src/app.test.ts",
-      "source_location": "L88",
+      "source_location": "L98",
       "weight": 1.0
     },
     {
@@ -8293,5 +8351,5 @@
       "source_file": "CLAUDE.md"
     }
   ],
-  "built_at_commit": "b2559cafe5f6e7e97171b9f7ff95a5367eb4a260"
+  "built_at_commit": "ff98faf4af7ff795d955643b5dd070754fc3c134"
 }
