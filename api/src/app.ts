@@ -2,23 +2,37 @@ import { Hono, type Context } from 'hono';
 import { cors } from 'hono/cors';
 import { MAX_TEXT_LENGTH, MAX_URL_LENGTH, type ApiErrorCode, type TranslateBody, type TranslateOk } from '../../shared/contract.ts';
 import { translate } from './translate.ts';
-import { checkDb } from './db.ts';
 import { translationsRepository } from './repositories/translations.ts';
 import { env } from './env.ts';
 
-const RATE_LIMIT = 60; // requests per minute per IP
+const RATE_LIMIT = 60; // requests per minute per user
 // ponytail: per-isolate Map, so the real ceiling is 60/min x live instances.
 // Move to a shared store only if abuse actually shows up in the logs.
 const hits = new Map<string, { count: number; resetAt: number }>();
 
-function isRateLimited(ip: string, now = Date.now()): boolean {
-  const entry = hits.get(ip);
+function isRateLimited(userId: string, now = Date.now()): boolean {
+  const entry = hits.get(userId);
   if (!entry || now >= entry.resetAt) {
-    hits.set(ip, { count: 1, resetAt: now + 60_000 });
+    hits.set(userId, { count: 1, resetAt: now + 60_000 });
     return false;
   }
   entry.count++;
   return entry.count > RATE_LIMIT;
+}
+
+// The gateway verified this JWT's signature before invoking us ([functions.api] verify_jwt = true
+// in supabase/config.toml) and rejects the publishable key, so we only read claims here.
+// Do NOT set verify_jwt = false without adding signature verification, or `sub` becomes forgeable.
+function userIdFrom(authorization: string | undefined): string | null {
+  const payload = authorization?.match(/^Bearer \S+\.(\S+)\.\S*$/)?.[1];
+  if (!payload) return null;
+  try {
+    const claims: unknown = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+    const { role, sub } = claims as { role?: unknown; sub?: unknown };
+    return role === 'authenticated' && typeof sub === 'string' ? sub : null;
+  } catch {
+    return null; // not base64, not JSON, or no claims at all
+  }
 }
 
 function parseBody(body: unknown): TranslateBody | string {
@@ -27,7 +41,7 @@ function parseBody(body: unknown): TranslateBody | string {
   if (typeof text !== 'string' || !text.trim()) return 'text is required';
   if (text.length > MAX_TEXT_LENGTH) return `text must be at most ${MAX_TEXT_LENGTH} characters`;
   if (typeof targetLang !== 'string' || !/^[a-zA-Z-]{2,8}$/.test(targetLang)) return 'targetLang is invalid';
-  // The endpoint is public, so bound the url rather than trusting the caller; content is not parsed.
+  // Bound the url rather than trusting the caller -- a signed-in client can still send junk. Never parsed.
   if (url !== undefined && (typeof url !== 'string' || url.length > MAX_URL_LENGTH)) return 'url is invalid';
   return {
     text,
@@ -52,15 +66,10 @@ app.use(
   }),
 );
 
-// 503 when the database is configured but unreachable, so a load balancer stops routing here.
-app.get('/health', async (c) => {
-  const db = await checkDb();
-  return c.json({ ok: db !== 'down', db }, db === 'down' ? 503 : 200);
-});
-
 app.post('/translate', async (c) => {
-  const ip = c.req.header('x-forwarded-for')?.split(',')[0]?.trim() ?? 'local';
-  if (isRateLimited(ip)) return fail(c, 429, 'rate-limited', 'Too many requests, slow down');
+  const userId = userIdFrom(c.req.header('authorization'));
+  if (!userId) return fail(c, 401, 'unauthenticated', 'Sign in to translate');
+  if (isRateLimited(userId)) return fail(c, 429, 'rate-limited', 'Too many requests, slow down');
 
   const body = await c.req.json().catch(() => null);
   const parsed = parseBody(body);
@@ -74,7 +83,7 @@ app.post('/translate', async (c) => {
   const save = (outcome: { result?: TranslateOk; error?: unknown }) =>
     // Not awaited: saving must not slow down or fail the translation.
     translationsRepository
-      .save({ id: rowId, request: parsed, ...outcome, durationMs: ms() })
+      .save({ id: rowId, userId, request: parsed, ...outcome, durationMs: ms() })
       .catch((dbError) => console.error(`[translate ${id}] db save failed`, dbError));
 
   console.info(`[translate ${id}] → ${new Date().toISOString()}`, JSON.stringify(parsed, null, 2));
@@ -98,6 +107,6 @@ function waitUntil(promise: Promise<unknown>) {
   (globalThis as { EdgeRuntime?: { waitUntil(p: Promise<unknown>): void } }).EdgeRuntime?.waitUntil(promise);
 }
 
-function fail(c: Context, status: 400 | 404 | 429 | 502, code: ApiErrorCode, message: string) {
+function fail(c: Context, status: 400 | 401 | 404 | 429 | 502, code: ApiErrorCode, message: string) {
   return c.json({ error: { message, code } }, status);
 }

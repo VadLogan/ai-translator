@@ -4,15 +4,18 @@ import { sql } from '../db.ts';
 /** One translation attempt, in app terms. The repository owns the `translations` column mapping. */
 export interface TranslationRecord {
   id: string;
+  /** `sub` of the signed-in user who asked for it. */
+  userId: string;
   request: TranslateBody;
   result?: TranslateOk; // set on success
   error?: unknown; // set on failure
   durationMs: number;
 }
 
-export function toRow({ id, request, result, error, durationMs }: TranslationRecord) {
+export function toRow({ id, userId, request, result, error, durationMs }: TranslationRecord) {
   return {
     id,
+    user_id: userId,
     text: request.text,
     target_lang: request.targetLang,
     source_lang: request.sourceLang ?? null,

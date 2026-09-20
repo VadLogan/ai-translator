@@ -3,10 +3,14 @@
 The translation backend for the extension, deployed as a single **Supabase Edge Function** named `api`.
 Wire types live in [`shared/contract.ts`](../shared/contract.ts).
 
-| Where | Base URL |
-|-------|----------|
-| Local | `http://127.0.0.1:54321/functions/v1/api` |
-| Deployed | `https://<project-ref>.supabase.co/functions/v1/api` |
+Two functions: **`api`** requires a signed-in user (`verify_jwt = true`), **`health`** is public.
+They are separate because `verify_jwt` is per-function and the gateway enforces it before the
+handler runs — a liveness probe that needs a login is useless.
+
+| Function | Local | Deployed |
+|----------|-------|----------|
+| `api` | `http://127.0.0.1:54321/functions/v1/api` | `https://<project-ref>.supabase.co/functions/v1/api` |
+| `health` | `http://127.0.0.1:54321/functions/v1/health` | `https://<project-ref>.supabase.co/functions/v1/health` |
 
 Supabase strips `/functions/v1` and hands the app paths that start with the function name, which is
 why [`src/app.ts`](src/app.ts) is built with `basePath('/api')`. [`src/index.ts`](src/index.ts) is the
@@ -20,9 +24,9 @@ npm run db          # supabase start — local Postgres + edge runtime (needs Do
 npm run dev:api     # supabase functions serve api --env-file supabase/functions/.env
 ```
 
-## `GET /health`
+## `GET /functions/v1/health`
 
-Checks the function and its database connection.
+Public. Checks the function and its database connection.
 
 | Status | Body                              | When                                  |
 |--------|-----------------------------------|---------------------------------------|
@@ -31,6 +35,10 @@ Checks the function and its database connection.
 | 503    | `{ "ok": false, "db": "down" }`    | Database unreachable (5 s connect timeout) |
 
 ## `POST /translate`
+
+**Requires `Authorization: Bearer <user access token>`.** The gateway verifies the signature and
+rejects both anonymous requests and the publishable key; the handler then reads `sub` from the
+claims and stores it as the row's `user_id`. See `userIdFrom()` in [`src/app.ts`](src/app.ts).
 
 Request body (JSON):
 
@@ -71,13 +79,17 @@ Every error has the same shape:
 | Status | `code`            | When                                         |
 |--------|-------------------|----------------------------------------------|
 | 400    | `invalid-input`   | Body isn't JSON or fails validation          |
+| 401    | `unauthenticated` | No user token, or a token that isn't a signed-in user |
 | 404    | `not-found`       | Unknown route                                |
 | 429    | `rate-limited`    | More than 60 requests per minute from one IP |
 | 502    | `provider-failed` | The translation provider threw               |
 
-The rate limit is an in-memory `Map`, so each isolate has its own: the real ceiling is 60/min ×
-live instances. The client IP comes from `x-forwarded-for`; requests without that header share one
-bucket.
+A 401 raised by the **gateway** (missing or malformed header) never reaches the handler, so its
+body is Supabase's `{code, message}` rather than the shape above. `extension/src/api.ts` derives
+`unauthenticated` from the status for exactly this reason.
+
+The rate limit is 60/min per **user**, kept in an in-memory `Map`, so each isolate has its own:
+the real ceiling is 60/min × live instances.
 
 ## Migrations
 
@@ -94,6 +106,22 @@ npx supabase db push                # apply to the linked project
 Two lists, on purpose. [`deno.json`](deno.json) is the **runtime** import map — Supabase Edge
 Functions have no `package.json` support. The same packages sit in `devDependencies` so vitest and
 `tsc` resolve the same bare specifiers from `node_modules`. Bump both together.
+
+## OAuth providers
+
+Google and Facebook are enabled in `supabase/config.toml`. Each provider console needs the callback
+URL `http://127.0.0.1:54321/auth/v1/callback` locally and
+`https://<project-ref>.supabase.co/auth/v1/callback` once deployed; ids and secrets go in the
+git-ignored **root `.env`** (template: [`.env.example`](../.env.example)), which the CLI substitutes
+into `config.toml` at `supabase start`.
+
+The extension's redirect target is `https://<extension-id>.chromiumapp.org/` and must be listed in
+`[auth] additional_redirect_urls`. That means pinning the extension id with `key` in
+`extension/wxt.config.ts` — an unpacked dev load otherwise derives its id from the folder path, and
+sign-in fails with a redirect mismatch that reads like a provider misconfiguration.
+
+Adding a provider is a `[auth.external.<name>]` block plus an entry in
+`extension/src/auth/providers.ts`.
 
 ## Configuration
 

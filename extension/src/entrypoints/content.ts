@@ -1,5 +1,6 @@
 import { defineContentScript } from 'wxt/utils/define-content-script';
 import { findLanguage, type Language } from '../core/languages';
+import { PROVIDERS, isProviderId } from '../auth/providers';
 import { replaceSelection } from '../content/replace';
 import {
   getEditableSelection,
@@ -72,13 +73,26 @@ export default defineContentScript({
       if (id !== requestId) return; // closed or superseded meanwhile
 
       if (!response.ok) {
-        widget.showError(response.error.message, () => void showLanguages());
+        if (response.error.code === 'unauthenticated') promptSignIn(targetLang);
+        else widget.showError(response.error.message, () => void showLanguages());
       } else if (!isSelectionUnchanged(current)) {
         widget.showError('The text changed while translating. Select it again.', () => void showLanguages());
       } else {
         replaceSelection(current, response.data.text);
         close();
       }
+    }
+
+    /** The API rejected us: offer the providers, then resume the translation that was interrupted. */
+    function promptSignIn(targetLang: string): void {
+      widget.showSignIn(PROVIDERS, (provider) => {
+        if (!isProviderId(provider)) return;
+        widget.showBusy(findLanguage(targetLang)?.name ?? targetLang);
+        void sendMessage({ type: 'sign-in', provider }).then((response) => {
+          if (!response.ok) widget.showError(response.error.message, () => promptSignIn(targetLang));
+          else void translate(targetLang);
+        });
+      });
     }
 
     ctx.addEventListener(document, 'mousedown', (event) => {

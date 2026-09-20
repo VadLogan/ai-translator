@@ -24,7 +24,7 @@ export interface TokenUsage {
   totalTokens: number;
 }
 
-export type ApiErrorCode = 'invalid-input' | 'rate-limited' | 'not-found' | 'provider-failed';
+export type ApiErrorCode = 'invalid-input' | 'unauthenticated' | 'rate-limited' | 'not-found' | 'provider-failed';
 
 export interface TranslateErr {
   error: { message: string; code: ApiErrorCode };

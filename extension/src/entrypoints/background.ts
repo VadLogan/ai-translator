@@ -1,7 +1,9 @@
 import { browser, type Browser } from 'wxt/browser';
 import { defineBackground } from 'wxt/utils/define-background';
-import { translate } from '../api';
-import { isMessage, type Message, type Response } from '../messaging/messages';
+import { ApiError, translate } from '../api';
+import { getAccessToken, signIn, signOut } from '../auth/oauth';
+import { storageSession } from '../auth/session';
+import { isMessage, type Account, type Message, type Response } from '../messaging/messages';
 
 export default defineBackground(() => {
   async function handle(message: Message, sender: Browser.runtime.MessageSender): Promise<Response<unknown>> {
@@ -9,18 +11,47 @@ export default defineBackground(() => {
       switch (message.type) {
         case 'translate':
           // Fetched here, not in the content script: host_permissions exempt the worker from page CORS.
+          // The url comes from the sender, not the message: the browser fills it in, so a
+          // compromised page can't forge where the extension was used.
           return {
             ok: true,
-            // The url comes from the sender, not the message: the browser fills it in, so a
-            // compromised page can't forge where the extension was used.
-            data: await translate({ text: message.text, targetLang: message.targetLang, url: sender.tab?.url ?? sender.url }),
+            data: await translateAsUser({
+              text: message.text,
+              targetLang: message.targetLang,
+              url: sender.tab?.url ?? sender.url,
+            }),
           };
         case 'open-options':
           await browser.runtime.openOptionsPage();
           return { ok: true, data: undefined };
+        case 'sign-in':
+          return { ok: true, data: accountFrom(await signIn(message.provider)) };
+        case 'sign-out':
+          await signOut();
+          return { ok: true, data: undefined };
+        case 'get-account': {
+          const session = await storageSession.get();
+          return { ok: true, data: session ? accountFrom(session) : null };
+        }
       }
     } catch (error) {
-      return { ok: false, error: { message: error instanceof Error ? error.message : String(error) } };
+      const reason = error instanceof Error ? error.message : String(error);
+      const code = error instanceof ApiError ? error.code : undefined;
+      return { ok: false, error: { message: reason, ...(code ? { code } : {}) } };
+    }
+  }
+
+  /**
+   * getAccessToken() already refreshes a token that is near expiry, so a 401 here means the
+   * session is genuinely dead (revoked, or the refresh token expired). Drop it so the next
+   * attempt prompts a sign-in instead of replaying a token the API keeps rejecting.
+   */
+  async function translateAsUser(body: Parameters<typeof translate>[0]) {
+    try {
+      return await translate(body, await getAccessToken());
+    } catch (error) {
+      if (error instanceof ApiError && error.code === 'unauthenticated') await storageSession.clear();
+      throw error;
     }
   }
 
@@ -36,6 +67,8 @@ export default defineBackground(() => {
 
   if (import.meta.env.DEV) void reloadPlaygroundWhenReady();
 });
+
+const accountFrom = ({ email }: { email?: string }): Account => (email ? { email } : {});
 
 /**
  * In dev, WXT registers content scripts at runtime, after the start-URL tab has

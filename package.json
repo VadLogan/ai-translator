@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "dev": "npm run dev:api & npm run dev:extension",
-    "dev:api": "supabase functions serve api --env-file supabase/functions/.env",
+    "dev:api": "supabase functions serve --env-file supabase/functions/.env",
     "dev:extension": "npm run dev:playground -w extension",
     "build": "npm run build --workspaces --if-present",
     "compile": "npm run compile --workspaces --if-present",

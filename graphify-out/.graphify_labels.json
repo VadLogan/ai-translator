@@ -1,6 +1,6 @@
 {
-  "0": "storage-settings.ts",
-  "1": "content.ts",
+  "0": "content.ts",
+  "1": "selection.ts",
   "2": "package.json",
   "3": "CLAUDE.md",
   "4": "extension/package.json",
@@ -9,7 +9,6 @@
   "7": "extension/tsconfig.json",
   "8": "vitest.config.ts",
   "9": "graphify reference: extra exports and benchmark",
-  "10": "graphify reference: query, path, explain",
   "11": "graphify reference: add a URL and watch a folder",
   "12": "graphify reference: commit hook and native CLAUDE.md integration",
   "13": "graphify reference: incremental update and cluster-only",

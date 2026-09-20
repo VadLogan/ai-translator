@@ -111,6 +111,23 @@ export class TranslatorWidget {
     this.showPanel(status);
   }
 
+  /** Same shape as showError, but the buttons start the OAuth flow instead of going back. */
+  showSignIn(providers: readonly { id: string; name: string }[], onPick: (providerId: string) => void): void {
+    const buttons = providers.map(({ id, name }) => {
+      const button = this.element('button', 'item', `Sign in with ${name}`);
+      button.type = 'button';
+      button.addEventListener('click', () => onPick(id));
+      return button;
+    });
+    this.showPanel(
+      this.element('div', 'status', 'Sign in to translate'),
+      this.divider(),
+      ...buttons,
+      this.divider(),
+      this.settingsLink(),
+    );
+  }
+
   showError(message: string, onBack: () => void): void {
     const back = this.element('button', 'item', '← Back');
     back.type = 'button';

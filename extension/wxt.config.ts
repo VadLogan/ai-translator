@@ -7,7 +7,12 @@ export default defineConfig({
   manifest: {
     name: 'AI Translator',
     description: 'Select text in any input field and translate it in place.',
-    permissions: ['storage'],
+    // `identity` powers launchWebAuthFlow, the OAuth window in src/auth/oauth.ts.
+    permissions: ['storage', 'identity'],
+    // Pins the extension id so chrome.identity's redirect URL is stable across machines and
+    // matches [auth] additional_redirect_urls in supabase/config.toml. Replace with the
+    // "key" field from the Chrome Web Store listing (or a locally generated one).
+    // key: '<base64 public key>',
     // The backend API: the local Supabase stack, plus the deployed edge function.
     // Swap <project-ref> for the real one; WXT_API_URL must point at the same origin.
     host_permissions: ['http://127.0.0.1:54321/*', 'https://<project-ref>.supabase.co/*'],

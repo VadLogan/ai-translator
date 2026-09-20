@@ -159,7 +159,9 @@ site_url = "http://127.0.0.1:3000"
 # The public URL that Auth serves on. Defaults to the API external URL with `/auth/v1` appended.
 # external_url = ""
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["https://127.0.0.1:3000"]
+# chrome.identity's redirect target. The id is pinned by `key` in extension/wxt.config.ts;
+# it must match exactly or sign-in fails with a redirect mismatch.
+additional_redirect_urls = ["https://127.0.0.1:3000", "https://<extension-id>.chromiumapp.org/"]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
 # JWT issuer URL. If not set, defaults to auth.external_url.
@@ -333,6 +335,22 @@ skip_nonce_check = false
 # If enabled, it will allow the user to successfully authenticate when the provider does not return an email address.
 email_optional = false
 
+# Providers the extension offers. Ids and secrets come from the git-ignored root .env,
+# substituted by the CLI when the stack starts -- see .env.example.
+# Each provider console needs the callback URL http://127.0.0.1:54321/auth/v1/callback
+# locally, and https://<project-ref>.supabase.co/auth/v1/callback once deployed.
+[auth.external.google]
+enabled = true
+client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)"
+# Required for local sign in with Google auth, per the comment on [auth.external.apple] above.
+skip_nonce_check = true
+
+[auth.external.facebook]
+enabled = true
+client_id = "env(SUPABASE_AUTH_EXTERNAL_FACEBOOK_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_EXTERNAL_FACEBOOK_SECRET)"
+
 # Allow Solana wallet holders to sign in to your project via the Sign in with Solana (SIWS, EIP-4361) standard.
 # You can configure "web3" rate limit in the [auth.rate_limit] section and set up [auth.captcha] if self-hosting.
 [auth.web3.solana]
@@ -418,10 +436,18 @@ enabled = true
 # The whole Hono app is one function. Supabase strips /functions/v1 and hands the app
 # paths that start with the function name, which is why app.ts uses basePath('/api').
 enabled = true
-# The extension holds no Supabase key, so the endpoint is public; the rate limit in
-# app.ts plus an OpenAI spend cap are the abuse ceiling.
-verify_jwt = false
+# Signed-in users only. The gateway verifies the JWT before the handler runs and rejects
+# the publishable key, so app.ts only has to decode the claims — see userIdFrom() there.
+verify_jwt = true
 # api/src stays put — the CLI bundles outward from this entrypoint.
 # Paths here resolve relative to supabase/, not the project root.
 entrypoint = "../api/src/index.ts"
+import_map = "../api/deno.json"
+
+[functions.health]
+# Separate function because verify_jwt is per-function and runs before the handler:
+# a liveness probe that needs a login is useless.
+enabled = true
+verify_jwt = false
+entrypoint = "../api/src/health.ts"
 import_map = "../api/deno.json"
