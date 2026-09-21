@@ -13,9 +13,14 @@ export default defineConfig({
     // matches [auth] additional_redirect_urls in supabase/config.toml. Replace with the
     // "key" field from the Chrome Web Store listing (or a locally generated one).
     // key: '<base64 public key>',
-    // The backend API: the local Supabase stack, plus the deployed edge function.
-    // Swap <project-ref> for the real one; WXT_API_URL must point at the same origin.
-    host_permissions: ['http://127.0.0.1:54321/*', 'https://<project-ref>.supabase.co/*'],
+    // The backend API: the local Node server (npm run dev:api), the local Supabase stack
+    // (npm run dev:api:edge), and the deployed edge function. All three serve the same paths,
+    // so one build works against any of them. Swap <project-ref> for the real one.
+    host_permissions: [
+      'http://127.0.0.1:8787/*',
+      'http://127.0.0.1:54321/*',
+      'https://<project-ref>.supabase.co/*',
+    ],
     action: { default_title: 'AI Translator settings' },
   },
   // Pinned so a dev build always points at the same reload socket; WXT otherwise

@@ -6,9 +6,9 @@
     "semantic_hash": ""
   },
   "CLAUDE.md": {
-    "mtime": 1789915452.3607492,
-    "seen": 1789915492.558941,
-    "ast_hash": "a8889f2f92e7141ecbbeb4e9120ffa5a",
+    "mtime": 1789916295.8114862,
+    "seen": 1789917815.32822,
+    "ast_hash": "a58683ef71189e1febc09aefd7a4a627",
     "semantic_hash": ""
   },
   ".claude/settings.json": {
@@ -18,9 +18,9 @@
     "semantic_hash": ""
   },
   ".claude/CLAUDE.md": {
-    "mtime": 1789660073.6453803,
-    "seen": 1789661598.8497732,
-    "ast_hash": "9b31786b637be3c13978bec4c2330752",
+    "mtime": 1789917644.4546795,
+    "seen": 1789917815.328058,
+    "ast_hash": "c5f97365884ae36e45fcc80257edfe87",
     "semantic_hash": ""
   },
   ".claude/skills/graphify/SKILL.md": {
@@ -126,15 +126,15 @@
     "semantic_hash": ""
   },
   "extension/src/content/selection.test.ts": {
-    "mtime": 1789718358.274272,
-    "seen": 1789720797.492407,
-    "ast_hash": "52226c58e543aca0745f9f05fefa8a5c",
+    "mtime": 1789917765.4217765,
+    "seen": 1789917815.32787,
+    "ast_hash": "84dce82ec926bdcfe00dc4b1b41d8cbf",
     "semantic_hash": ""
   },
   "extension/src/content/selection.ts": {
-    "mtime": 1789718350.5594313,
-    "seen": 1789720797.492408,
-    "ast_hash": "fb70c449f8c11d13bc2abb0880a83e8f",
+    "mtime": 1789917742.4997706,
+    "seen": 1789917815.327871,
+    "ast_hash": "eacd112c5c699c44979a37bdb6c01217",
     "semantic_hash": ""
   },
   "extension/src/content/ui/styles.ts": {
@@ -162,9 +162,9 @@
     "semantic_hash": ""
   },
   "extension/src/entrypoints/content.ts": {
-    "mtime": 1789898849.804596,
-    "seen": 1789899086.213117,
-    "ast_hash": "ed2811442f88e1e72052e2357820cc33",
+    "mtime": 1789917664.916508,
+    "seen": 1789917815.327942,
+    "ast_hash": "96a7e1d07d39be22e38c23b4fb7b5f65",
     "semantic_hash": ""
   },
   "extension/src/entrypoints/options/main.ts": {
@@ -234,9 +234,9 @@
     "semantic_hash": ""
   },
   "api/README.md": {
-    "mtime": 1789915452.3679614,
-    "seen": 1789915492.558941,
-    "ast_hash": "37850a328eb7a6b84229892889869972",
+    "mtime": 1789916295.8109097,
+    "seen": 1789917815.3282208,
+    "ast_hash": "7131708b4087025b071ca83f9319d9bb",
     "semantic_hash": ""
   },
   "extension/public/icon/128.png": {

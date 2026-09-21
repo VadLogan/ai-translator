@@ -22,6 +22,7 @@ export function toRow({ id, userId, request, result, error, durationMs }: Transl
     url: request.url ?? null,
     result: result?.text ?? null,
     detected_source_lang: result?.detectedSourceLang ?? null,
+    model: result?.model ?? null,
     input_tokens: result?.usage?.inputTokens ?? null,
     output_tokens: result?.usage?.outputTokens ?? null,
     total_tokens: result?.usage?.totalTokens ?? null,

@@ -1,6 +1,16 @@
-import type { ApiErrorCode, TranslateBody, TranslateErr, TranslateOk } from '../../shared/contract';
+import type {
+  ApiErrorCode,
+  DetectBody,
+  DetectOk,
+  Settings,
+  TranslateBody,
+  TranslateErr,
+  TranslateOk,
+} from '../../shared/contract';
 
-const BASE_URL = import.meta.env.WXT_API_URL ?? 'http://127.0.0.1:54321/functions/v1/api';
+// Defaults to the local Node server (`npm run dev:api`). The edge runtime serves the same paths
+// on :54321, so switching between them is an origin change only.
+const BASE_URL = import.meta.env.WXT_API_URL ?? 'http://127.0.0.1:8787/functions/v1/api';
 
 /** An API error that kept its code, so callers can tell 401 from a network failure. */
 export class ApiError extends Error {
@@ -14,20 +24,39 @@ export class ApiError extends Error {
 }
 
 /** Calls the backend API, which owns translation; the extension never holds provider keys. */
-export async function translate(body: TranslateBody, accessToken: string | null, baseUrl = BASE_URL): Promise<TranslateOk> {
+export const translate = (body: TranslateBody, accessToken: string | null, baseUrl = BASE_URL) =>
+  call<TranslateOk>('/translate', { method: 'POST', body }, accessToken, baseUrl);
+
+/** What language is the selection in? Asked when the menu opens, before a target is picked. */
+export const detect = (body: DetectBody, accessToken: string | null, baseUrl = BASE_URL) =>
+  call<DetectOk>('/detect', { method: 'POST', body }, accessToken, baseUrl);
+
+/** Settings live server-side so they follow the user across devices. */
+export const getSettings = (accessToken: string | null, baseUrl = BASE_URL) =>
+  call<Settings>('/settings', {}, accessToken, baseUrl);
+
+export const saveSettings = (settings: Settings, accessToken: string | null, baseUrl = BASE_URL) =>
+  call<Settings>('/settings', { method: 'PUT', body: settings }, accessToken, baseUrl);
+
+async function call<T>(
+  path: string,
+  { method = 'GET', body }: { method?: string; body?: unknown },
+  accessToken: string | null,
+  baseUrl: string,
+): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(`${baseUrl}/translate`, {
-      method: 'POST',
+    response = await fetch(`${baseUrl}${path}`, {
+      method,
       headers: {
         'content-type': 'application/json',
         // host_permissions exempt the worker from CORS, so this header triggers no preflight.
         ...(accessToken ? { authorization: `Bearer ${accessToken}` } : {}),
       },
-      body: JSON.stringify(body),
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     });
   } catch (error) {
-    throw new ApiError(`Cannot reach the translation API at ${baseUrl}. Is it running?`, undefined, { cause: error });
+    throw new ApiError(`Cannot reach the API at ${baseUrl}. Is it running?`, undefined, { cause: error });
   }
 
   const data: unknown = await response.json().catch(() => null);
@@ -39,5 +68,5 @@ export async function translate(body: TranslateBody, accessToken: string | null,
     const { message, code } = (data as TranslateErr | null)?.error ?? {};
     throw new ApiError(message ?? `API returned ${response.status}`, code);
   }
-  return data as TranslateOk;
+  return data as T;
 }

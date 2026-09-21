@@ -4,10 +4,13 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "dev": "node --watch --env-file-if-exists=../.env --env-file-if-exists=../supabase/functions/.env src/server.ts",
+    "token": "node --env-file-if-exists=../.env src/dev-token.ts",
     "compile": "tsc --noEmit",
     "test": "vitest run"
   },
   "devDependencies": {
+    "@hono/node-server": "^2.1.1",
     "@types/node": "^24.5.2",
     "hono": "^4.13.8",
     "openai": "^7.18.0",

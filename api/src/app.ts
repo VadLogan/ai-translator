@@ -1,8 +1,22 @@
 import { Hono, type Context } from 'hono';
 import { cors } from 'hono/cors';
-import { MAX_TEXT_LENGTH, MAX_URL_LENGTH, type ApiErrorCode, type TranslateBody, type TranslateOk } from '../../shared/contract.ts';
+import {
+  LANGUAGE_CODE,
+  MAX_FAVORITE_LANGUAGES,
+  MAX_TEXT_LENGTH,
+  MAX_URL_LENGTH,
+  type ApiErrorCode,
+  type DetectBody,
+  type DetectOk,
+  type Settings,
+  type TranslateBody,
+  type TranslateOk,
+} from '../../shared/contract.ts';
 import { translate } from './translate.ts';
+import { detectLang } from './detect.ts';
 import { translationsRepository } from './repositories/translations.ts';
+import { detectionsRepository } from './repositories/detections.ts';
+import { profilesRepository } from './repositories/profiles.ts';
 import { env } from './env.ts';
 
 const RATE_LIMIT = 60; // requests per minute per user
@@ -35,19 +49,42 @@ function userIdFrom(authorization: string | undefined): string | null {
   }
 }
 
-function parseBody(body: unknown): TranslateBody | string {
+function parseSettings(body: unknown): Settings | string {
   if (typeof body !== 'object' || body === null) return 'Body must be a JSON object';
-  const { text, targetLang, sourceLang, url } = body as Record<string, unknown>;
+  const { favoriteLanguages } = body as Record<string, unknown>;
+  if (!Array.isArray(favoriteLanguages)) return 'favoriteLanguages must be an array';
+  if (favoriteLanguages.length > MAX_FAVORITE_LANGUAGES) {
+    return `favoriteLanguages must have at most ${MAX_FAVORITE_LANGUAGES} entries`;
+  }
+  if (!favoriteLanguages.every((code) => typeof code === 'string' && LANGUAGE_CODE.test(code))) {
+    return 'favoriteLanguages contains an invalid language code';
+  }
+  return { favoriteLanguages: favoriteLanguages as string[] };
+}
+
+/** The text + url both request bodies share. Returns the reason as a string when it is invalid. */
+function parseDetectBody(body: unknown): DetectBody | string {
+  if (typeof body !== 'object' || body === null) return 'Body must be a JSON object';
+  const { text, url } = body as Record<string, unknown>;
   if (typeof text !== 'string' || !text.trim()) return 'text is required';
   if (text.length > MAX_TEXT_LENGTH) return `text must be at most ${MAX_TEXT_LENGTH} characters`;
-  if (typeof targetLang !== 'string' || !/^[a-zA-Z-]{2,8}$/.test(targetLang)) return 'targetLang is invalid';
   // Bound the url rather than trusting the caller -- a signed-in client can still send junk. Never parsed.
   if (url !== undefined && (typeof url !== 'string' || url.length > MAX_URL_LENGTH)) return 'url is invalid';
+  return { text, ...(typeof url === 'string' ? { url } : {}) };
+}
+
+function parseBody(body: unknown): TranslateBody | string {
+  const parsed = parseDetectBody(body);
+  if (typeof parsed === 'string') return parsed;
+  const { targetLang, sourceLang } = body as Record<string, unknown>;
+  if (typeof targetLang !== 'string' || !LANGUAGE_CODE.test(targetLang)) return 'targetLang is invalid';
+  if (sourceLang !== undefined && (typeof sourceLang !== 'string' || !LANGUAGE_CODE.test(sourceLang))) {
+    return 'sourceLang is invalid';
+  }
   return {
-    text,
+    ...parsed,
     targetLang,
     ...(typeof sourceLang === 'string' ? { sourceLang } : {}),
-    ...(typeof url === 'string' ? { url } : {}),
   };
 }
 
@@ -65,6 +102,57 @@ app.use(
     },
   }),
 );
+
+// Settings live server-side so they follow the user across devices; the extension keeps a
+// chrome.storage copy as a cache. Awaited, unlike the translate save -- the caller needs the result.
+app.get('/settings', async (c) => {
+  const userId = userIdFrom(c.req.header('authorization'));
+  if (!userId) return fail(c, 401, 'unauthenticated', 'Sign in to load your settings');
+
+  return c.json(await profilesRepository.settings(userId));
+});
+
+app.put('/settings', async (c) => {
+  const userId = userIdFrom(c.req.header('authorization'));
+  if (!userId) return fail(c, 401, 'unauthenticated', 'Sign in to save your settings');
+
+  const parsed = parseSettings(await c.req.json().catch(() => null));
+  if (typeof parsed === 'string') return fail(c, 400, 'invalid-input', parsed);
+
+  return c.json(await profilesRepository.saveSettings(userId, parsed));
+});
+
+// Asked for when the in-page menu opens, before a target language is picked, so the widget can
+// show what the selection is written in. Same shape as /translate: auth, rate limit, log, save.
+app.post('/detect', async (c) => {
+  const userId = userIdFrom(c.req.header('authorization'));
+  if (!userId) return fail(c, 401, 'unauthenticated', 'Sign in to detect the language');
+  if (isRateLimited(userId)) return fail(c, 429, 'rate-limited', 'Too many requests, slow down');
+
+  const parsed = parseDetectBody(await c.req.json().catch(() => null));
+  if (typeof parsed === 'string') return fail(c, 400, 'invalid-input', parsed);
+
+  const rowId = crypto.randomUUID();
+  const id = rowId.slice(0, 8);
+  const started = performance.now();
+  const ms = () => Math.round(performance.now() - started);
+  const save = (outcome: { result?: DetectOk; error?: unknown }) =>
+    detectionsRepository
+      .save({ id: rowId, userId, request: parsed, ...outcome, durationMs: ms() })
+      .catch((dbError) => console.error(`[detect ${id}] db save failed`, dbError));
+
+  console.info(`[detect ${id}] \u2192 ${new Date().toISOString()}`, JSON.stringify(parsed, null, 2));
+  try {
+    const result = await detectLang(parsed);
+    console.info(`[detect ${id}] \u2190 ${ms()}ms`, JSON.stringify(result, null, 2));
+    waitUntil(save({ result }));
+    return c.json(result);
+  } catch (error) {
+    console.error(`[detect ${id}] \u2717 ${ms()}ms`, error);
+    waitUntil(save({ error }));
+    return fail(c, 502, 'provider-failed', 'Language detection failed');
+  }
+});
 
 app.post('/translate', async (c) => {
   const userId = userIdFrom(c.req.header('authorization'));
@@ -85,6 +173,16 @@ app.post('/translate', async (c) => {
     translationsRepository
       .save({ id: rowId, userId, request: parsed, ...outcome, durationMs: ms() })
       .catch((dbError) => console.error(`[translate ${id}] db save failed`, dbError));
+
+  // What the client translated with is the only verdict we get on the detection it was given:
+  // same language = the user accepted it, a different one = the user corrected it.
+  if (parsed.sourceLang) {
+    waitUntil(
+      detectionsRepository
+        .verify(userId, parsed.text, parsed.sourceLang)
+        .catch((dbError) => console.error(`[translate ${id}] detection verify failed`, dbError)),
+    );
+  }
 
   console.info(`[translate ${id}] → ${new Date().toISOString()}`, JSON.stringify(parsed, null, 2));
   try {

@@ -1,7 +1,6 @@
 import { LANGUAGES } from '../../core/languages';
 import { PROVIDERS } from '../../auth/providers';
 import { sendMessage } from '../../messaging/messages';
-import { storageSettings } from '../../settings/storage-settings';
 
 const accountContainer = document.querySelector<HTMLDivElement>('#account')!;
 const languagesContainer = document.querySelector<HTMLDivElement>('#languages')!;
@@ -55,10 +54,17 @@ function button(label: string, onClick: () => Promise<void>): HTMLButtonElement 
   return element;
 }
 
+// Settings come through the worker, which owns the access token and keeps the chrome.storage
+// cache in step. Signed out or API down, it answers from that cache.
+let favoriteLanguages: string[] = [];
+
 async function init(): Promise<void> {
   await renderAccount();
-  const settings = await storageSettings.get();
-  const favorites = new Set(settings.favoriteLanguages);
+  const response = await sendMessage({ type: 'get-settings' });
+  if (!response.ok) return setStatus(response.error.message, true);
+
+  favoriteLanguages = response.data.favoriteLanguages;
+  const favorites = new Set(favoriteLanguages);
   languagesContainer.replaceChildren(
     ...LANGUAGES.map(({ code, name }) => {
       const label = document.createElement('label');
@@ -73,15 +79,20 @@ async function init(): Promise<void> {
 }
 
 saveButton.addEventListener('click', async () => {
-  const { favoriteLanguages: previous } = await storageSettings.get();
+  const previous = favoriteLanguages;
   const checked = [...languagesContainer.querySelectorAll<HTMLInputElement>('input:checked')].map((c) => c.value);
   // Keep the user's existing order, append newly checked languages at the end.
-  const favoriteLanguages = [
+  const next = [
     ...previous.filter((code) => checked.includes(code)),
     ...checked.filter((code) => !previous.includes(code)),
   ];
 
-  await storageSettings.update({ favoriteLanguages });
+  saveButton.disabled = true;
+  const response = await sendMessage({ type: 'save-settings', settings: { favoriteLanguages: next } });
+  saveButton.disabled = false;
+  if (!response.ok) return setStatus(response.error.message, true);
+
+  favoriteLanguages = response.data.favoriteLanguages;
   setStatus('Saved');
   setTimeout(() => setStatus(''), 2000);
 });

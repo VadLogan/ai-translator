@@ -88,22 +88,66 @@ export interface Anchor {
 }
 
 /**
- * Anchor for the selected text. Text controls don't expose the selection's rect,
- * so a mouse selection uses the pointer's line and a keyboard one uses the whole field.
+ * Anchor for the selected text: the end of the selection, so the icon lands where the user
+ * stopped selecting -- the same place whether they used the mouse or the keyboard.
  */
-export function getSelectionAnchor(snapshot: EditableSelection, pointer?: { x: number; y: number }): Anchor {
-  if (snapshot.kind === 'content-editable') {
-    const rect = snapshot.range.getBoundingClientRect();
-    return { x: pointer?.x ?? rect.right, top: rect.top, bottom: rect.bottom };
-  }
-  const rect = snapshot.element.getBoundingClientRect();
-  if (!pointer) return { x: rect.right, top: rect.top, bottom: rect.bottom };
-  // ponytail: pointer line ± half a line height; a mirror div would give the exact rect if this drifts.
-  const half = lineHeight(snapshot.element) / 2;
-  return { x: pointer.x, top: pointer.y - half, bottom: pointer.y + half };
+export function getSelectionAnchor(snapshot: EditableSelection): Anchor {
+  if (snapshot.kind === 'text-control') return textControlAnchor(snapshot);
+  const { range } = snapshot;
+  const rect = lastRect(range.getClientRects()) ?? range.getBoundingClientRect();
+  return { x: rect.right, top: rect.top, bottom: rect.bottom };
 }
 
-function lineHeight(element: HTMLElement): number {
-  const style = element.ownerDocument.defaultView!.getComputedStyle(element);
-  return parseFloat(style.lineHeight) || (parseFloat(style.fontSize) || 16) * 1.2;
+/** With several lines the selection ends at the last rect, not at the bounding one. */
+function lastRect(rects: DOMRectList): DOMRect | undefined {
+  return rects.length ? rects[rects.length - 1] : undefined;
+}
+
+// Everything that moves the text around inside the box, so the mirror wraps it identically.
+const MIRROR_STYLES = [
+  'fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'fontVariant', 'letterSpacing', 'wordSpacing',
+  'textTransform', 'textIndent', 'lineHeight', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
+  'borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth', 'width', 'direction',
+] as const;
+
+/**
+ * Text controls expose no rect for their selection, so lay the same text out in an off-screen
+ * mirror and measure the selected span there. Falls back to the whole field when that can't be
+ * measured (no layout engine, or the selection scrolled out of the field).
+ */
+function textControlAnchor(snapshot: Extract<EditableSelection, { kind: 'text-control' }>): Anchor {
+  const { element, start } = snapshot;
+  const doc = element.ownerDocument;
+  const box = element.getBoundingClientRect();
+  const field: Anchor = { x: box.right, top: box.top, bottom: box.bottom };
+  const style = doc.defaultView?.getComputedStyle(element);
+  if (!style) return field;
+
+  const mirror = doc.createElement('div');
+  for (const property of MIRROR_STYLES) mirror.style[property] = style[property];
+  mirror.style.position = 'absolute';
+  mirror.style.top = '0';
+  mirror.style.left = '-9999px';
+  mirror.style.visibility = 'hidden';
+  mirror.style.boxSizing = 'content-box';
+  mirror.style.whiteSpace = element instanceof HTMLTextAreaElement ? 'pre-wrap' : 'pre';
+  mirror.style.overflowWrap = 'break-word';
+
+  const marker = doc.createElement('span');
+  marker.textContent = snapshot.text;
+  mirror.append(doc.createTextNode(element.value.slice(0, start)), marker);
+  doc.body.append(mirror);
+  const origin = mirror.getBoundingClientRect();
+  const rect = lastRect(marker.getClientRects()) ?? marker.getBoundingClientRect();
+  mirror.remove();
+  if (!rect.height) return field;
+
+  const top = box.top + (rect.top - origin.top) - element.scrollTop;
+  const anchor: Anchor = {
+    x: box.left + (rect.right - origin.left) - element.scrollLeft,
+    top,
+    bottom: top + rect.height,
+  };
+  // A selection scrolled out of the field would otherwise drag the icon off it.
+  return anchor.bottom < box.top || anchor.top > box.bottom ? field : anchor;
 }

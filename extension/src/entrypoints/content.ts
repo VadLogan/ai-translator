@@ -22,6 +22,8 @@ export default defineContentScript({
     let snapshot: EditableSelection | null = null;
     /** Bumped on every close/new request so stale responses are ignored. */
     let requestId = 0;
+    /** What POST /detect said the selection is written in, and what translate() sends back. */
+    let detectedLang: string | null = null;
 
     const widget = new TranslatorWidget({
       onIconClick: () => void showLanguages(),
@@ -36,10 +38,11 @@ export default defineContentScript({
     function close(): void {
       requestId++;
       snapshot = null;
+      detectedLang = null;
       widget.hide();
     }
 
-    function refresh(pointer?: { x: number; y: number }): void {
+    function refresh(): void {
       // After an extension reload or update this script is orphaned: every chrome.* call throws
       // "Extension context invalidated". Reading isInvalid lets WXT notice, remove our listeners
       // and fire onInvalidated, so the stale copy goes quiet.
@@ -49,27 +52,56 @@ export default defineContentScript({
         close();
         return;
       }
+      // A different selection is a different language question.
+      if (selection.text !== snapshot?.text) detectedLang = null;
       snapshot = selection;
-      widget.showIcon(getSelectionAnchor(selection, pointer));
+      widget.showIcon(getSelectionAnchor(selection));
     }
 
     async function showLanguages(): Promise<void> {
+      const id = requestId;
       try {
+        // The cache answers immediately; the menu must not wait on the network to open.
         const { favoriteLanguages } = await storageSettings.get();
-        widget.showLanguages(favoriteLanguages.map(findLanguage).filter((l): l is Language => l !== undefined));
+        widget.showLanguages(
+          favoriteLanguages.map(findLanguage).filter((l): l is Language => l !== undefined),
+          detectedLang ? languageName(detectedLang) : undefined,
+        );
       } catch {
         // Only fails when the extension was reloaded while the icon was showing.
         widget.showError('The extension was updated. Reload the page.', close);
+        return;
       }
+      if (!detectedLang) void detect(id);
+    }
+
+    /** Fills in the menu's "From:" line. Failures stay silent -- translating does not depend on it. */
+    async function detect(id: number): Promise<void> {
+      const current = snapshot;
+      if (!current) return;
+
+      const response = await sendMessage({ type: 'detect', text: current.text });
+      if (id !== requestId) return; // closed or superseded meanwhile
+
+      const lang = response.ok ? response.data.lang : null;
+      // "und" is the provider saying it could not tell, so it must not travel on as a sourceLang.
+      detectedLang = lang && lang !== 'und' ? lang : null;
+      widget.showDetected(detectedLang ? languageName(detectedLang) : 'unknown');
     }
 
     async function translate(targetLang: string): Promise<void> {
       const current = snapshot;
       if (!current) return;
       const id = ++requestId;
-      widget.showBusy(findLanguage(targetLang)?.name ?? targetLang);
+      widget.showBusy(languageName(targetLang));
 
-      const response = await sendMessage({ type: 'translate', text: current.text, targetLang });
+      // sourceLang is what the user translated with, so the API can mark the detection verified.
+      const response = await sendMessage({
+        type: 'translate',
+        text: current.text,
+        targetLang,
+        ...(detectedLang ? { sourceLang: detectedLang } : {}),
+      });
       if (id !== requestId) return; // closed or superseded meanwhile
 
       if (!response.ok) {
@@ -87,7 +119,7 @@ export default defineContentScript({
     function promptSignIn(targetLang: string): void {
       widget.showSignIn(PROVIDERS, (provider) => {
         if (!isProviderId(provider)) return;
-        widget.showBusy(findLanguage(targetLang)?.name ?? targetLang);
+        widget.showBusy(languageName(targetLang));
         void sendMessage({ type: 'sign-in', provider }).then((response) => {
           if (!response.ok) widget.showError(response.error.message, () => promptSignIn(targetLang));
           else void translate(targetLang);
@@ -95,20 +127,23 @@ export default defineContentScript({
       });
     }
 
+    const languageName = (code: string): string => findLanguage(code)?.name ?? code;
+
     ctx.addEventListener(document, 'mousedown', (event) => {
       if (!widget.owns(event)) close();
     });
     ctx.addEventListener(document, 'mouseup', (event) => {
       if (widget.owns(event)) return;
-      const pointer = { x: event.clientX, y: event.clientY };
       // Let the browser finalize the selection first.
-      setTimeout(() => refresh(pointer), 0);
+      setTimeout(refresh, 0);
     });
     ctx.addEventListener(document, 'keydown', (event) => {
       if (event.key === 'Escape' && widget.isVisible) close();
     });
     ctx.addEventListener(document, 'keyup', (event) => {
-      if (event.key !== 'Escape') refresh();
+      // Deferred like mouseup: model-based editors (Lexical, ProseMirror) move the selection
+      // after the key event, so reading it synchronously would miss it.
+      if (event.key !== 'Escape') setTimeout(refresh, 0);
     });
     // Close only when the scroll moves the selected field: pages like Teams scroll unrelated
     // panes (chat list, typing indicators) constantly, which would otherwise kill the menu.

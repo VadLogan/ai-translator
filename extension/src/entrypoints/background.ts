@@ -1,9 +1,10 @@
 import { browser, type Browser } from 'wxt/browser';
 import { defineBackground } from 'wxt/utils/define-background';
-import { ApiError, translate } from '../api';
+import { ApiError, detect, getSettings, saveSettings, translate } from '../api';
 import { getAccessToken, signIn, signOut } from '../auth/oauth';
 import { storageSession } from '../auth/session';
 import { isMessage, type Account, type Message, type Response } from '../messaging/messages';
+import { storageSettings } from '../settings/storage-settings';
 
 export default defineBackground(() => {
   async function handle(message: Message, sender: Browser.runtime.MessageSender): Promise<Response<unknown>> {
@@ -15,23 +16,48 @@ export default defineBackground(() => {
           // compromised page can't forge where the extension was used.
           return {
             ok: true,
-            data: await translateAsUser({
-              text: message.text,
-              targetLang: message.targetLang,
-              url: sender.tab?.url ?? sender.url,
-            }),
+            data: await asUser((token) =>
+              translate(
+                {
+                  text: message.text,
+                  targetLang: message.targetLang,
+                  ...(message.sourceLang ? { sourceLang: message.sourceLang } : {}),
+                  url: sender.tab?.url ?? sender.url,
+                },
+                token,
+              ),
+            ),
+          };
+        case 'detect':
+          // Same reasons as translate, url included.
+          return {
+            ok: true,
+            data: await asUser((token) => detect({ text: message.text, url: sender.tab?.url ?? sender.url }, token)),
           };
         case 'open-options':
           await browser.runtime.openOptionsPage();
           return { ok: true, data: undefined };
-        case 'sign-in':
-          return { ok: true, data: accountFrom(await signIn(message.provider)) };
+        case 'sign-in': {
+          const account = accountFrom(await signIn(message.provider));
+          // Pull the server's settings straight into the cache: this is what makes a second
+          // machine show the right languages without opening the options page first.
+          await pullSettings();
+          return { ok: true, data: account };
+        }
         case 'sign-out':
           await signOut();
           return { ok: true, data: undefined };
         case 'get-account': {
           const session = await storageSession.get();
           return { ok: true, data: session ? accountFrom(session) : null };
+        }
+        case 'get-settings':
+          return { ok: true, data: await pullSettings() };
+        case 'save-settings': {
+          // API first, cache second, so the server stays authoritative if the write fails.
+          const saved = await saveSettings(message.settings, await getAccessToken());
+          await storageSettings.update(saved);
+          return { ok: true, data: saved };
         }
       }
     } catch (error) {
@@ -42,13 +68,27 @@ export default defineBackground(() => {
   }
 
   /**
-   * getAccessToken() already refreshes a token that is near expiry, so a 401 here means the
-   * session is genuinely dead (revoked, or the refresh token expired). Drop it so the next
-   * attempt prompts a sign-in instead of replaying a token the API keeps rejecting.
+   * Server is the source of truth; chrome.storage is a cache the content script reads on every
+   * icon click. A signed-out or unreachable API falls back to the cache rather than erroring,
+   * so nobody is locked out of their own language list.
    */
-  async function translateAsUser(body: Parameters<typeof translate>[0]) {
+  async function pullSettings() {
     try {
-      return await translate(body, await getAccessToken());
+      return await storageSettings.update(await getSettings(await getAccessToken()));
+    } catch {
+      return await storageSettings.get();
+    }
+  }
+
+  /**
+   * Runs an API call with a fresh access token. getAccessToken() already refreshes a token that is
+   * near expiry, so a 401 here means the session is genuinely dead (revoked, or the refresh token
+   * expired). Drop it so the next attempt prompts a sign-in instead of replaying a token the API
+   * keeps rejecting.
+   */
+  async function asUser<T>(call: (accessToken: string | null) => Promise<T>): Promise<T> {
+    try {
+      return await call(await getAccessToken());
     } catch (error) {
       if (error instanceof ApiError && error.code === 'unauthenticated') await storageSession.clear();
       throw error;

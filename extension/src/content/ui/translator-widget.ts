@@ -19,6 +19,8 @@ export class TranslatorWidget {
   private readonly icon: HTMLButtonElement;
   private readonly panel: HTMLDivElement;
   private anchor: Anchor = { x: 0, top: 0, bottom: 0 };
+  /** The "From: …" line of the open menu, so detection can fill it in later. */
+  private detectedLine: HTMLDivElement | null = null;
 
   constructor(
     private readonly callbacks: WidgetCallbacks,
@@ -91,7 +93,9 @@ export class TranslatorWidget {
     this.icon.style.top = `${clamp(top, VIEWPORT_MARGIN, viewport.height - ICON_SIZE - VIEWPORT_MARGIN)}px`;
   }
 
-  showLanguages(languages: readonly Language[]): void {
+  /** `detectedName` is left out while detection is still in flight; showDetected() fills it in. */
+  showLanguages(languages: readonly Language[], detectedName?: string): void {
+    this.detectedLine = this.element('div', 'title', `From: ${detectedName ?? 'detecting…'}`);
     const title = this.element('div', 'title', 'Translate to');
     const items = languages.map((language) => {
       const item = this.element('button', 'item');
@@ -102,7 +106,16 @@ export class TranslatorWidget {
       return item;
     });
     const empty = languages.length === 0 ? [this.element('div', 'status', 'No favorite languages yet.')] : [];
-    this.showPanel(title, ...items, ...empty, this.divider(), this.settingsLink());
+    this.showPanel(this.detectedLine, title, ...items, ...empty, this.divider(), this.settingsLink());
+  }
+
+  /**
+   * Fills in the "From:" line once detection answers, rather than rebuilding the panel -- a rebuild
+   * would re-measure and move the menu under the user's cursor. A no-op if the panel moved on
+   * (busy, error, sign-in), since replaceChildren detached the line.
+   */
+  showDetected(name: string): void {
+    if (this.detectedLine?.isConnected) this.detectedLine.textContent = `From: ${name}`;
   }
 
   showBusy(languageName: string): void {

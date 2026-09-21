@@ -70,12 +70,19 @@ describe('isSelectionUnchanged', () => {
 });
 
 describe('getSelectionAnchor', () => {
-  it('brackets the pointer line in a text field so the icon can sit above it', () => {
-    document.body.innerHTML = '<textarea style="line-height: 20px">Hello world</textarea>';
-    const textarea = document.querySelector('textarea')!;
-    textarea.focus();
-    textarea.setSelectionRange(0, 5);
+  // The mirror measurement needs a layout engine; happy-dom has none, so only the fallback is
+  // unit-testable here. Positioning itself is checked in a real browser.
+  it('falls back to the whole field when the selection cannot be measured', () => {
+    document.body.innerHTML = '<input value="Hello world">';
+    const input = document.querySelector('input')!;
+    input.focus();
+    input.setSelectionRange(0, 5);
+    const field = input.getBoundingClientRect();
 
-    expect(getSelectionAnchor(getEditableSelection()!, { x: 50, y: 100 })).toEqual({ x: 50, top: 90, bottom: 110 });
+    expect(getSelectionAnchor(getEditableSelection()!)).toEqual({
+      x: field.right,
+      top: field.top,
+      bottom: field.bottom,
+    });
   });
 });
