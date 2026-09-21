@@ -1,0 +1,14 @@
+/*
+ * The one stylesheet for both UI surfaces: the options page imports it, the content script
+ * imports it with `?inline` and injects it into the widget's shadow root, and Storybook's
+ * preview imports it so stories look like the real thing.
+ *
+ * `@heroui/styles` pulls in Tailwind itself, so there is no separate `@import "tailwindcss"`.
+ */
+@import '@heroui/styles';
+
+/*
+ * Tailwind scans for class names relative to the file that imports it -- which here is inside
+ * node_modules, where it would find nothing. Point it back at our sources by hand.
+ */
+@source '../';

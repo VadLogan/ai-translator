@@ -1,27 +1,26 @@
+import { createElement } from 'react';
+import { createRoot, type Root } from 'react-dom/client';
 import type { Language } from '../../core/languages';
 import type { Anchor } from '../selection';
-import ICON_SVG from '../../assets/translate-icon.svg?raw';
-import { WIDGET_CSS } from './styles';
+import { TranslatorWidget as WidgetView_, type WidgetCallbacks, type WidgetView } from './TranslatorWidget';
+// Processed by the Tailwind Vite plugin and handed back as a string, so it can go straight into a
+// <style> inside the shadow root instead of leaking into the page as a stylesheet.
+import WIDGET_CSS from '../../ui/theme.css?inline';
 
-export interface WidgetCallbacks {
-  onIconClick(): void;
-  onLanguagePick(code: string): void;
-  onFixLayout(): void;
-  onOpenSettings(): void;
-}
+export type { WidgetCallbacks };
 
-const ICON_SIZE = 26;
-const GAP = 6;
-const VIEWPORT_MARGIN = 8;
-
-/** Floating icon + language menu, isolated from page CSS in a closed shadow root. */
+/**
+ * Floating icon + language menu, isolated from page CSS in a closed shadow root.
+ *
+ * The class is a thin imperative facade over the React component: every show*() sets the view and
+ * re-renders. The content script drives it exactly as before.
+ */
 export class TranslatorWidget {
   private readonly host: HTMLElement;
-  private readonly icon: HTMLButtonElement;
-  private readonly panel: HTMLDivElement;
+  private readonly root: Root;
+  private view: WidgetView = { kind: 'hidden' };
   private anchor: Anchor = { x: 0, top: 0, bottom: 0 };
-  /** The "From: …" line of the open menu, so detection can fill it in later. */
-  private detectedLine: HTMLDivElement | null = null;
+  private dark = matchMedia('(prefers-color-scheme: dark)').matches;
 
   constructor(
     private readonly callbacks: WidgetCallbacks,
@@ -34,23 +33,9 @@ export class TranslatorWidget {
     const style = doc.createElement('style');
     style.textContent = WIDGET_CSS;
 
-    const root = doc.createElement('div');
-    root.className = 'widget';
-
-    this.icon = doc.createElement('button');
-    this.icon.className = 'icon';
-    this.icon.type = 'button';
-    this.icon.title = 'Translate selection';
-    this.icon.setAttribute('aria-label', 'Translate selection');
-    this.icon.innerHTML = ICON_SVG;
-    this.icon.addEventListener('click', () => this.callbacks.onIconClick());
-
-    this.panel = doc.createElement('div');
-    this.panel.className = 'panel';
-    this.panel.setAttribute('role', 'menu');
-
-    root.append(this.icon, this.panel);
-    shadow.append(style, root);
+    const container = doc.createElement('div');
+    shadow.append(style, container);
+    this.root = createRoot(container);
 
     // Keep focus and the text selection in the page's input while clicking the widget.
     shadow.addEventListener('mousedown', (event) => event.preventDefault());
@@ -59,7 +44,12 @@ export class TranslatorWidget {
       this.host.addEventListener(type, (event) => event.stopPropagation());
     }
 
-    this.hide();
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
+      this.dark = event.matches;
+      this.render();
+    });
+
+    this.render();
   }
 
   mount(): void {
@@ -67,15 +57,19 @@ export class TranslatorWidget {
   }
 
   destroy(): void {
+    // Unmount asynchronously: React refuses to tear a root down from inside a render or effect,
+    // and destroy() runs from WXT's onInvalidated.
+    const root = this.root;
+    queueMicrotask(() => root.unmount());
     this.host.remove();
   }
 
   get isMenuOpen(): boolean {
-    return !this.panel.hidden;
+    return this.view.kind !== 'hidden' && this.view.kind !== 'icon';
   }
 
   get isVisible(): boolean {
-    return !this.icon.hidden || !this.panel.hidden;
+    return this.view.kind !== 'hidden';
   }
 
   owns(event: Event): boolean {
@@ -83,15 +77,8 @@ export class TranslatorWidget {
   }
 
   showIcon(anchor: Anchor): void {
-    this.mount();
     this.anchor = anchor;
-    this.panel.hidden = true;
-    this.icon.hidden = false;
-    const viewport = this.viewport();
-    let top = anchor.top - ICON_SIZE - GAP;
-    if (top < VIEWPORT_MARGIN) top = anchor.bottom + GAP; // no room above: drop below the selection
-    this.icon.style.left = `${clamp(anchor.x - ICON_SIZE / 2, VIEWPORT_MARGIN, viewport.width - ICON_SIZE - VIEWPORT_MARGIN)}px`;
-    this.icon.style.top = `${clamp(top, VIEWPORT_MARGIN, viewport.height - ICON_SIZE - VIEWPORT_MARGIN)}px`;
+    this.show({ kind: 'icon' });
   }
 
   /**
@@ -100,117 +87,47 @@ export class TranslatorWidget {
    * wrong. `detectedName` is left out while detection is still in flight; showDetected() fills it in.
    */
   showLanguages(languages: readonly Language[], layoutPreview?: string, detectedName?: string): void {
-    this.detectedLine = this.element('div', 'title', `From: ${detectedName ?? 'detecting…'}`);
-    const title = this.element('div', 'title', 'Translate to');
-    const items = languages.map((language) => {
-      const item = this.element('button', 'item');
-      item.type = 'button';
-      item.setAttribute('role', 'menuitem');
-      item.append(this.element('span', '', language.name), this.element('span', 'code', language.code));
-      item.addEventListener('click', () => this.callbacks.onLanguagePick(language.code));
-      return item;
-    });
-    const empty = languages.length === 0 ? [this.element('div', 'status', 'No favorite languages yet.')] : [];
-    const fix = layoutPreview === undefined ? [] : [this.divider(), this.layoutFix(layoutPreview)];
-    this.showPanel(this.detectedLine, title, ...items, ...empty, ...fix, this.divider(), this.settingsLink());
+    this.show({ kind: 'languages', languages, layoutPreview, detectedName });
   }
 
   /**
-   * Fills in the "From:" line once detection answers, rather than rebuilding the panel -- a rebuild
-   * would re-measure and move the menu under the user's cursor. A no-op if the panel moved on
-   * (busy, error, sign-in), since replaceChildren detached the line.
+   * Fills in the "From:" line once detection answers. Only the line changes, so React keeps the
+   * panel node -- a rebuild would re-measure and move the menu under the user's cursor. A no-op if
+   * the panel moved on (busy, error, sign-in). `lang` is left out for "unknown" and "wrong keyboard
+   * layout", so the Rewrite section (which needs a real source language) stays hidden for those.
    */
-  showDetected(name: string): void {
-    if (this.detectedLine?.isConnected) this.detectedLine.textContent = `From: ${name}`;
+  showDetected(name: string, lang?: string): void {
+    if (this.view.kind !== 'languages') return;
+    this.show({ ...this.view, detectedName: name, detectedLang: lang });
   }
 
   showBusy(languageName: string): void {
-    const status = this.element('div', 'status');
-    status.append(this.element('div', 'spinner'), this.element('span', '', `Translating to ${languageName}…`));
-    this.showPanel(status);
+    this.show({ kind: 'busy', languageName });
   }
 
   /** Same shape as showError, but the buttons start the OAuth flow instead of going back. */
   showSignIn(providers: readonly { id: string; name: string }[], onPick: (providerId: string) => void): void {
-    const buttons = providers.map(({ id, name }) => {
-      const button = this.element('button', 'item', `Sign in with ${name}`);
-      button.type = 'button';
-      button.addEventListener('click', () => onPick(id));
-      return button;
-    });
-    this.showPanel(
-      this.element('div', 'status', 'Sign in to translate'),
-      this.divider(),
-      ...buttons,
-      this.divider(),
-      this.settingsLink(),
-    );
+    this.show({ kind: 'signIn', providers, onPick });
   }
 
   showError(message: string, onBack: () => void): void {
-    const back = this.element('button', 'item', '← Back');
-    back.type = 'button';
-    back.addEventListener('click', onBack);
-    this.showPanel(this.element('div', 'error', message), this.divider(), back, this.settingsLink());
+    this.show({ kind: 'error', message, onBack });
   }
 
   hide(): void {
-    this.icon.hidden = true;
-    this.panel.hidden = true;
+    this.view = { kind: 'hidden' };
+    this.render();
   }
 
-  private showPanel(...children: Node[]): void {
+  private show(view: WidgetView): void {
     this.mount();
-    this.panel.replaceChildren(...children);
-    this.icon.hidden = true;
-    this.panel.hidden = false;
-    this.positionPanel();
+    this.view = view;
+    this.render();
   }
 
-  private positionPanel(): void {
-    const viewport = this.viewport();
-    const { width, height } = this.panel.getBoundingClientRect();
-    let top = this.anchor.bottom + GAP;
-    if (top + height > viewport.height - VIEWPORT_MARGIN) {
-      top = this.anchor.top - height - GAP; // flip above the selection
-    }
-    this.panel.style.left = `${clamp(this.anchor.x + GAP, VIEWPORT_MARGIN, viewport.width - width - VIEWPORT_MARGIN)}px`;
-    this.panel.style.top = `${clamp(top, VIEWPORT_MARGIN, viewport.height - height - VIEWPORT_MARGIN)}px`;
+  private render(): void {
+    this.root.render(
+      createElement(WidgetView_, { view: this.view, anchor: this.anchor, dark: this.dark, callbacks: this.callbacks }),
+    );
   }
-
-  private layoutFix(preview: string): HTMLButtonElement {
-    const button = this.element('button', 'item');
-    button.type = 'button';
-    button.setAttribute('role', 'menuitem');
-    button.append(this.element('span', '', preview), this.element('span', 'code', 'layout'));
-    button.addEventListener('click', () => this.callbacks.onFixLayout());
-    return button;
-  }
-
-  private settingsLink(): HTMLButtonElement {
-    const link = this.element('button', 'item link', 'Settings…');
-    link.type = 'button';
-    link.addEventListener('click', () => this.callbacks.onOpenSettings());
-    return link;
-  }
-
-  private divider(): HTMLDivElement {
-    return this.element('div', 'divider');
-  }
-
-  private element<K extends keyof HTMLElementTagNameMap>(tag: K, className: string, text?: string): HTMLElementTagNameMap[K] {
-    const element = this.doc.createElement(tag);
-    if (className) element.className = className;
-    if (text !== undefined) element.textContent = text;
-    return element;
-  }
-
-  private viewport(): { width: number; height: number } {
-    const { clientWidth, clientHeight } = this.doc.documentElement;
-    return { width: clientWidth, height: clientHeight };
-  }
-}
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.max(min, Math.min(value, Math.max(min, max)));
 }

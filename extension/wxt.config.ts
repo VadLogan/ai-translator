@@ -1,7 +1,12 @@
 import { defineConfig } from 'wxt';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   srcDir: 'src',
+  // React powers both UI surfaces (the in-page widget and the options page); HeroUI is built
+  // on Tailwind v4, whose Vite plugin generates the utility classes src/ui/theme.css pulls in.
+  modules: ['@wxt-dev/module-react'],
+  vite: () => ({ plugins: [tailwindcss()] }),
   // Not dot-prefixed so the folder shows up in Chrome's "Load unpacked" file picker.
   outDir: 'output',
   manifest: {

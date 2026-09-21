@@ -25,6 +25,8 @@ export default defineContentScript({
     let requestId = 0;
     /** What POST /detect said the selection is written in, and what translate() sends back. */
     let detectedLang: string | null = null;
+    /** The favorites currently shown in the menu, so digit-key shortcuts can pick among them. */
+    let menuLanguages: readonly Language[] = [];
 
     const widget = new TranslatorWidget({
       onIconClick: () => void showLanguages(),
@@ -41,6 +43,7 @@ export default defineContentScript({
       requestId++;
       snapshot = null;
       detectedLang = null;
+      menuLanguages = [];
       widget.hide();
     }
 
@@ -66,8 +69,9 @@ export default defineContentScript({
         // The cache answers immediately; the menu must not wait on the network to open.
         const { favoriteLanguages } = await storageSettings.get();
         const fixed = snapshot ? switchLayout(snapshot.text) : '';
+        menuLanguages = favoriteLanguages.map(findLanguage).filter((l): l is Language => l !== undefined);
         widget.showLanguages(
-          favoriteLanguages.map(findLanguage).filter((l): l is Language => l !== undefined),
+          menuLanguages,
           fixed && fixed !== snapshot?.text ? preview(fixed) : undefined,
           detectedLang ? languageName(detectedLang) : undefined,
         );
@@ -97,7 +101,7 @@ export default defineContentScript({
       const lang = response.ok ? response.data.lang : null;
       // "und" is the provider saying it could not tell, so it must not travel on as a sourceLang.
       detectedLang = lang && lang !== 'und' ? lang : null;
-      widget.showDetected(detectedLang ? languageName(detectedLang) : 'unknown');
+      widget.showDetected(detectedLang ? languageName(detectedLang) : 'unknown', detectedLang ?? undefined);
     }
 
     /** Re-types the selection on the other keyboard layout. No API call, no translation. */
@@ -163,7 +167,15 @@ export default defineContentScript({
       setTimeout(refresh, 0);
     });
     ctx.addEventListener(document, 'keydown', (event) => {
-      if (event.key === 'Escape' && widget.isVisible) close();
+      if (event.key === 'Escape' && widget.isVisible) {
+        close();
+        return;
+      }
+      // Menu shortcut badges: "1".."9" pick the matching favorite language.
+      if (widget.isMenuOpen && /^[1-9]$/.test(event.key)) {
+        const language = menuLanguages[Number(event.key) - 1];
+        if (language) void translate(language.code);
+      }
     });
     ctx.addEventListener(document, 'keyup', (event) => {
       // Deferred like mouseup: model-based editors (Lexical, ProseMirror) move the selection
