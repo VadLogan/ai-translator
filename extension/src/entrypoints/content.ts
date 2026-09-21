@@ -1,4 +1,5 @@
 import { defineContentScript } from 'wxt/utils/define-content-script';
+import { switchLayout } from '../core/layout';
 import { findLanguage, type Language } from '../core/languages';
 import { PROVIDERS, isProviderId } from '../auth/providers';
 import { replaceSelection } from '../content/replace';
@@ -28,6 +29,7 @@ export default defineContentScript({
     const widget = new TranslatorWidget({
       onIconClick: () => void showLanguages(),
       onLanguagePick: (code) => void translate(code),
+      onFixLayout: () => fixLayout(),
       onOpenSettings: () => {
         close();
         void sendMessage({ type: 'open-options' });
@@ -63,8 +65,10 @@ export default defineContentScript({
       try {
         // The cache answers immediately; the menu must not wait on the network to open.
         const { favoriteLanguages } = await storageSettings.get();
+        const fixed = snapshot ? switchLayout(snapshot.text) : '';
         widget.showLanguages(
           favoriteLanguages.map(findLanguage).filter((l): l is Language => l !== undefined),
+          fixed && fixed !== snapshot?.text ? preview(fixed) : undefined,
           detectedLang ? languageName(detectedLang) : undefined,
         );
       } catch {
@@ -83,10 +87,29 @@ export default defineContentScript({
       const response = await sendMessage({ type: 'detect', text: current.text });
       if (id !== requestId) return; // closed or superseded meanwhile
 
+      // Not a language at all: point at the fix item already sitting in the menu.
+      if (response.ok && response.data.mistyped) {
+        detectedLang = null;
+        widget.showDetected('wrong keyboard layout');
+        return;
+      }
+
       const lang = response.ok ? response.data.lang : null;
       // "und" is the provider saying it could not tell, so it must not travel on as a sourceLang.
       detectedLang = lang && lang !== 'und' ? lang : null;
       widget.showDetected(detectedLang ? languageName(detectedLang) : 'unknown');
+    }
+
+    /** Re-types the selection on the other keyboard layout. No API call, no translation. */
+    function fixLayout(): void {
+      const current = snapshot;
+      if (!current) return;
+      if (!isSelectionUnchanged(current)) {
+        widget.showError('The text changed. Select it again.', () => void showLanguages());
+        return;
+      }
+      replaceSelection(current, switchLayout(current.text));
+      close();
     }
 
     async function translate(targetLang: string): Promise<void> {
@@ -128,6 +151,8 @@ export default defineContentScript({
     }
 
     const languageName = (code: string): string => findLanguage(code)?.name ?? code;
+
+    const preview = (text: string): string => (text.length > 28 ? `${text.slice(0, 28)}…` : text);
 
     ctx.addEventListener(document, 'mousedown', (event) => {
       if (!widget.owns(event)) close();

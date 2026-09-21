@@ -6,6 +6,7 @@ import { WIDGET_CSS } from './styles';
 export interface WidgetCallbacks {
   onIconClick(): void;
   onLanguagePick(code: string): void;
+  onFixLayout(): void;
   onOpenSettings(): void;
 }
 
@@ -93,8 +94,12 @@ export class TranslatorWidget {
     this.icon.style.top = `${clamp(top, VIEWPORT_MARGIN, viewport.height - ICON_SIZE - VIEWPORT_MARGIN)}px`;
   }
 
-  /** `detectedName` is left out while detection is still in flight; showDetected() fills it in. */
-  showLanguages(languages: readonly Language[], detectedName?: string): void {
+  /**
+   * `layoutPreview` is the selection re-typed on the other keyboard layout, offered as an item so a
+   * mistyped selection is always one click from fixed -- the menu does not wait to be told it is
+   * wrong. `detectedName` is left out while detection is still in flight; showDetected() fills it in.
+   */
+  showLanguages(languages: readonly Language[], layoutPreview?: string, detectedName?: string): void {
     this.detectedLine = this.element('div', 'title', `From: ${detectedName ?? 'detecting…'}`);
     const title = this.element('div', 'title', 'Translate to');
     const items = languages.map((language) => {
@@ -106,7 +111,8 @@ export class TranslatorWidget {
       return item;
     });
     const empty = languages.length === 0 ? [this.element('div', 'status', 'No favorite languages yet.')] : [];
-    this.showPanel(this.detectedLine, title, ...items, ...empty, this.divider(), this.settingsLink());
+    const fix = layoutPreview === undefined ? [] : [this.divider(), this.layoutFix(layoutPreview)];
+    this.showPanel(this.detectedLine, title, ...items, ...empty, ...fix, this.divider(), this.settingsLink());
   }
 
   /**
@@ -170,6 +176,15 @@ export class TranslatorWidget {
     }
     this.panel.style.left = `${clamp(this.anchor.x + GAP, VIEWPORT_MARGIN, viewport.width - width - VIEWPORT_MARGIN)}px`;
     this.panel.style.top = `${clamp(top, VIEWPORT_MARGIN, viewport.height - height - VIEWPORT_MARGIN)}px`;
+  }
+
+  private layoutFix(preview: string): HTMLButtonElement {
+    const button = this.element('button', 'item');
+    button.type = 'button';
+    button.setAttribute('role', 'menuitem');
+    button.append(this.element('span', '', preview), this.element('span', 'code', 'layout'));
+    button.addEventListener('click', () => this.callbacks.onFixLayout());
+    return button;
   }
 
   private settingsLink(): HTMLButtonElement {

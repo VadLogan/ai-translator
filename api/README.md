@@ -13,7 +13,9 @@ handler runs — a liveness probe that needs a login is useless.
 | `health` | `http://127.0.0.1:54321/functions/v1/health` | `https://<project-ref>.supabase.co/functions/v1/health` |
 
 Supabase strips `/functions/v1` and hands the app paths that start with the function name, which is
-why [`src/app.ts`](src/app.ts) is built with `basePath('/api')`. [`src/index.ts`](src/index.ts) is the
+why [`src/app.ts`](src/app.ts) is built with `basePath('/api')`. `app.ts` is wiring only — the guards
+are middleware ([`src/middleware/`](src/middleware)) and the per-request work is a controller
+([`src/controllers/`](src/controllers)). [`src/index.ts`](src/index.ts) is the
 entrypoint; `supabase/config.toml` points at it from outside `supabase/functions/`, so this folder
 keeps its normal npm-workspace layout for vitest and `tsc`.
 
@@ -63,7 +65,7 @@ Public. Checks the function and its database connection.
 
 **Requires `Authorization: Bearer <user access token>`.** The gateway verifies the signature and
 rejects both anonymous requests and the publishable key; the handler then reads `sub` from the
-claims and stores it as the row's `user_id`. See `userIdFrom()` in [`src/app.ts`](src/app.ts).
+claims and stores it as the row's `user_id`. See `userIdFrom()` in [`src/middleware/auth.ts`](src/middleware/auth.ts).
 
 Request body (JSON):
 

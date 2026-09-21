@@ -30,8 +30,13 @@ export interface DetectBody {
 }
 
 export interface DetectOk {
-  /** Language code the provider detected, e.g. "en", "pl", "de". */
+  /** Language code the provider detected, e.g. "en", "pl", "de". "und" when it could not tell. */
   lang: string;
+  /**
+   * The text is not a language at all but one typed on the wrong keyboard layout ("ghbdtn" for
+   * "привет"). `lang` is then "und"; the client re-types it locally with `switchLayout`.
+   */
+  mistyped?: boolean;
   usage?: TokenUsage;
   model?: string;
 }
