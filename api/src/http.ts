@@ -13,3 +13,15 @@ export function fail(c: Context, status: 400 | 401 | 404 | 429 | 502, code: ApiE
 export function waitUntil(promise: Promise<unknown>) {
   (globalThis as { EdgeRuntime?: { waitUntil(p: Promise<unknown>): void } }).EdgeRuntime?.waitUntil(promise);
 }
+
+/** One request's two ids: `rowId` is what it is saved as, `id` is the short form the log lines carry. */
+export function requestId() {
+  const rowId = crypto.randomUUID();
+  return { rowId, id: rowId.slice(0, 8) };
+}
+
+/** Starts a stopwatch. The returned function reports whole ms elapsed, and can be called repeatedly. */
+export function benchmark() {
+  const started = performance.now();
+  return () => Math.round(performance.now() - started);
+}

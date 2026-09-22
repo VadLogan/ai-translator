@@ -1,29 +1,45 @@
 import type { Context } from 'hono';
 import type { TranslateBody } from '../../../shared/contract.ts';
-import { waitUntil, type AppEnv } from '../http.ts';
+import { benchmark, fail, requestId, waitUntil, type AppEnv } from '../http.ts';
+import { scopedLogger } from '../logger.ts';
 import { translate } from '../translate.ts';
-import { translationsRepository } from '../repositories/translations.ts';
+import { translationsRepository, type TranslationRecord } from '../repositories/translations.ts';
 import { detectionsRepository } from '../repositories/detections.ts';
-import { startAttempt } from './attempt.ts';
 
-export function translateController(c: Context<AppEnv>) {
+export async function translateController(c: Context<AppEnv>) {
   const body = c.get('body') as TranslateBody; // validate(parseTranslateBody) ran first
-  const attempt = startAttempt('translate');
+  const userId = c.get('userId'); // requireUser ran first
+  const { rowId, id } = requestId();
+  const ms = benchmark();
+  const log = scopedLogger('translate', id);
+
+  // Not awaited: saving must not slow down or fail the request.
+  const save = (outcome: Pick<TranslationRecord, 'result' | 'error'>) =>
+    waitUntil(
+      translationsRepository
+        .save({ id: rowId, userId, request: body, ...outcome, durationMs: ms() })
+        .catch((dbError) => log.error('db save failed', dbError)),
+    );
 
   // What the client translated with is the only verdict we get on the detection it was given:
   // same language = the user accepted it, a different one = the user corrected it.
   if (body.sourceLang) {
     waitUntil(
       detectionsRepository
-        .verify(c.get('userId'), body.text, body.sourceLang)
-        .catch((dbError) => attempt.error('detection verify failed', dbError)),
+        .verify(userId, body.text, body.sourceLang)
+        .catch((dbError) => log.error('detection verify failed', dbError)),
     );
   }
 
-  return attempt.run(c, {
-    request: body,
-    call: translate,
-    repository: translationsRepository,
-    failure: 'Translation provider failed',
-  });
+  log.info(`→ ${new Date().toISOString()}`, body);
+  try {
+    const result = await translate(body);
+    log.info(`← ${ms()}ms`, result);
+    save({ result });
+    return c.json(result);
+  } catch (error) {
+    log.error(`✗ ${ms()}ms`, error);
+    save({ error });
+    return fail(c, 502, 'provider-failed', 'Translation provider failed');
+  }
 }

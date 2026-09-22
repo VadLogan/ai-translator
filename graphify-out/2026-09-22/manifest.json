@@ -12,9 +12,9 @@
     "semantic_hash": ""
   },
   ".claude/settings.json": {
-    "mtime": 1789986344.5856783,
-    "seen": 1790063984.3163798,
-    "ast_hash": "144e188e30e62ebe6807a60e3e5c9d81",
+    "mtime": 1789661060.4242582,
+    "seen": 1789661598.849752,
+    "ast_hash": "5d38f4d5cf2f1da9db750d7125164cc3",
     "semantic_hash": ""
   },
   ".claude/CLAUDE.md": {
@@ -108,9 +108,9 @@
     "semantic_hash": ""
   },
   "extension/package.json": {
-    "mtime": 1789985508.1840327,
-    "seen": 1790063984.3168519,
-    "ast_hash": "4ee501493dac7dc88264c9c6f8b19285",
+    "mtime": 1789721912.6714776,
+    "seen": 1789726641.48684,
+    "ast_hash": "e2220177c2b2b2eee475018b449e82bb",
     "semantic_hash": ""
   },
   "extension/src/content/replace.test.ts": {
@@ -137,10 +137,16 @@
     "ast_hash": "eacd112c5c699c44979a37bdb6c01217",
     "semantic_hash": ""
   },
+  "extension/src/content/ui/styles.ts": {
+    "mtime": 1789659779.38313,
+    "seen": 1789668127.837157,
+    "ast_hash": "0af16c655bc6640931c609df9311db2b",
+    "semantic_hash": ""
+  },
   "extension/src/content/ui/translator-widget.ts": {
-    "mtime": 1789987170.933919,
-    "seen": 1790063984.317118,
-    "ast_hash": "202e521de5deb5a5e492a56ec87e2ff6",
+    "mtime": 1789981529.500804,
+    "seen": 1789981994.515046,
+    "ast_hash": "32f509fac8ebafa304a20f2da8910acc",
     "semantic_hash": ""
   },
   "extension/src/core/languages.ts": {
@@ -156,9 +162,15 @@
     "semantic_hash": ""
   },
   "extension/src/entrypoints/content.ts": {
-    "mtime": 1789987176.1377637,
-    "seen": 1790063984.317194,
-    "ast_hash": "0e8b80a037c609ffc61c0588e1bafd57",
+    "mtime": 1789981529.5014687,
+    "seen": 1789981994.5150878,
+    "ast_hash": "0290aa09d01a93efa783db4f8426c4f8",
+    "semantic_hash": ""
+  },
+  "extension/src/entrypoints/options/main.ts": {
+    "mtime": 1789915359.883173,
+    "seen": 1789915492.5587149,
+    "ast_hash": "04c1d7a0b2f35702ad212ca394d792bb",
     "semantic_hash": ""
   },
   "extension/src/messaging/messages.ts": {
@@ -174,9 +186,9 @@
     "semantic_hash": ""
   },
   "extension/tsconfig.json": {
-    "mtime": 1789985411.901091,
-    "seen": 1790063984.317236,
-    "ast_hash": "7d09a95848ce9304222542ad57da1d16",
+    "mtime": 1789659658.2419763,
+    "seen": 1789668127.837166,
+    "ast_hash": "134bf9e71984f6f7b68bc365c1e2d01a",
     "semantic_hash": ""
   },
   "extension/vitest.config.ts": {
@@ -186,9 +198,9 @@
     "semantic_hash": ""
   },
   "extension/wxt.config.ts": {
-    "mtime": 1789985149.475167,
-    "seen": 1790063984.317251,
-    "ast_hash": "ee7b032526ddd9d35820fb9f51e73140",
+    "mtime": 1789913302.6907642,
+    "seen": 1789913557.471017,
+    "ast_hash": "74c1f71cab89aebef5c845292ddb2e0d",
     "semantic_hash": ""
   },
   "shared/contract.ts": {
@@ -204,9 +216,9 @@
     "semantic_hash": ""
   },
   "extension/src/entrypoints/options/index.html": {
-    "mtime": 1789985357.7509482,
-    "seen": 1790063984.3175108,
-    "ast_hash": "0d147202c8dbddf26a68e17d430dc453",
+    "mtime": 1789898872.0640934,
+    "seen": 1789899086.2134259,
+    "ast_hash": "25efef56c259275b5e014f77a567b4ce",
     "semantic_hash": ""
   },
   "extension/src/api.test.ts": {
@@ -390,9 +402,9 @@
     "semantic_hash": ""
   },
   "api/src/controllers/detect.ts": {
-    "mtime": 1790063857.686553,
-    "seen": 1790063984.316471,
-    "ast_hash": "cb515e8c69419d07b4371deef1c4aacc",
+    "mtime": 1789981946.465788,
+    "seen": 1789981994.514339,
+    "ast_hash": "95fd91f5d04d1500560085c081873855",
     "semantic_hash": ""
   },
   "api/src/controllers/settings.ts": {
@@ -402,15 +414,15 @@
     "semantic_hash": ""
   },
   "api/src/controllers/translate.ts": {
-    "mtime": 1790063865.5806818,
-    "seen": 1790063984.3164911,
-    "ast_hash": "620ef2ac585e2559a7be626c6c145bd5",
+    "mtime": 1789981941.4970257,
+    "seen": 1789981994.514369,
+    "ast_hash": "b2e500a0cd4eaa2f0b703fe3faac6e98",
     "semantic_hash": ""
   },
   "api/src/http.ts": {
-    "mtime": 1790063849.6813884,
-    "seen": 1790063984.316629,
-    "ast_hash": "0fad4957d2dbd7d0b17acb70042699ec",
+    "mtime": 1789979614.651545,
+    "seen": 1789979779.53892,
+    "ast_hash": "d2c5fe98d54290994f388a362b636a3e",
     "semantic_hash": ""
   },
   "api/src/middleware/auth.ts": {
@@ -431,6 +443,12 @@
     "ast_hash": "ebc9cff4ba35e0ac55d19527d38b131c",
     "semantic_hash": ""
   },
+  "api/src/controllers/attempt.ts": {
+    "mtime": 1789981935.2901962,
+    "seen": 1789981994.514336,
+    "ast_hash": "033be65ace35c6dd64dbab60ecc82bac",
+    "semantic_hash": ""
+  },
   "extension/src/core/layout.test.ts": {
     "mtime": 1789981035.4644563,
     "seen": 1789981994.5150669,
@@ -444,57 +462,9 @@
     "semantic_hash": ""
   },
   ".claude/rules/api-architecture.md": {
-    "mtime": 1790063920.6223261,
-    "seen": 1790063984.317295,
-    "ast_hash": "98c7c1780e50cce2c0781b900a231081",
-    "semantic_hash": ""
-  },
-  "api/src/logger.ts": {
-    "mtime": 1790063842.979126,
-    "seen": 1790063984.3166442,
-    "ast_hash": "9d5da04a4f331a90b9d5fda7f4f6ec57",
-    "semantic_hash": ""
-  },
-  "extension/.storybook/main.ts": {
-    "mtime": 1789985508.145624,
-    "seen": 1790063984.31685,
-    "ast_hash": "bf697103a0d74ba72d117377dfb39bed",
-    "semantic_hash": ""
-  },
-  "extension/.storybook/preview.tsx": {
-    "mtime": 1789985508.156854,
-    "seen": 1790063984.316851,
-    "ast_hash": "92acf6461f12e097805920186033782d",
-    "semantic_hash": ""
-  },
-  "extension/src/content/ui/TranslatorWidget.stories.tsx": {
-    "mtime": 1789985529.249746,
-    "seen": 1790063984.317116,
-    "ast_hash": "5b66fdff4036a8874899d8380a65121e",
-    "semantic_hash": ""
-  },
-  "extension/src/content/ui/TranslatorWidget.tsx": {
-    "mtime": 1789987165.063383,
-    "seen": 1790063984.317117,
-    "ast_hash": "9830204d437b664400a0e149549dd39d",
-    "semantic_hash": ""
-  },
-  "extension/src/entrypoints/options/OptionsPage.stories.tsx": {
-    "mtime": 1789985529.2609093,
-    "seen": 1790063984.317195,
-    "ast_hash": "f1472d49e5d7018835a7d18f25190140",
-    "semantic_hash": ""
-  },
-  "extension/src/entrypoints/options/OptionsPage.tsx": {
-    "mtime": 1789985658.9427881,
-    "seen": 1790063984.3171961,
-    "ast_hash": "959fb052b251468910e48d550fd66088",
-    "semantic_hash": ""
-  },
-  "extension/src/entrypoints/options/main.tsx": {
-    "mtime": 1789985357.7514672,
-    "seen": 1790063984.3171961,
-    "ast_hash": "9d4f0a97fefe0c9aa2d698855d7a43a5",
+    "mtime": 1789981986.9951494,
+    "seen": 1789981994.515209,
+    "ast_hash": "71605521f53639f0c79cc2205b95393c",
     "semantic_hash": ""
   }
 }

@@ -1,12 +1,11 @@
 {
-  "0": "app.ts",
   "1": "content.ts",
   "2": "scripts",
   "3": "CLAUDE.md",
   "4": "extension/package.json",
   "5": "What You Must Do When Invoked",
   "6": "api/package.json",
-  "7": "compilerOptions",
+  "7": "extension/tsconfig.json",
   "8": "vitest.config.ts",
   "9": "graphify reference: extra exports and benchmark",
   "10": "dev-jwt.ts",
@@ -16,16 +15,14 @@
   "14": "graphify reference: GitHub clone and cross-repo merge",
   "15": "graphify reference: transcribe video and audio",
   "16": "extraction-spec.md",
-  "17": "TranslatorWidget.tsx",
+  "17": "TranslatorWidget",
   "18": "background.ts",
   "19": "compilerOptions",
   "20": "Selection Snapshot and isSelectionUnchanged Check",
   "21": "AI Translator API",
-  "22": "contract.ts",
+  "22": "app.ts",
   "23": "imports",
   "24": "ref_dotenv_config",
   "25": "ref_node_crypto",
-  "26": "ref_node_fs_promises",
-  "27": "OptionsPage.stories.tsx",
-  "28": "devDependencies"
+  "26": "ref_node_fs_promises"
 }

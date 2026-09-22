@@ -1,29 +1,28 @@
-# Graph Report - ai-translator-ext  (2026-09-22)
+# Graph Report - ai-translator-ext  (2026-09-21)
 
 ## Corpus Check
-- 83 files · ~33,432 words
+- 78 files · ~31,609 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 9 file(s) not represented in the graph (top: (none) 5, .example 2, .css 1)
 
 ## Summary
-- 504 nodes · 892 edges · 29 communities (22 shown, 7 thin omitted)
-- Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 49 edges (avg confidence: 0.89)
+- 427 nodes · 780 edges · 26 communities (19 shown, 7 thin omitted)
+- Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 40 edges (avg confidence: 0.87)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `19258804`
+- Built from commit: `745a3155`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- app.ts
 - content.ts
 - scripts
 - CLAUDE.md
 - extension/package.json
 - What You Must Do When Invoked
 - api/package.json
-- compilerOptions
+- extension/tsconfig.json
 - vitest.config.ts
 - graphify reference: extra exports and benchmark
 - dev-jwt.ts
@@ -33,30 +32,28 @@
 - graphify reference: GitHub clone and cross-repo merge
 - graphify reference: transcribe video and audio
 - extraction-spec.md
-- TranslatorWidget.tsx
+- TranslatorWidget
 - background.ts
 - compilerOptions
 - Selection Snapshot and isSelectionUnchanged Check
 - AI Translator API
-- contract.ts
+- app.ts
 - imports
 - ref_dotenv_config
 - ref_node_crypto
 - ref_node_fs_promises
-- OptionsPage.stories.tsx
-- devDependencies
 
 ## God Nodes (most connected - your core abstractions)
-1. `TranslatorWidget` - 20 edges
-2. `fail()` - 14 edges
-3. `scripts` - 13 edges
-4. `main()` - 13 edges
-5. `compilerOptions` - 12 edges
-6. `API architecture (`api/src/`)` - 12 edges
-7. `What You Must Do When Invoked` - 12 edges
+1. `TranslatorWidget` - 24 edges
+2. `main()` - 13 edges
+3. `compilerOptions` - 12 edges
+4. `What You Must Do When Invoked` - 12 edges
+5. `fail()` - 11 edges
+6. `scripts` - 11 edges
+7. `sendMessage()` - 11 edges
 8. `AI Translator API` - 11 edges
-9. `handle()` - 10 edges
-10. `sendMessage()` - 10 edges
+9. `AppEnv` - 10 edges
+10. `handle()` - 10 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `API architecture (`api/src/`)` --references--> `checkDb()`  [INFERRED]
@@ -76,15 +73,11 @@
 ## Hyperedges (group relationships)
 - **Content Script Selection-to-Replacement Flow** — claude_selection_snapshot, claude_closed_shadow_root_widget, claude_requestid_stale_response_guard, claude_execcommand_insert_text_replacement [EXTRACTED 1.00]
 
-## Communities (29 total, 7 thin omitted)
-
-### Community 0 - "app.ts"
-Cohesion: 0.15
-Nodes (26): app, detectController(), getSettings(), putSettings(), translateController(), AppEnv, benchmark(), fail() (+18 more)
+## Communities (26 total, 7 thin omitted)
 
 ### Community 1 - "content.ts"
-Cohesion: 0.10
-Nodes (36): isProviderId(), ProviderId, PROVIDERS, dispatchInput(), replaceInContentEditable(), replaceInTextControl(), replaceSelection(), tryInsertText() (+28 more)
+Cohesion: 0.08
+Nodes (44): isProviderId(), ProviderId, PROVIDERS, dispatchInput(), replaceInContentEditable(), replaceInTextControl(), replaceSelection(), tryInsertText() (+36 more)
 
 ### Community 2 - "scripts"
 Cohesion: 0.11
@@ -95,8 +88,8 @@ Cohesion: 0.20
 Nodes (10): Adding a Translation Provider (4 steps), Translation Stays in Background Worker, graphify, Prompts, Rules, Dependency Inversion for Translation Engines, happy-dom Opt-in Test Environment, Mock Provider ([<lang>] <text>) (+2 more)
 
 ### Community 4 - "extension/package.json"
-Cohesion: 0.05
-Nodes (41): dependencies, @heroui/react, @heroui/styles, react, react-dom, description, typescript, vitest (+33 more)
+Cohesion: 0.07
+Nodes (25): description, devDependencies, happy-dom, typescript, vitest, wxt, typescript, vitest (+17 more)
 
 ### Community 5 - "What You Must Do When Invoked"
 Cohesion: 0.08
@@ -106,9 +99,9 @@ Nodes (24): For /graphify add and --watch, For /graphify query, For the commit h
 Cohesion: 0.09
 Nodes (22): devDependencies, hono, @hono/node-server, openai, postgres, @types/node, typescript, vitest (+14 more)
 
-### Community 7 - "compilerOptions"
-Cohesion: 0.29
-Nodes (6): compilerOptions, jsx, noUncheckedIndexedAccess, strict, extends, ./.wxt/tsconfig.json
+### Community 7 - "extension/tsconfig.json"
+Cohesion: 0.33
+Nodes (5): compilerOptions, noUncheckedIndexedAccess, strict, extends, ./.wxt/tsconfig.json
 
 ### Community 9 - "graphify reference: extra exports and benchmark"
 Cohesion: 0.22
@@ -130,13 +123,13 @@ Nodes (3): For git commit hook, For native CLAUDE.md integration, graphify refer
 Cohesion: 0.50
 Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphify reference: incremental update and cluster-only
 
-### Community 17 - "TranslatorWidget.tsx"
-Cohesion: 0.05
-Nodes (28): Anchor, TranslatorWidget, clamp(), Icon(), ICON_SIZE, iconStyle(), Panel(), PanelBody() (+20 more)
+### Community 17 - "TranslatorWidget"
+Cohesion: 0.14
+Nodes (6): Anchor, WIDGET_CSS, clamp(), TranslatorWidget, WidgetCallbacks, ref_assets_translate_icon_svg_raw
 
 ### Community 18 - "background.ts"
-Cohesion: 0.11
-Nodes (33): RFC-7636, ApiError, call(), detect(), getSettings(), saveSettings(), translate(), base64url() (+25 more)
+Cohesion: 0.10
+Nodes (35): RFC-7636, ApiError, call(), detect(), getSettings(), saveSettings(), translate(), base64url() (+27 more)
 
 ### Community 19 - "compilerOptions"
 Cohesion: 0.14
@@ -150,41 +143,33 @@ Nodes (5): CDP DOM.getDocument pierce for Closed Shadow Root Automation, Closed 
 Cohesion: 0.17
 Nodes (11): AI Translator API, Configuration, Dependencies, Errors, `GET /functions/v1/health`, `GET /settings` and `PUT /settings`, Migrations, OAuth providers (+3 more)
 
-### Community 22 - "contract.ts"
-Cohesion: 0.09
-Nodes (33): jwt(), userToken(), detectLang(), parseDetectBody(), parseSettings(), parseTranslateBody(), client, MODEL (+25 more)
+### Community 22 - "app.ts"
+Cohesion: 0.06
+Nodes (54): app, jwt(), userToken(), AttemptRepository, startAttempt(), detectController(), getSettings(), putSettings() (+46 more)
 
 ### Community 23 - "imports"
 Cohesion: 0.40
 Nodes (4): imports, hono, openai, postgres
 
-### Community 27 - "OptionsPage.stories.tsx"
-Cohesion: 0.11
-Nodes (16): Language, LANGUAGES, colorScheme, Options(), OptionsPage(), OptionsPageProps, Failed, Loading (+8 more)
-
-### Community 28 - "devDependencies"
-Cohesion: 0.17
-Nodes (12): devDependencies, happy-dom, storybook, @storybook/react-vite, tailwindcss, @tailwindcss/vite, @types/react, @types/react-dom (+4 more)
-
 ## Knowledge Gaps
-- **195 isolated node(s):** `hono`, `openai`, `postgres`, `name`, `private` (+190 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 246 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **149 isolated node(s):** `hono`, `openai`, `postgres`, `name`, `private` (+144 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 186 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **7 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `TranslatorWidget.tsx` to `OptionsPage.stories.tsx`, `extension/package.json`?**
-  _High betweenness centrality (0.073) - this node is a cross-community bridge._
 - **Why does `hono` connect `app.ts` to `dev-jwt.ts`, `api/package.json`?**
-  _High betweenness centrality (0.061) - this node is a cross-community bridge._
-- **Why does `@heroui/react` connect `OptionsPage.stories.tsx` to `TranslatorWidget.tsx`, `extension/package.json`?**
-  _High betweenness centrality (0.045) - this node is a cross-community bridge._
-- **Are the 2 inferred relationships involving `fail()` (e.g. with `API architecture (`api/src/`)` and `Rules`) actually correct?**
-  _`fail()` has 2 INFERRED edges - model-reasoned connections that need verification._
+  _High betweenness centrality (0.059) - this node is a cross-community bridge._
+- **Why does `TranslatorWidget` connect `TranslatorWidget` to `content.ts`?**
+  _High betweenness centrality (0.057) - this node is a cross-community bridge._
+- **Why does `userIdFrom()` connect `app.ts` to `AI Translator API`?**
+  _High betweenness centrality (0.036) - this node is a cross-community bridge._
 - **Are the 3 inferred relationships involving `main()` (e.g. with `.destroy()` and `.owns()`) actually correct?**
   _`main()` has 3 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `hono`, `openai`, `postgres` to the rest of the system?**
-  _195 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `app.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.145748987854251 - nodes in this community are weakly interconnected._
+  _149 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `content.ts` be split into smaller, more focused modules?**
+  _Cohesion score 0.07769423558897243 - nodes in this community are weakly interconnected._
+- **Should `scripts` be split into smaller, more focused modules?**
+  _Cohesion score 0.1111111111111111 - nodes in this community are weakly interconnected._
