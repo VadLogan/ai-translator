@@ -1,6 +1,6 @@
 // JWT helpers for local development only. Deliberately free of app imports, so dev-token.ts can
 // mint a token without loading translate.ts (which constructs the OpenAI client at module load).
-import { env } from './env.ts';
+import { env } from '../src/env.ts';
 
 // The legacy shared secret `supabase start` prints. Not a secret, and never used in production.
 // Named DEV_* rather than SUPABASE_*, because SUPABASE_-prefixed names are reserved by the platform.

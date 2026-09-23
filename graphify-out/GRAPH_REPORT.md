@@ -1,190 +1,182 @@
-# Graph Report - ai-translator-ext  (2026-09-22)
+# Graph Report - ai-translator-ext  (2026-09-23)
 
 ## Corpus Check
-- 83 files · ~33,432 words
+- 109 files · ~40,883 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 9 file(s) not represented in the graph (top: (none) 5, .example 2, .css 1)
 
 ## Summary
-- 504 nodes · 892 edges · 29 communities (22 shown, 7 thin omitted)
-- Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 49 edges (avg confidence: 0.89)
+- 607 nodes · 1168 edges · 24 communities (20 shown, 4 thin omitted)
+- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 46 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `19258804`
+- Built from commit: `6e91b28c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- app.ts
+- ref_vitest
 - content.ts
-- scripts
-- CLAUDE.md
-- extension/package.json
-- What You Must Do When Invoked
-- api/package.json
-- compilerOptions
-- vitest.config.ts
-- graphify reference: extra exports and benchmark
-- dev-jwt.ts
-- graphify reference: add a URL and watch a folder
-- graphify reference: commit hook and native CLAUDE.md integration
-- graphify reference: incremental update and cluster-only
-- graphify reference: GitHub clone and cross-repo merge
-- graphify reference: transcribe video and audio
-- extraction-spec.md
-- TranslatorWidget.tsx
-- background.ts
-- compilerOptions
-- Selection Snapshot and isSelectionUnchanged Check
-- AI Translator API
+- inputs.stories.tsx
+- graphify skill (SKILL.md)
 - contract.ts
+- background.ts
+- AI Translator API README
+- dev-jwt.ts
+- api/package.json
+- API architecture rules
+- scripts
+- extension/package.json
+- TranslatorWidget
+- compilerOptions
+- TranslatorWidget.stories.tsx
+- TranslatorWidget.tsx
+- buttons.tsx
+- icons.tsx
+- WidgetCallbacks
+- compilerOptions
 - imports
-- ref_dotenv_config
-- ref_node_crypto
-- ref_node_fs_promises
-- OptionsPage.stories.tsx
-- devDependencies
+- Extension Icon 128px (translation speech bubbles)
+- Extension id pinning for OAuth redirect
+- vitest.config.ts
 
 ## God Nodes (most connected - your core abstractions)
 1. `TranslatorWidget` - 20 edges
-2. `fail()` - 14 edges
-3. `scripts` - 13 edges
-4. `main()` - 13 edges
-5. `compilerOptions` - 12 edges
-6. `API architecture (`api/src/`)` - 12 edges
-7. `What You Must Do When Invoked` - 12 edges
-8. `AI Translator API` - 11 edges
-9. `handle()` - 10 edges
-10. `sendMessage()` - 10 edges
+2. `graphify skill (SKILL.md)` - 19 edges
+3. `fail()` - 16 edges
+4. `scripts` - 13 edges
+5. `main()` - 13 edges
+6. `API architecture rules` - 13 edges
+7. `compilerOptions` - 12 edges
+8. `scopedLogger()` - 11 edges
+9. `waitUntil()` - 11 edges
+10. `AppEnv` - 10 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `API architecture (`api/src/`)` --references--> `checkDb()`  [INFERRED]
-  .claude/rules/api-architecture.md → api/src/db.ts
-- `Rules` --references--> `checkDb()`  [INFERRED]
-  .claude/rules/api-architecture.md → api/src/db.ts
-- `Step 0 — Constrained query expansion (REQUIRED before traversal)` --references--> `handler()`  [INFERRED]
-  .claude/skills/graphify/references/query.md → api/src/health.ts
-- `API architecture (`api/src/`)` --references--> `AppEnv`  [INFERRED]
-  .claude/rules/api-architecture.md → api/src/http.ts
-- `API architecture (`api/src/`)` --references--> `fail()`  [INFERRED]
-  .claude/rules/api-architecture.md → api/src/http.ts
+- `ResponseMap` --references--> `DetectOk`  [EXTRACTED]
+  extension/src/messaging/messages.ts → shared/contract.ts
+- `ResponseMap` --references--> `Settings`  [EXTRACTED]
+  extension/src/messaging/messages.ts → shared/contract.ts
+- `ResponseMap` --references--> `TranslateOk`  [EXTRACTED]
+  extension/src/messaging/messages.ts → shared/contract.ts
+- `Extension id pinning for OAuth redirect` --conceptually_related_to--> `Hand-rolled PKCE OAuth`  [INFERRED]
+  api/README.md → CLAUDE.md
+- `POST /detect` --references--> `Wrong keyboard layout (mistyped + switchLayout)`  [EXTRACTED]
+  api/README.md → CLAUDE.md
 
 ## Import Cycles
 - None detected.
 
 ## Hyperedges (group relationships)
-- **Content Script Selection-to-Replacement Flow** — claude_selection_snapshot, claude_closed_shadow_root_widget, claude_requestid_stale_response_guard, claude_execcommand_insert_text_replacement [EXTRACTED 1.00]
+- **API layered call chain** — _claude_rules_api_architecture_entrypoint_layer, _claude_rules_api_architecture_wiring_layer, _claude_rules_api_architecture_middleware_layer, _claude_rules_api_architecture_controller_layer, _claude_rules_api_architecture_service_layer, _claude_rules_api_architecture_repository_layer, _claude_rules_api_architecture_connection_layer [EXTRACTED 1.00]
+- **Gateway-enforced auth model** — claude_verify_jwt_gate, claude_dev_gateway_emulation, claude_gateway_401_status_detection, api_readme_health_endpoint [EXTRACTED 1.00]
+- **graphify build pipeline steps** — _claude_skills_graphify_skill_ast_extraction, _claude_skills_graphify_skill_semantic_extraction, _claude_skills_graphify_skill_merge_extraction, _claude_skills_graphify_skill_build_cluster, _claude_skills_graphify_skill_community_labels, _claude_skills_graphify_skill_manifest [EXTRACTED 1.00]
+- **Provider routes whose attempts join on trace_id** — api_readme_translate_endpoint, api_readme_detect_endpoint, claude_fix_grammar_route, claude_rewrite_route, claude_trace_id [EXTRACTED 1.00]
+- **graphify graph refresh mechanisms** — _claude_skills_graphify_references_add_watch_watch, _claude_skills_graphify_references_hooks_post_commit_hook, _claude_skills_graphify_references_update_incremental_update [INFERRED 0.85]
+- **Extension toolbar icon set (16/32/48/128)** — extension_public_icon_16_icon, extension_public_icon_32_icon, extension_public_icon_48_icon, extension_public_icon_128_icon [INFERRED 0.95]
 
-## Communities (29 total, 7 thin omitted)
+## Communities (24 total, 4 thin omitted)
 
-### Community 0 - "app.ts"
-Cohesion: 0.15
-Nodes (26): app, detectController(), getSettings(), putSettings(), translateController(), AppEnv, benchmark(), fail() (+18 more)
+### Community 0 - "ref_vitest"
+Cohesion: 0.10
+Nodes (18): CorrectionRecord, request, toRow(), request, toRow(), request, toRow(), request (+10 more)
 
 ### Community 1 - "content.ts"
-Cohesion: 0.10
-Nodes (36): isProviderId(), ProviderId, PROVIDERS, dispatchInput(), replaceInContentEditable(), replaceInTextControl(), replaceSelection(), tryInsertText() (+28 more)
+Cohesion: 0.06
+Nodes (52): isProviderId(), PROVIDERS, dispatchInput(), replaceInContentEditable(), replaceInTextControl(), replaceSelection(), tryInsertText(), tryPaste() (+44 more)
 
-### Community 2 - "scripts"
+### Community 2 - "inputs.stories.tsx"
+Cohesion: 0.18
+Nodes (14): CHIP_TONE, LanguageCard(), Meter(), RemovableChip(), SearchField(), Segmented(), Select(), StatusChip() (+6 more)
+
+### Community 3 - "graphify skill (SKILL.md)"
+Cohesion: 0.06
+Nodes (44): .claude/CLAUDE.md (project instructions), Understood-as prompt rule, graphify reference: add URL and watch, graphify add URL ingest, graphify --watch auto-rebuild, graphify reference: exports and benchmark, Token reduction benchmark, FalkorDB export (+36 more)
+
+### Community 4 - "contract.ts"
+Cohesion: 0.07
+Nodes (63): app, jwt(), userToken(), detectController(), fixGrammarController(), rewriteController(), getSettings(), putSettings() (+55 more)
+
+### Community 5 - "background.ts"
 Cohesion: 0.11
-Nodes (17): devDependencies, supabase, name, private, scripts, build, compile, db (+9 more)
+Nodes (32): RFC-7636, ApiError, call(), detect(), getSettings(), saveSettings(), translate(), base64url() (+24 more)
 
-### Community 3 - "CLAUDE.md"
-Cohesion: 0.20
-Nodes (10): Adding a Translation Provider (4 steps), Translation Stays in Background Worker, graphify, Prompts, Rules, Dependency Inversion for Translation Engines, happy-dom Opt-in Test Environment, Mock Provider ([<lang>] <text>) (+2 more)
-
-### Community 4 - "extension/package.json"
-Cohesion: 0.05
-Nodes (41): dependencies, @heroui/react, @heroui/styles, react, react-dom, description, typescript, vitest (+33 more)
-
-### Community 5 - "What You Must Do When Invoked"
+### Community 6 - "AI Translator API README"
 Cohesion: 0.08
-Nodes (24): For /graphify add and --watch, For /graphify query, For the commit hook and native CLAUDE.md integration, For --update and --cluster-only, /graphify, Honesty Rules, Interpreter guard for subcommands, Part A - Structural extraction for code files (+16 more)
+Nodes (27): AI Translator API README, POST /detect, deno.json + devDependencies dual lists, API error shape {error:{message,code}}, GET /health, Per-user in-memory rate limit (60/min), GET/PUT /settings, POST /translate (+19 more)
 
-### Community 6 - "api/package.json"
+### Community 7 - "dev-jwt.ts"
+Cohesion: 0.11
+Nodes (20): gateway, token(), ASYMMETRIC, base64url(), decodeJson(), DEV_JWT_SECRET, hmacKey(), jwks() (+12 more)
+
+### Community 8 - "api/package.json"
 Cohesion: 0.09
 Nodes (22): devDependencies, hono, @hono/node-server, openai, postgres, @types/node, typescript, vitest (+14 more)
 
-### Community 7 - "compilerOptions"
-Cohesion: 0.29
-Nodes (6): compilerOptions, jsx, noUncheckedIndexedAccess, strict, extends, ./.wxt/tsconfig.json
+### Community 9 - "API architecture rules"
+Cohesion: 0.18
+Nodes (19): API architecture rules, Connection layer (db.ts), Controller layer, A controller owns its own response, Entrypoint layer (index.ts, server.ts, health.ts), Erasable TypeScript constraint, Error body {error:{message, code}} synced with shared/contract.ts, http.ts shared helpers (fail, waitUntil, requestId, benchmark, AppEnv) (+11 more)
 
-### Community 9 - "graphify reference: extra exports and benchmark"
-Cohesion: 0.22
-Nodes (8): graphify reference: extra exports and benchmark, Step 6b - Wiki (only if --wiki flag), Step 7 - Neo4j export (only if --neo4j or --neo4j-push flag), Step 7a - FalkorDB export (only if --falkordb or --falkordb-push flag), Step 7b - SVG export (only if --svg flag), Step 7c - GraphML export (only if --graphml flag), Step 7d - MCP server (only if --mcp flag), Step 8 - Token reduction benchmark (only if total_words > 5000)
-
-### Community 10 - "dev-jwt.ts"
-Cohesion: 0.10
-Nodes (23): checkDb(), sql, gateway, token(), ASYMMETRIC, base64url(), decodeJson(), DEV_JWT_SECRET (+15 more)
-
-### Community 11 - "graphify reference: add a URL and watch a folder"
-Cohesion: 0.50
-Nodes (3): For /graphify add, For --watch, graphify reference: add a URL and watch a folder
-
-### Community 12 - "graphify reference: commit hook and native CLAUDE.md integration"
-Cohesion: 0.50
-Nodes (3): For git commit hook, For native CLAUDE.md integration, graphify reference: commit hook and native CLAUDE.md integration
-
-### Community 13 - "graphify reference: incremental update and cluster-only"
-Cohesion: 0.50
-Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphify reference: incremental update and cluster-only
-
-### Community 17 - "TranslatorWidget.tsx"
-Cohesion: 0.05
-Nodes (28): Anchor, TranslatorWidget, clamp(), Icon(), ICON_SIZE, iconStyle(), Panel(), PanelBody() (+20 more)
-
-### Community 18 - "background.ts"
+### Community 10 - "scripts"
 Cohesion: 0.11
-Nodes (33): RFC-7636, ApiError, call(), detect(), getSettings(), saveSettings(), translate(), base64url() (+25 more)
+Nodes (17): devDependencies, supabase, name, private, scripts, build, compile, db (+9 more)
 
-### Community 19 - "compilerOptions"
+### Community 11 - "extension/package.json"
+Cohesion: 0.04
+Nodes (47): dependencies, @heroui/react, @heroui/styles, react, react-dom, description, devDependencies, happy-dom (+39 more)
+
+### Community 13 - "compilerOptions"
 Cohesion: 0.14
 Nodes (13): compilerOptions, allowImportingTsExtensions, erasableSyntaxOnly, module, moduleResolution, noEmit, noUncheckedIndexedAccess, rewriteRelativeImportExtensions (+5 more)
 
-### Community 20 - "Selection Snapshot and isSelectionUnchanged Check"
-Cohesion: 0.40
-Nodes (5): CDP DOM.getDocument pierce for Closed Shadow Root Automation, Closed Shadow Root Translator Widget, execCommand insertText Replacement Strategy, requestId Stale Response Guard, Selection Snapshot and isSelectionUnchanged Check
+### Community 14 - "TranslatorWidget.stories.tsx"
+Cohesion: 0.06
+Nodes (28): Busy, Error, FAVORITES, Icon, Menu, MenuDetecting, MenuWithLayoutFix, MenuWithoutFavorites (+20 more)
 
-### Community 21 - "AI Translator API"
-Cohesion: 0.17
-Nodes (11): AI Translator API, Configuration, Dependencies, Errors, `GET /functions/v1/health`, `GET /settings` and `PUT /settings`, Migrations, OAuth providers (+3 more)
+### Community 15 - "TranslatorWidget.tsx"
+Cohesion: 0.16
+Nodes (10): Anchor, clamp(), iconStyle(), Panel(), TranslatorWidget(), TranslatorWidgetProps, Trigger(), react (+2 more)
 
-### Community 22 - "contract.ts"
-Cohesion: 0.09
-Nodes (33): jwt(), userToken(), detectLang(), parseDetectBody(), parseSettings(), parseTranslateBody(), client, MODEL (+25 more)
+### Community 16 - "buttons.tsx"
+Cohesion: 0.15
+Nodes (13): ICON_SIZE, ICON_TONE, IconButton(), IconButtonProps, Kbd(), KBD_TONE, PILL_SIZE, PILL_VARIANT (+5 more)
 
-### Community 23 - "imports"
+### Community 17 - "icons.tsx"
+Cohesion: 0.24
+Nodes (11): BrandMark(), fixed(), Flag(), FLAGS, Icon(), ICON_NAMES, IconName, PATHS (+3 more)
+
+### Community 19 - "compilerOptions"
+Cohesion: 0.29
+Nodes (6): compilerOptions, jsx, noUncheckedIndexedAccess, strict, extends, ./.wxt/tsconfig.json
+
+### Community 20 - "imports"
 Cohesion: 0.40
 Nodes (4): imports, hono, openai, postgres
 
-### Community 27 - "OptionsPage.stories.tsx"
-Cohesion: 0.11
-Nodes (16): Language, LANGUAGES, colorScheme, Options(), OptionsPage(), OptionsPageProps, Failed, Loading (+8 more)
-
-### Community 28 - "devDependencies"
-Cohesion: 0.17
-Nodes (12): devDependencies, happy-dom, storybook, @storybook/react-vite, tailwindcss, @tailwindcss/vite, @types/react, @types/react-dom (+4 more)
+### Community 22 - "Extension Icon 128px (translation speech bubbles)"
+Cohesion: 0.60
+Nodes (5): Extension Icon 128px (translation speech bubbles), Extension Icon 16px, Extension Icon 32px, Extension Icon 48px, Translate Icon SVG (blue source bubble, yellow target bubble with A)
 
 ## Knowledge Gaps
-- **195 isolated node(s):** `hono`, `openai`, `postgres`, `name`, `private` (+190 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 246 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **7 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **193 isolated node(s):** `hono`, `openai`, `postgres`, `DEV_JWT_SECRET`, `ASYMMETRIC` (+188 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 244 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `TranslatorWidget.tsx` to `OptionsPage.stories.tsx`, `extension/package.json`?**
-  _High betweenness centrality (0.073) - this node is a cross-community bridge._
-- **Why does `hono` connect `app.ts` to `dev-jwt.ts`, `api/package.json`?**
-  _High betweenness centrality (0.061) - this node is a cross-community bridge._
-- **Why does `@heroui/react` connect `OptionsPage.stories.tsx` to `TranslatorWidget.tsx`, `extension/package.json`?**
-  _High betweenness centrality (0.045) - this node is a cross-community bridge._
-- **Are the 2 inferred relationships involving `fail()` (e.g. with `API architecture (`api/src/`)` and `Rules`) actually correct?**
-  _`fail()` has 2 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 3 inferred relationships involving `main()` (e.g. with `.destroy()` and `.owns()`) actually correct?**
-  _`main()` has 3 INFERRED edges - model-reasoned connections that need verification._
+- **Why does `react` connect `TranslatorWidget.tsx` to `content.ts`, `inputs.stories.tsx`, `extension/package.json`, `TranslatorWidget.stories.tsx`, `buttons.tsx`, `icons.tsx`?**
+  _High betweenness centrality (0.117) - this node is a cross-community bridge._
+- **Why does `hono` connect `contract.ts` to `api/package.json`, `dev-jwt.ts`?**
+  _High betweenness centrality (0.051) - this node is a cross-community bridge._
+- **Why does `@storybook/react-vite` connect `TranslatorWidget.stories.tsx` to `content.ts`, `inputs.stories.tsx`, `extension/package.json`, `buttons.tsx`, `icons.tsx`?**
+  _High betweenness centrality (0.047) - this node is a cross-community bridge._
 - **What connects `hono`, `openai`, `postgres` to the rest of the system?**
-  _195 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `app.ts` be split into smaller, more focused modules?**
-  _Cohesion score 0.145748987854251 - nodes in this community are weakly interconnected._
+  _193 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `ref_vitest` be split into smaller, more focused modules?**
+  _Cohesion score 0.10483870967741936 - nodes in this community are weakly interconnected._
+- **Should `content.ts` be split into smaller, more focused modules?**
+  _Cohesion score 0.05754527162977867 - nodes in this community are weakly interconnected._
+- **Should `graphify skill (SKILL.md)` be split into smaller, more focused modules?**
+  _Cohesion score 0.0613107822410148 - nodes in this community are weakly interconnected._

@@ -1,17 +1,25 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { app } from './app.ts';
-import { translate } from './translate.ts';
-import { detectLang } from './detect.ts';
+import { translate } from './resources/aiClient/requests/translate.ts';
+import { detectLang } from './resources/aiClient/requests/detect.ts';
 import { translationsRepository } from './repositories/translations.ts';
 import { detectionsRepository } from './repositories/detections.ts';
 import { profilesRepository } from './repositories/profiles.ts';
+import { fixGrammar } from './resources/aiClient/requests/fix-grammar/fix-grammar.ts';
+import { correctionsRepository } from './repositories/corrections.ts';
+import { rewrite } from './resources/aiClient/requests/rewrite.ts';
+import { rewritesRepository } from './repositories/rewrites.ts';
 
 // The real providers call OpenAI; tests only cover the HTTP layer.
 vi.mock('./translate.ts', () => ({
   translate: vi.fn(async ({ text, targetLang }) => ({ text: `[${targetLang}] ${text}` })),
 }));
 vi.mock('./detect.ts', () => ({ detectLang: vi.fn(async () => ({ lang: 'en' })) }));
-vi.mock('./repositories/translations.ts', () => ({ translationsRepository: { save: vi.fn(async () => {}) } }));
+vi.mock('./fix-grammar.ts', () => ({ fixGrammar: vi.fn(async ({ text }) => ({ text: `fixed: ${text}`, html: `fixed: ${text}` })) }));
+vi.mock('./rewrite.ts', () => ({ rewrite: vi.fn(async ({ text, style }) => ({ text: `[${style}] ${text}` })) }));
+vi.mock('./repositories/rewrites.ts', () => ({ rewritesRepository: { save: vi.fn(async () => {}) } }));
+vi.mock('./repositories/corrections.ts', () => ({ correctionsRepository: { save: vi.fn(async () => {}) } }));
+vi.mock('./repositories/translations.ts',() => ({ translationsRepository: { save: vi.fn(async () => {}) } }));
 vi.mock('./repositories/detections.ts', () => ({
   detectionsRepository: { save: vi.fn(async () => {}), verify: vi.fn(async () => {}) },
 }));
@@ -200,6 +208,106 @@ describe('POST /detect', () => {
     expect(res.status).toBe(400);
     await expect(res.json()).resolves.toMatchObject({ error: { code: 'invalid-input' } });
     expect(detectionsRepository.save).not.toHaveBeenCalled();
+  });
+});
+
+describe('POST /fix-grammar', () => {
+  const fix = (body: unknown, authorization: string | null = `Bearer ${userToken()}`) =>
+    app.request('/api/fix-grammar', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', ...(authorization ? { authorization } : {}) },
+      body: JSON.stringify(body),
+    });
+
+  it('returns the corrected text and saves it against the signed-in user', async () => {
+    const sub = crypto.randomUUID();
+    const res = await fix({ text: 'i has went', url: 'https://teams.microsoft.com/chat' }, `Bearer ${userToken(sub)}`);
+
+    expect(res.status).toBe(200);
+    await expect(res.json()).resolves.toEqual({ text: 'fixed: i has went', html: 'fixed: i has went' });
+    expect(correctionsRepository.save).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        userId: sub,
+        request: { text: 'i has went', url: 'https://teams.microsoft.com/chat' },
+        result: { text: 'fixed: i has went', html: 'fixed: i has went' },
+      }),
+    );
+  });
+
+  it('401s without a user token', async () => {
+    const res = await fix({ text: 'Hello' }, null);
+
+    expect(res.status).toBe(401);
+    await expect(res.json()).resolves.toMatchObject({ error: { code: 'unauthenticated' } });
+    expect(correctionsRepository.save).not.toHaveBeenCalled();
+  });
+
+  it('400s blank text', async () => {
+    const res = await fix({ text: '  ' });
+
+    expect(res.status).toBe(400);
+    expect(correctionsRepository.save).not.toHaveBeenCalled();
+  });
+
+  it('502s when the provider fails and saves the error', async () => {
+    const boom = new Error('provider down');
+    vi.mocked(fixGrammar).mockRejectedValueOnce(boom);
+    vi.spyOn(console, 'error').mockImplementationOnce(() => {});
+    const res = await fix({ text: 'Hello' });
+
+    expect(res.status).toBe(502);
+    await expect(res.json()).resolves.toMatchObject({ error: { code: 'provider-failed' } });
+    expect(correctionsRepository.save).toHaveBeenLastCalledWith(expect.objectContaining({ error: boom }));
+  });
+});
+
+describe('POST /rewrite', () => {
+  const post = (body: unknown, authorization: string | null = `Bearer ${userToken()}`) =>
+    app.request('/api/rewrite', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', ...(authorization ? { authorization } : {}) },
+      body: JSON.stringify(body),
+    });
+
+  it('returns the rewritten text and saves it, style included, against the signed-in user', async () => {
+    const sub = crypto.randomUUID();
+    const res = await post({ text: 'send report asap', style: 'formal', url: 'https://teams.microsoft.com/chat' }, `Bearer ${userToken(sub)}`);
+
+    expect(res.status).toBe(200);
+    await expect(res.json()).resolves.toEqual({ text: '[formal] send report asap' });
+    expect(rewritesRepository.save).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        userId: sub,
+        request: { text: 'send report asap', style: 'formal', url: 'https://teams.microsoft.com/chat' },
+        result: { text: '[formal] send report asap' },
+      }),
+    );
+  });
+
+  it('401s without a user token', async () => {
+    const res = await post({ text: 'Hello', style: 'natural' }, null);
+
+    expect(res.status).toBe(401);
+    expect(rewritesRepository.save).not.toHaveBeenCalled();
+  });
+
+  it.each([undefined, 'poetic', 1])('400s style %s', async (style) => {
+    const res = await post({ text: 'Hello', style });
+
+    expect(res.status).toBe(400);
+    await expect(res.json()).resolves.toMatchObject({ error: { code: 'invalid-input' } });
+    expect(rewritesRepository.save).not.toHaveBeenCalled();
+  });
+
+  it('502s when the provider fails and saves the error', async () => {
+    const boom = new Error('provider down');
+    vi.mocked(rewrite).mockRejectedValueOnce(boom);
+    vi.spyOn(console, 'error').mockImplementationOnce(() => {});
+    const res = await post({ text: 'Hello', style: 'natural' });
+
+    expect(res.status).toBe(502);
+    await expect(res.json()).resolves.toMatchObject({ error: { code: 'provider-failed' } });
+    expect(rewritesRepository.save).toHaveBeenLastCalledWith(expect.objectContaining({ error: boom }));
   });
 });
 

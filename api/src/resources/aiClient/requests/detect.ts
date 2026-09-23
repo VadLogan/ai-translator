@@ -1,5 +1,5 @@
-import type { DetectBody, DetectOk } from '../../shared/contract.ts';
-import { MODEL, client } from './openai.ts';
+import type { DetectBody, DetectOk } from '../../../../../shared/contract.ts';
+import { MODEL, client } from '../client.ts';
 
 /** Detection only: DetectBody in, DetectOk out. Logging and saving live in the route (app.ts). */
 export async function detectLang({ text }: DetectBody): Promise<DetectOk> {

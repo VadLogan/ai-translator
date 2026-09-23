@@ -1,10 +1,11 @@
 import { useLayoutEffect, useRef, type CSSProperties, type ReactNode } from 'react';
-import { Button, Card, Separator, Spinner } from '@heroui/react';
+import { Button, Spinner } from '@heroui/react';
 import type { Language } from '../../core/languages';
 import type { Anchor } from '../selection';
-import ICON_SVG from '../../assets/translate-icon.svg?raw';
+import { Kbd, PillButton } from '../../ui/buttons';
+import { BrandMark, Flag, Icon, type IconName } from '../../ui/icons';
 
-export const ICON_SIZE = 26;
+const ICON_SIZE = 26;
 const GAP = 6;
 const VIEWPORT_MARGIN = 8;
 
@@ -51,25 +52,23 @@ export function TranslatorWidget({ view, anchor, dark, callbacks }: TranslatorWi
     // HeroUI reads its theme from a `.light` / `.dark` ancestor. `:root` matches nothing inside a
     // shadow tree, and the variables have no prefers-color-scheme fallback, so the class is what
     // decides -- both for the CSS variables and for Tailwind's `dark:` variant.
-    <div className={`${dark ? 'dark' : 'light'} font-sans text-[13px] leading-[1.4] text-foreground`}>
-      {view.kind === 'icon' ? <Icon anchor={anchor} onPress={callbacks.onIconClick} /> : <Panel anchor={anchor} view={view} callbacks={callbacks} />}
+    <div className={`${dark ? 'dark' : 'light'} font-tm tm-body text-tm-ink`}>
+      {view.kind === 'icon' ? <Trigger anchor={anchor} onPress={callbacks.onIconClick} /> : <Panel anchor={anchor} view={view} callbacks={callbacks} />}
     </div>
   );
 }
 
-function Icon({ anchor, onPress }: { anchor: Anchor; onPress: () => void }) {
+function Trigger({ anchor, onPress }: { anchor: Anchor; onPress: () => void }) {
   return (
     <Button
       isIconOnly
-      variant="outline"
+      variant="ghost"
       aria-label="Translate selection"
-      className="fixed size-[26px] min-w-0 rounded-[7px] border border-border bg-surface p-0 shadow-overlay [&>span>svg]:size-4"
+      className="fixed size-[26px] min-w-0 rounded-full p-0 shadow-tm-pop"
       style={iconStyle(anchor)}
       onPress={onPress}
     >
-      {/* Our own asset, imported as raw markup -- the same thing the old widget assigned to innerHTML. */}
-      {/* `title` rides on the span because react-aria's Button type does not accept it. */}
-      <span title="Translate selection" className="grid place-items-center" dangerouslySetInnerHTML={{ __html: ICON_SVG }} />
+      <BrandMark size={ICON_SIZE} shape="round" />
     </Button>
   );
 }
@@ -91,29 +90,31 @@ function Panel({ anchor, view, callbacks }: { anchor: Anchor; view: WidgetView; 
   });
 
   return (
-    <Card
+    <div
       ref={ref}
+      role="dialog"
       aria-label="Translate selection"
-      className="fixed max-h-[320px] min-w-[180px] max-w-[260px] overflow-auto rounded-lg border border-border bg-surface p-1 shadow-overlay"
+      className="fixed max-h-[420px] min-w-[200px] max-w-[280px] overflow-auto rounded-2xl bg-tm-surface p-1.5 shadow-tm-pop"
     >
       <PanelBody view={view} callbacks={callbacks} />
-    </Card>
+    </div>
   );
 }
 
 function PanelBody({ view, callbacks }: { view: WidgetView; callbacks: WidgetCallbacks }) {
-  const settings = <Item label="Settings…" muted onPress={callbacks.onOpenSettings} />;
+  const settings = <Item label="Settings…" icon="settings" muted onPress={callbacks.onOpenSettings} />;
 
   switch (view.kind) {
     case 'languages':
       return (
         <>
-          <DetectedHeader name={view.detectedName} />
+          <DetectedHeader name={view.detectedName} lang={view.detectedLang} />
           <Section title="Translate to">
             {view.languages.map((language, index) => (
               <Item
                 key={language.code}
                 label={language.name}
+                flag={language.code}
                 shortcut={index < 9 ? String(index + 1) : undefined}
                 onPress={() => callbacks.onLanguagePick(language.code)}
               />
@@ -123,27 +124,29 @@ function PanelBody({ view, callbacks }: { view: WidgetView; callbacks: WidgetCal
           {view.detectedLang !== undefined && (
             <Section title={`Rewrite in ${view.detectedName}`}>
               {/* Not wired up yet: shown to match the design, no service behind it. */}
-              <Item label="More native" icon={SPARKLE_ICON} shortcut="N" disabled onPress={noop} />
-              <Item label="More official" icon={DOCUMENT_ICON} shortcut="O" disabled onPress={noop} />
-              <Item label="Shorter" icon={LINES_ICON} shortcut="S" disabled onPress={noop} />
+              <Item label="More native" icon="moreNative" shortcut="N" disabled onPress={noop} />
+              <Item label="More official" icon="moreOfficial" shortcut="O" disabled onPress={noop} />
+              <Item label="Shorter" icon="shorter" shortcut="S" disabled onPress={noop} />
             </Section>
           )}
           {view.layoutPreview !== undefined && (
             <>
-              <Separator className="my-1" />
-              <Item label={view.layoutPreview} hint="layout" onPress={callbacks.onFixLayout} />
+              <Divider />
+              <Item label={view.layoutPreview} icon="keyboard" hint="layout" onPress={callbacks.onFixLayout} />
             </>
           )}
-          <Separator className="my-1" />
+          <Divider />
           {settings}
-          <div className="px-2 pb-1 pt-1 text-center text-[11px] text-muted">Press a key · Esc closes</div>
+          <div className="flex items-center justify-center gap-1.5 px-2 pb-1 pt-1.5 tm-meta text-tm-muted">
+            Press a key · <Kbd>Esc</Kbd> closes
+          </div>
         </>
       );
 
     case 'busy':
       return (
         <Status>
-          <Spinner size="sm" />
+          <Spinner size="sm" className="text-tm-accent" />
           <span>Translating to {view.languageName}…</span>
         </Status>
       );
@@ -151,12 +154,18 @@ function PanelBody({ view, callbacks }: { view: WidgetView; callbacks: WidgetCal
     case 'signIn':
       return (
         <>
-          <Status>Sign in to translate</Status>
-          <Separator className="my-1" />
-          {view.providers.map((provider) => (
-            <Item key={provider.id} label={`Sign in with ${provider.name}`} onPress={() => view.onPick(provider.id)} />
-          ))}
-          <Separator className="my-1" />
+          <div className="flex flex-col gap-1.5 p-1.5">
+            <div className="flex items-center gap-2 px-1 pb-1 tm-label text-tm-secondary">
+              <Icon name="lock" />
+              Sign in to translate
+            </div>
+            {view.providers.map((provider) => (
+              <PillButton key={provider.id} variant="soft" size="sm" fullWidth onPress={() => view.onPick(provider.id)}>
+                Sign in with {provider.name}
+              </PillButton>
+            ))}
+          </div>
+          <Divider />
           {settings}
         </>
       );
@@ -164,9 +173,9 @@ function PanelBody({ view, callbacks }: { view: WidgetView; callbacks: WidgetCal
     case 'error':
       return (
         <>
-          <div className="p-2 text-danger">{view.message}</div>
-          <Separator className="my-1" />
-          <Item label="← Back" onPress={view.onBack} />
+          <div className="px-2.5 py-2 text-tm-danger-ink">{view.message}</div>
+          <Divider />
+          <Item label="Back" icon="back" onPress={view.onBack} />
           {settings}
         </>
       );
@@ -176,24 +185,26 @@ function PanelBody({ view, callbacks }: { view: WidgetView; callbacks: WidgetCal
   }
 }
 
-function Status({ children }: { children: ReactNode }) {
-  return <div className="flex items-center gap-2 p-2">{children}</div>;
+function Divider() {
+  return <div role="separator" className="mx-1 my-1 h-px bg-tm-line" />;
 }
 
-/** "{name} detected" plus a "Change" action -- not wired up yet, so it's rendered disabled. */
-function DetectedHeader({ name }: { name?: string }) {
+function Status({ children }: { children: ReactNode }) {
+  return <div className="flex items-center gap-2 px-2.5 py-2">{children}</div>;
+}
+
+/** Flag + "{name} detected" plus a "Change" action -- not wired up yet, so it's rendered disabled. */
+function DetectedHeader({ name, lang }: { name?: string; lang?: string }) {
   return (
-    <div className="flex items-center justify-between gap-2 px-2 pb-1 pt-1.5">
-      <span className="truncate text-[13px]">{name ? `${name} detected` : 'detecting…'}</span>
-      <Button
-        variant="ghost"
-        size="sm"
-        isDisabled
-        className="h-6 min-h-0 gap-1.5 px-1.5 text-xs font-normal text-muted"
-      >
+    <div className="flex items-center justify-between gap-2 py-1 pl-2.5 pr-1">
+      <span className="flex min-w-0 items-center gap-2">
+        {lang !== undefined && <Flag lang={lang} width={18} />}
+        <span className="tm-label leading-tight">{name ? `${name} detected` : 'Detecting…'}</span>
+      </span>
+      <PillButton variant="ghost" size="xs" isDisabled className="gap-1.5 disabled:bg-transparent">
         Change
-        <ShortcutBadge shortcut="C" />
-      </Button>
+        <Kbd>C</Kbd>
+      </PillButton>
     </div>
   );
 }
@@ -201,25 +212,19 @@ function DetectedHeader({ name }: { name?: string }) {
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div>
-      <div className="px-2 pb-1 pt-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted">{title}</div>
+      <div className="px-2.5 pb-1 pt-2 tm-group-label text-tm-muted">{title}</div>
       {children}
     </div>
   );
 }
 
-function ShortcutBadge({ shortcut }: { shortcut: string }) {
-  return (
-    <span className="grid size-4.5 shrink-0 place-items-center rounded bg-foreground/10 text-[11px] font-medium text-muted">
-      {shortcut}
-    </span>
-  );
-}
-
+/** A menu row: icon or flag, label, then a key hint or a trailing note. */
 function Item({
   label,
   hint,
   shortcut,
   icon,
+  flag,
   muted,
   disabled,
   onPress,
@@ -227,7 +232,9 @@ function Item({
   label: string;
   hint?: string;
   shortcut?: string;
-  icon?: string;
+  icon?: IconName;
+  /** A language code; rows without a flag for it keep the slot so labels stay aligned. */
+  flag?: string;
   muted?: boolean;
   disabled?: boolean;
   onPress: () => void;
@@ -235,34 +242,31 @@ function Item({
   return (
     <Button
       variant="ghost"
-      size="sm"
       fullWidth
       isDisabled={disabled}
-      className={`h-7 min-h-0 justify-between gap-3 px-2 text-[13px] font-normal ${muted ? 'text-muted' : ''}`}
+      className={`h-8 min-h-0 justify-between gap-3 rounded-xl px-2.5 tm-label hover:bg-tm-subtle ${
+        muted ? 'text-tm-muted' : 'text-tm-ink'
+      }`}
       onPress={onPress}
     >
-      <span className="flex min-w-0 items-center gap-2">
-        {icon !== undefined && <span className="grid size-4 shrink-0 place-items-center" dangerouslySetInnerHTML={{ __html: icon }} />}
+      <span className="flex min-w-0 items-center gap-2.5">
+        {(icon !== undefined || flag !== undefined) && (
+          <span className="grid w-[18px] shrink-0 place-items-center">
+            {icon !== undefined ? <Icon name={icon} /> : <Flag lang={flag!} width={18} />}
+          </span>
+        )}
         <span className="truncate">{label}</span>
       </span>
       {shortcut !== undefined ? (
-        <ShortcutBadge shortcut={shortcut} />
+        <Kbd tone="row">{shortcut}</Kbd>
       ) : (
-        hint !== undefined && <span className="text-xs text-muted">{hint}</span>
+        hint !== undefined && <span className="tm-meta text-tm-muted">{hint}</span>
       )}
     </Button>
   );
 }
 
 const noop = () => undefined;
-
-/** Inline so the redesigned rewrite section needs no icon dependency -- same pattern as ICON_SVG. */
-const SPARKLE_ICON =
-  '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.2 4.3L13 6.5l-3.8 1.2L8 12l-1.2-4.3L3 6.5l3.8-1.2L8 1z"/></svg>';
-const DOCUMENT_ICON =
-  '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 1.5h5.5L12 4v10.5H4V1.5z"/><path d="M9 1.5V4h3"/></svg>';
-const LINES_ICON =
-  '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M2.5 4.5h11M2.5 8h8M2.5 11.5h5"/></svg>';
 
 function iconStyle(anchor: Anchor): CSSProperties {
   const viewport = { width: document.documentElement.clientWidth, height: document.documentElement.clientHeight };

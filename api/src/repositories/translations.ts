@@ -1,5 +1,5 @@
 import type { TranslateBody, TranslateOk } from '../../../shared/contract.ts';
-import { sql } from '../db.ts';
+import { sql } from '../resources/db.ts';
 
 /** One translation attempt, in app terms. The repository owns the `translations` column mapping. */
 export interface TranslationRecord {

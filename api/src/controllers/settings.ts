@@ -1,6 +1,6 @@
 import type { Context } from 'hono';
 import type { Settings } from '../../../shared/contract.ts';
-import type { AppEnv } from '../http.ts';
+import type { AppEnv } from '../utils/http.ts';
 import { profilesRepository } from '../repositories/profiles.ts';
 
 // Settings live server-side so they follow the user across devices; the extension keeps a

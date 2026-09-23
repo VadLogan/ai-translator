@@ -1,5 +1,5 @@
 import postgres from 'postgres';
-import { env } from './env.ts';
+import { env } from '../env.ts';
 
 // SUPABASE_DB_URL is injected into a deployed function and by `supabase start`;
 // DATABASE_URL stays as an override. Neither set (tests) = null = nothing is saved.

@@ -1,5 +1,5 @@
 import type { Context } from 'hono';
-import type { ApiErrorCode } from '../../shared/contract.ts';
+import type { ApiErrorCode } from '../../../shared/contract.ts';
 
 /** What the middleware chain puts on the context for the controllers. */
 export type AppEnv = { Variables: { userId: string; body: unknown } };

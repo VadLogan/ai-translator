@@ -1,8 +1,8 @@
 import type { Context } from 'hono';
 import type { TranslateBody } from '../../../shared/contract.ts';
-import { benchmark, fail, requestId, waitUntil, type AppEnv } from '../http.ts';
-import { scopedLogger } from '../logger.ts';
-import { translate } from '../translate.ts';
+import { benchmark, fail, requestId, waitUntil, type AppEnv } from '../utils/http.ts';
+import { scopedLogger } from '../resources/logger.ts';
+import { translate } from '../resources/aiClient/requests/translate.ts';
 import { translationsRepository, type TranslationRecord } from '../repositories/translations.ts';
 import { detectionsRepository } from '../repositories/detections.ts';
 

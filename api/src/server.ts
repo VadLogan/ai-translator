@@ -3,7 +3,7 @@
 // Env comes from node --env-file-if-exists (see the `dev` script), so there is no dotenv
 // import-order rule to get wrong.
 import { serve } from '@hono/node-server';
-import { gateway } from './dev-gateway.ts';
+import { gateway } from '../dev/dev-gateway.ts';
 
 const port = Number(process.env.PORT ?? 8787);
 

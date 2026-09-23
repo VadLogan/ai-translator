@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { env } from './env.ts';
+import { env } from '../../env.ts';
 
 // Shared by every provider call (translate.ts, detect.ts): one key read, one model setting.
 // Module-level is fine -- Supabase has the secrets before the isolate runs.

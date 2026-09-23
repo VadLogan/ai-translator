@@ -1,5 +1,5 @@
 import { createMiddleware } from 'hono/factory';
-import { fail, type AppEnv } from '../http.ts';
+import { fail, type AppEnv } from '../utils/http.ts';
 
 const RATE_LIMIT = 60; // requests per minute per user
 // ponytail: per-isolate Map, so the real ceiling is 60/min x live instances.

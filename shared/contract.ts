@@ -41,6 +41,38 @@ export interface DetectOk {
   model?: string;
 }
 
+/** Grammar fix: the same text + url as detection. */
+export type FixGrammarBody = DetectBody;
+
+export interface FixGrammarOk {
+  /** The corrected text, in the same language. Unchanged when there was nothing to fix. */
+  text: string;
+  /**
+   * The corrected text as escaped HTML, each edit (a word, a punctuation mark or a range of words)
+   * wrapped in `<span class="fix" data-original="…">`. An insertion has `data-original=""`; a
+   * deletion is an empty span.
+   */
+  html: string;
+  usage?: TokenUsage;
+  model?: string;
+}
+
+export const REWRITE_STYLES = ['natural', 'formal'] as const;
+/** `natural`: how a native speaker would say it. `formal`: official / business register. */
+export type RewriteStyle = (typeof REWRITE_STYLES)[number];
+
+/** Rewrite: the same text + url as detection, plus the style to rewrite into. */
+export interface RewriteBody extends DetectBody {
+  style: RewriteStyle;
+}
+
+export interface RewriteOk {
+  /** The rewritten text, in the same language. */
+  text: string;
+  usage?: TokenUsage;
+  model?: string;
+}
+
 export interface TokenUsage {
   inputTokens: number;
   outputTokens: number;

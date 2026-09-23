@@ -1,5 +1,5 @@
 import type { DetectBody, DetectOk } from '../../../shared/contract.ts';
-import { sql } from '../db.ts';
+import { sql } from '../resources/db.ts';
 
 /** One detection attempt, in app terms. The repository owns the `detections` column mapping. */
 export interface DetectionRecord {

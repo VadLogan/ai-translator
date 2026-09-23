@@ -12,5 +12,5 @@
     "erasableSyntaxOnly": true,
     "types": ["node"]
   },
-  "include": ["src/**/*.ts", "../shared/**/*.ts"]
+  "include": ["src/**/*.ts", "../shared/**/*.ts", "dev/dev-gateway.test.ts", "dev/dev-gateway.ts", "dev/dev-jwt.ts", "dev/dev-token.ts"]
 }

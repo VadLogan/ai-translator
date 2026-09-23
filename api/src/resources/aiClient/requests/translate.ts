@@ -1,5 +1,5 @@
-import type { TranslateBody, TranslateOk } from '../../shared/contract.ts';
-import { MODEL, client } from './openai.ts';
+import type { TranslateBody, TranslateOk } from '../../../../../shared/contract.ts';
+import { MODEL, client } from '../client.ts';
 
 /** Translation only: TranslateBody in, TranslateOk out. Logging and saving live in the route (app.ts). */
 export async function translate(translateBody: TranslateBody): Promise<TranslateOk> {

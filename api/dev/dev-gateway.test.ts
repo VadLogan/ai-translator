@@ -1,13 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { gateway } from './dev-gateway.ts';
 import { signJwt } from './dev-jwt.ts';
-import { checkDb } from './db.ts';
+import { checkDb } from '../src/resources/db.ts';
 
 // Same boundaries as app.test.ts: no key, no DB, no network.
 vi.mock('./translate.ts', () => ({
   translate: vi.fn(async ({ text, targetLang }) => ({ text: `[${targetLang}] ${text}` })),
 }));
 vi.mock('./detect.ts', () => ({ detectLang: vi.fn(async () => ({ lang: 'en' })) }));
+vi.mock('./fix-grammar.ts', () => ({ fixGrammar: vi.fn(async ({ text }) => ({ text, html: text })) }));
+vi.mock('./rewrite.ts', () => ({ rewrite: vi.fn(async ({ text, style }) => ({ text: `[${style}] ${text}` })) }));
+vi.mock('./repositories/rewrites.ts', () => ({ rewritesRepository: { save: vi.fn(async () => {}) } }));
+vi.mock('./repositories/corrections.ts', () => ({ correctionsRepository: { save: vi.fn(async () => {}) } }));
 vi.mock('./db.ts', () => ({ checkDb: vi.fn(async () => 'disabled') }));
 vi.mock('./repositories/translations.ts', () => ({ translationsRepository: { save: vi.fn(async () => {}) } }));
 vi.mock('./repositories/detections.ts', () => ({

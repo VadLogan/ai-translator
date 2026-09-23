@@ -1,5 +1,5 @@
 import { createMiddleware } from 'hono/factory';
-import { fail, type AppEnv } from '../http.ts';
+import { fail, type AppEnv } from '../utils/http.ts';
 
 // The gateway verified this JWT's signature before invoking us ([functions.api] verify_jwt = true
 // in supabase/config.toml) and rejects the publishable key, so we only read claims here.

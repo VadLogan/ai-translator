@@ -4,11 +4,14 @@ import {
   MAX_FAVORITE_LANGUAGES,
   MAX_TEXT_LENGTH,
   MAX_URL_LENGTH,
+  REWRITE_STYLES,
   type DetectBody,
+  type RewriteBody,
+  type RewriteStyle,
   type Settings,
   type TranslateBody,
 } from '../../../shared/contract.ts';
-import { fail, type AppEnv } from '../http.ts';
+import { fail, type AppEnv } from '../utils/http.ts';
 
 /**
  * Validates the JSON body with `parse` and puts the result on the context, or 400s with the
@@ -61,4 +64,12 @@ export function parseTranslateBody(body: unknown): TranslateBody | string {
     targetLang,
     ...(typeof sourceLang === 'string' ? { sourceLang } : {}),
   };
+}
+
+export function parseRewriteBody(body: unknown): RewriteBody | string {
+  const parsed = parseDetectBody(body);
+  if (typeof parsed === 'string') return parsed;
+  const { style } = body as Record<string, unknown>;
+  if (!REWRITE_STYLES.includes(style as RewriteStyle)) return `style must be one of ${REWRITE_STYLES.join(', ')}`;
+  return { ...parsed, style: style as RewriteStyle };
 }

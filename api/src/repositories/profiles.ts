@@ -1,5 +1,5 @@
 import { DEFAULT_SETTINGS, type Settings } from '../../../shared/contract.ts';
-import { sql } from '../db.ts';
+import { sql } from '../resources/db.ts';
 
 /**
  * The `profiles` row for a signed-in user. The repository owns the column mapping.

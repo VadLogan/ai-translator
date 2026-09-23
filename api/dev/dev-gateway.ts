@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
-import { app } from './app.ts';
-import { handler as health } from './health.ts';
+import { app } from '../src/app.ts';
+import { handler as health } from '../src/health.ts';
 import { verifyJwt } from './dev-jwt.ts';
 
 /**

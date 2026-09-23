@@ -12,3 +12,108 @@
  * node_modules, where it would find nothing. Point it back at our sources by hand.
  */
 @source '../';
+
+/*
+ * The design system's palette (Components-* sheets). `@theme` both declares the variables (on
+ * `:root, :host`, so they reach the widget's shadow root) and generates the utilities
+ * (`bg-tm-accent`, `text-tm-muted`, ...).
+ */
+@theme {
+  --font-tm: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  /* Text colours, strongest first. */
+  --color-tm-ink: #18181b; /* body, titles, buttons */
+  --color-tm-secondary: #52525b; /* board captions, tabs */
+  --color-tm-muted: #71717a; /* helpers, labels, meta */
+  --color-tm-placeholder: #a1a1aa; /* empty fields, disabled */
+  --color-tm-accent-text: #46699d; /* on tm-soft only */
+
+  /* Fills and lines. */
+  --color-tm-accent: #4a6fa5;
+  --color-tm-accent-hover: #436495;
+  --color-tm-on-accent: #fcfcfc;
+  --color-tm-surface: #ffffff;
+  --color-tm-subtle: #f5f5f5;
+  --color-tm-neutral: #ebebec;
+  --color-tm-line: #e4e4e7;
+  --color-tm-dash: #d4d4d8;
+  --color-tm-soft: #e2e8f1;
+  --color-tm-danger-soft: #ffe5e2;
+  --color-tm-danger-ink: #a43433;
+  --color-tm-warning: #f5a524;
+  --color-tm-warning-soft: #fff2e3;
+  --color-tm-warning-ink: #855f2e;
+}
+
+/*
+ * Type scale (Components-Typography). Size, weight and leading only -- colour stays a separate
+ * `text-tm-*` class, so one scale step can be ink in one place and muted in another.
+ */
+@utility tm-wordmark {
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+@utility tm-page-title {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+@utility tm-dialog-title {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+@utility tm-section-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+@utility tm-body {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+/* Buttons and menu items. */
+@utility tm-label {
+  font-size: 14px;
+  font-weight: 500;
+}
+@utility tm-helper {
+  font-size: 13px;
+  font-weight: 400;
+}
+@utility tm-group-label {
+  font-size: 12px;
+  font-weight: 500;
+}
+@utility tm-meta {
+  font-size: 11.5px;
+  font-weight: 400;
+}
+
+/* `inline` so these follow `.dark`: a plain @theme var would resolve its var()s once, at :root. */
+@theme inline {
+  --shadow-tm-card: 0 2px 4px 0 rgb(0 0 0 / 0.04), 0 1px 2px 0 rgb(0 0 0 / 0.06), 0 0 1px 0 rgb(0 0 0 / 0.06);
+  /* Floating surfaces: the split icon pill, the in-page menu. */
+  --shadow-tm-pop: 0 2px 8px 0 rgb(0 0 0 / 0.06), 0 -6px 12px 0 rgb(0 0 0 / 0.03), 0 14px 28px 0 rgb(0 0 0 / 0.08);
+  --shadow-tm-ring: 0 0 0 2px var(--color-tm-surface), 0 0 0 4px var(--color-tm-accent);
+}
+
+/* The sheet is light only; these dark values are ours, not the design's. */
+.dark {
+  --color-tm-neutral: #2a2a2e;
+  --color-tm-ink: #fafafa;
+  --color-tm-muted: #a1a1aa;
+  --color-tm-placeholder: #5a5a63;
+  --color-tm-dash: #3f3f46;
+  --color-tm-line: #2e2e33;
+  --color-tm-soft: #253247;
+  --color-tm-accent-text: #a9c0e3;
+  --color-tm-danger-soft: #3d1f1e;
+  --color-tm-danger-ink: #f2a19e;
+  --color-tm-subtle: #27272a;
+  --color-tm-surface: #1c1c1f;
+  --color-tm-secondary: #c8c8cf;
+  --color-tm-warning-soft: #3a2c17;
+  --color-tm-warning-ink: #f0c27f;
+}

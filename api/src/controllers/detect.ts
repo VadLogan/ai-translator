@@ -1,8 +1,8 @@
 import type { Context } from 'hono';
 import type { DetectBody } from '../../../shared/contract.ts';
-import { benchmark, fail, requestId, waitUntil, type AppEnv } from '../http.ts';
-import { scopedLogger } from '../logger.ts';
-import { detectLang } from '../detect.ts';
+import { benchmark, fail, requestId, waitUntil, type AppEnv } from '../utils/http.ts';
+import { scopedLogger } from '../resources/logger.ts';
+import { detectLang } from '../resources/aiClient/requests/detect.ts';
 import { detectionsRepository, type DetectionRecord } from '../repositories/detections.ts';
 
 /**

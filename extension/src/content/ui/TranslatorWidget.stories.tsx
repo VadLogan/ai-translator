@@ -35,7 +35,7 @@ const story = (view: WidgetView): Story => ({ args: { view, dark: false } });
 
 export const Icon = story({ kind: 'icon' });
 
-export const Menu = story({ kind: 'languages', languages: FAVORITES, detectedName: 'English' });
+export const Menu = story({ kind: 'languages', languages: FAVORITES, detectedName: 'English', detectedLang: 'en' });
 
 export const MenuDetecting = story({ kind: 'languages', languages: FAVORITES });
 
