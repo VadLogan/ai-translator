@@ -24,17 +24,17 @@ export type WidgetView =
   | { kind: 'hidden' }
   | { kind: 'icon' }
   | {
-      kind: 'languages';
-      languages: readonly Language[];
-      /** The selection re-typed on the other keyboard layout, offered as a menu item. */
-      layoutPreview?: string;
-      /** Left out while POST /detect is still in flight, detection failed, or the text was mistyped. */
-      detectedName?: string;
-      /** The detected language code, e.g. "en" -- present only alongside a real detectedName, so the
-       *  Rewrite section (which needs an actual source language) doesn't show for "unknown" or
-       *  "wrong keyboard layout". */
-      detectedLang?: string;
-    }
+    kind: 'languages';
+    languages: readonly Language[];
+    /** The selection re-typed on the other keyboard layout, offered as a menu item. */
+    layoutPreview?: string;
+    /** Left out while POST /detect is still in flight, detection failed, or the text was mistyped. */
+    detectedName?: string;
+    /** The detected language code, e.g. "en" -- present only alongside a real detectedName, so the
+     *  Rewrite section (which needs an actual source language) doesn't show for "unknown" or
+     *  "wrong keyboard layout". */
+    detectedLang?: string;
+  }
   | { kind: 'busy'; languageName: string }
   | { kind: 'signIn'; providers: readonly { id: string; name: string }[]; onPick: (id: string) => void }
   | { kind: 'error'; message: string; onBack: () => void };
@@ -244,25 +244,26 @@ function Item({
       variant="ghost"
       fullWidth
       isDisabled={disabled}
-      className={`h-8 min-h-0 justify-between gap-3 rounded-xl px-2.5 tm-label hover:bg-tm-subtle ${
-        muted ? 'text-tm-muted' : 'text-tm-ink'
-      }`}
+      className={`h-8 min-h-0 justify-between gap-3 rounded-xl px-2.5 tm-label hover:bg-tm-subtle ${muted ? 'text-tm-muted' : 'text-tm-ink'
+        }`}
       onPress={onPress}
     >
-      <span className="flex min-w-0 items-center gap-2.5">
+      <div className="flex min-w-0 items-center gap-2.5">
         {(icon !== undefined || flag !== undefined) && (
-          <span className="grid w-[18px] shrink-0 place-items-center">
+          <span>
             {icon !== undefined ? <Icon name={icon} /> : <Flag lang={flag!} width={18} />}
           </span>
         )}
         <span className="truncate">{label}</span>
-      </span>
-      {shortcut !== undefined ? (
-        <Kbd tone="row">{shortcut}</Kbd>
-      ) : (
-        hint !== undefined && <span className="tm-meta text-tm-muted">{hint}</span>
-      )}
-    </Button>
+      </div>
+      {
+        shortcut !== undefined ? (
+          <Kbd tone="row">{shortcut}</Kbd>
+        ) : (
+          hint !== undefined && <span className="tm-meta text-tm-muted">{hint}</span>
+        )
+      }
+    </Button >
   );
 }
 

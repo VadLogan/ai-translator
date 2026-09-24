@@ -85,28 +85,62 @@ export function BrandMark({ size = 32, shape = 'tile' }: { size?: number; shape?
   );
 }
 
-// ponytail: only the three flags the design draws; add one here per language as the menu needs it.
-const FLAGS: Record<string, ReactNode> = {
-  en: (
-    <>
-      <rect width="20" height="14" fill="#012169" />
-      <path d="M0 0L20 14M20 0L0 14" stroke="#FFFFFF" strokeWidth="3" />
-      <path d="M0 0L20 14M20 0L0 14" stroke="#C8102E" strokeWidth="1.5" />
-      <path d="M10 0v14M0 7h20" stroke="#FFFFFF" strokeWidth="4.5" />
-      <path d="M10 0v14M0 7h20" stroke="#C8102E" strokeWidth="2.4" />
-    </>
-  ),
-  pl: <><rect width="20" height="7" fill="#FFFFFF" /><rect y="7" width="20" height="7" fill="#DC143C" /></>,
-  uk: <><rect width="20" height="7" fill="#005BBB" /><rect y="7" width="20" height="7" fill="#FFD500" /></>,
+// flag-icons ships one SVG per country (4:3, no width/height attrs -- `[&>svg]:size-full` below
+// fills the wrapper). Static imports, not a glob: this is the fixed set LANGUAGES needs, and a
+// static list is what lets the bundler drop the other 240-odd countries.
+import gb from 'flag-icons/flags/4x3/gb.svg?raw';
+import arab from 'flag-icons/flags/4x3/arab.svg?raw';
+import bg from 'flag-icons/flags/4x3/bg.svg?raw';
+import cn from 'flag-icons/flags/4x3/cn.svg?raw';
+import cz from 'flag-icons/flags/4x3/cz.svg?raw';
+import dk from 'flag-icons/flags/4x3/dk.svg?raw';
+import nl from 'flag-icons/flags/4x3/nl.svg?raw';
+import ee from 'flag-icons/flags/4x3/ee.svg?raw';
+import fi from 'flag-icons/flags/4x3/fi.svg?raw';
+import fr from 'flag-icons/flags/4x3/fr.svg?raw';
+import de from 'flag-icons/flags/4x3/de.svg?raw';
+import gr from 'flag-icons/flags/4x3/gr.svg?raw';
+import il from 'flag-icons/flags/4x3/il.svg?raw';
+import inFlag from 'flag-icons/flags/4x3/in.svg?raw';
+import hu from 'flag-icons/flags/4x3/hu.svg?raw';
+import id from 'flag-icons/flags/4x3/id.svg?raw';
+import it from 'flag-icons/flags/4x3/it.svg?raw';
+import jp from 'flag-icons/flags/4x3/jp.svg?raw';
+import kr from 'flag-icons/flags/4x3/kr.svg?raw';
+import lv from 'flag-icons/flags/4x3/lv.svg?raw';
+import lt from 'flag-icons/flags/4x3/lt.svg?raw';
+import no from 'flag-icons/flags/4x3/no.svg?raw';
+import pl from 'flag-icons/flags/4x3/pl.svg?raw';
+import pt from 'flag-icons/flags/4x3/pt.svg?raw';
+import ro from 'flag-icons/flags/4x3/ro.svg?raw';
+import sk from 'flag-icons/flags/4x3/sk.svg?raw';
+import es from 'flag-icons/flags/4x3/es.svg?raw';
+import se from 'flag-icons/flags/4x3/se.svg?raw';
+import tr from 'flag-icons/flags/4x3/tr.svg?raw';
+import ua from 'flag-icons/flags/4x3/ua.svg?raw';
+import vn from 'flag-icons/flags/4x3/vn.svg?raw';
+
+/** LANGUAGES code -> flag-icons country code. One entry per language.ts, kept in sync by hand. */
+const LANG_FLAG: Record<string, string> = {
+  ar: arab, bg, zh: cn, cs: cz, da: dk, nl, en: gb, et: ee, fi, fr, de, el: gr, he: il, hi: inFlag,
+  hu, id, it, ja: jp, ko: kr, lv, lt, no, pl, pt, ro, sk, es, sv: se, tr, uk: ua, vi: vn,
 };
 
-/** 20×14, r3, hairline edge so white stripes don't vanish. Null for a language with no flag yet. */
+/*
+ * 20×14, r3, hairline edge so white stripes (e.g. Poland) don't vanish into the card. Null for a
+ * language with no flag mapped. Some flags (kr, in, pt, ...) reuse internal ids for clipPaths --
+ * ponytail: harmless when the same flag repeats on a page (both copies resolve to the same
+ * artwork), but rewrite to unique ids with useId() if that ever stops being true.
+ */
 export function Flag({ lang, width = 20 }: { lang: string; width?: number }) {
-  const flag = FLAGS[lang];
-  if (!flag) return null;
+  const svg = LANG_FLAG[lang];
+  if (!svg) return null;
+  const height = (width * 3) / 4;
   return (
-    <svg width={width} height={(width * 14) / 20} style={fixed(width, (width * 14) / 20)} viewBox="0 0 20 14" aria-hidden="true" className="shrink-0 rounded-[3px] shadow-[0_0_0_1px_rgb(0_0_0/0.08)]">
-      {flag}
-    </svg>
+    <span
+      aria-hidden="true"
+      style={{ width, height }}
+      dangerouslySetInnerHTML={{ __html: svg }}
+    />
   );
 }
