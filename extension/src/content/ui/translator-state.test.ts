@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { badge, countFixes, grammarCount, isChecking, detectedLang, hidden, isMenuOpen, menuLanguages, reducer } from './translator-state';
+import { badge, countFixes, grammarCount, isChecking, isMistyped, detectedLang, hidden, isMenuOpen, menuLanguages, reducer } from './translator-state';
 import type { EditableSelection } from '../selection';
 import { findLanguage } from '../../core/languages';
 
@@ -42,7 +42,7 @@ it('counts one error per span.fix', () => {
 });
 
 it('badges the field icon only while the check matches the text', () => {
-  const fix = { text: 'I have gone.', html: 'I <span class="fix" data-original="has">have</span> gone.' };
+  const fix = { text: 'I have gone.', html: 'I <span class="fix" data-original="has">have</span> gone.', mistyped: false, gibberish: false };
   let state = reducer(hidden, { type: 'select', selection, anchor, field: true });
   state = reducer(state, { type: 'checked', check: { text: 'hello', fix } });
   expect(badge(state)).toBe(1);
@@ -72,7 +72,7 @@ it('spins while the check is in flight, then badges', () => {
   expect(isChecking(state)).toBe(true);
   expect(badge(state)).toBeUndefined();
 
-  state = reducer(state, { type: 'checked', check: { text: 'hello', fix: { text: 'Hello', html: '<span class="fix" data-original="hello">Hello</span>' } } });
+  state = reducer(state, { type: 'checked', check: { text: 'hello', fix: { text: 'Hello', html: '<span class="fix" data-original="hello">Hello</span>', mistyped: false, gibberish: false } } });
   expect(isChecking(state)).toBe(false);
   expect(badge(state)).toBe(1);
 });
@@ -90,9 +90,42 @@ it('counts the grammar fixes of the selected text only', () => {
   const state = reducer(hidden, { type: 'select', selection, anchor });
   expect(grammarCount(state)).toBeUndefined();
   expect(grammarCount(reducer(state, { type: 'checked', check: { text: 'hello', fix: null } }))).toBe('checking');
-  const done = reducer(state, { type: 'checked', check: { text: 'hello', fix: { text: 'Hello', html: '<span class="fix" data-original="hello">Hello</span>' } } });
+  const done = reducer(state, { type: 'checked', check: { text: 'hello', fix: { text: 'Hello', html: '<span class="fix" data-original="hello">Hello</span>', mistyped: false, gibberish: false } } });
   expect(grammarCount(done)).toBe(1);
   expect(badge(done)).toBeUndefined(); // the selection icon has no badge; only the field's does
   expect(grammarCount(reducer(state, { type: 'checked', check: { text: 'other', fix: null } }))).toBeUndefined();
   expect(grammarCount(reducer(state, { type: 'checked', check: { text: 'hello', fix: null, error: { message: 'x' } } }))).toBe('error');
+});
+
+it('badges a wrong layout on both icons, until the user dismisses it', () => {
+  const mistyped = { text: 'hello', fix: { text: 'hello', html: 'hello', mistyped: true, gibberish: false } };
+  const field = reducer(reducer(hidden, { type: 'select', selection, anchor, field: true }), { type: 'checked', check: mistyped });
+  const picked = reducer(reducer(hidden, { type: 'select', selection: { ...selection, kind: 'text-control' } as EditableSelection, anchor }), { type: 'checked', check: mistyped });
+  expect(badge(field)).toBe('layout');
+  expect(badge(picked)).toBe('layout');
+  expect(isMistyped(field)).toBe(true);
+
+  const dismissed = reducer(field, { type: 'dismissWarning' });
+  expect(isMistyped(dismissed)).toBe(false);
+  expect(badge(dismissed)).toBeUndefined(); // gibberish has no error count either
+});
+
+it('gives a selection icon no grammar count, only its spinner while its own text is checked', () => {
+  const picked = reducer(hidden, { type: 'select', selection: { ...selection, kind: 'text-control' } as EditableSelection, anchor });
+  const fix = { text: 'Hello', html: '<span class="fix" data-original="hello">Hello</span>', mistyped: false, gibberish: false };
+  expect(isChecking(reducer(picked, { type: 'checked', check: { text: 'hello', fix: null } }))).toBe(true);
+  expect(isChecking(reducer(picked, { type: 'checked', check: { text: 'other', fix: null } }))).toBe(false);
+  expect(badge(reducer(picked, { type: 'checked', check: { text: 'hello', fix } }))).toBeUndefined();
+  // Page text is never checked, so it never spins.
+  const page = reducer(hidden, { type: 'select', selection: { ...selection, kind: 'page' } as EditableSelection, anchor });
+  expect(isChecking(reducer(page, { type: 'checked', check: { text: 'hello', fix: null } }))).toBe(false);
+});
+
+it('badges random keystrokes "?" on both icons -- never a clean check -- until waved off', () => {
+  const noise = { text: 'hello', fix: { text: 'hello', html: 'hello', mistyped: false, gibberish: true } };
+  const field = reducer(reducer(hidden, { type: 'select', selection, anchor, field: true }), { type: 'checked', check: noise });
+  const picked = reducer(reducer(hidden, { type: 'select', selection: { ...selection, kind: 'text-control' } as EditableSelection, anchor }), { type: 'checked', check: noise });
+  expect(badge(field)).toBe('gibberish');
+  expect(badge(picked)).toBe('gibberish');
+  expect(badge(reducer(field, { type: 'dismissWarning' }))).toBeUndefined();
 });

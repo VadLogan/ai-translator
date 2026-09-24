@@ -1,9 +1,9 @@
 import { useLayoutEffect, useRef, type CSSProperties, type ReactNode } from 'react';
 import { Button, Skeleton, Spinner } from '@heroui/react';
 import type { RewriteStyle } from '../../../../shared/contract';
-import type { Language } from '../../core/languages';
+import { findLanguage, type Language } from '../../core/languages';
 import type { Anchor } from '../selection';
-import { Kbd, PillButton } from '../../ui/buttons';
+import { IconButton, Kbd, PillButton } from '../../ui/buttons';
 import { BrandMark, Flag, Icon, type IconName } from '../../ui/icons';
 import { Text } from '../../ui/typography';
 
@@ -24,7 +24,8 @@ export type WidgetView =
   | { kind: 'hidden' }
   /** `field`: sits in the focused field's bottom-right corner instead of above the selection. */
   /** `badge`: errors the background grammar check found; 0 = clean, 'error' = the check failed, absent = not checked. */
-  | { kind: 'icon'; field?: boolean; badge?: number | 'error'; checking?: boolean }
+  /** 'layout' = typed on the wrong keyboard layout, 'gibberish' = random keystrokes; both on either icon. */
+  | { kind: 'icon'; field?: boolean; badge?: Badge; checking?: boolean }
   | {
     kind: 'languages';
     languages: readonly Language[];
@@ -34,8 +35,10 @@ export type WidgetView =
     detectedName?: string;
     /** The detected language code, e.g. "en" -- present only alongside a real detectedName. */
     detectedLang?: string;
-    /** The selection's grammar check: its error count, or still running. 'error' hides the item. */
-    grammar?: number | 'error' | 'checking';
+    /** The selection's grammar check: its error count, or still running. 'error' and 'layout' hide the item. */
+    grammar?: number | 'error' | 'checking' | 'layout' | 'gibberish';
+    /** Page text, not a field: nothing can be replaced, so only the languages are offered. */
+    readOnly?: boolean;
   }
   | { kind: 'busy'; label: string }
   | {
@@ -49,6 +52,15 @@ export type WidgetView =
     onCopy: () => void;
     onRewrite: (style: RewriteStyle) => void;
   }
+  /**
+   * Wrong keyboard layout: `typed` as it is, `fixed` re-typed on the other layout. `from` is what it
+   * reads as, `to` the language of the fix. The card's button is `callbacks.onFixLayout`.
+   */
+  | { kind: 'layout'; typed: string; fixed: string; from: string; to: string; onDismiss: () => void }
+  /** Random keystrokes: a notice. `onContinue` waves it off and opens the regular widget. */
+  | { kind: 'notText'; onContinue: () => void }
+  /** A page selection's translation, to copy. `lang` is the target language code. */
+  | { kind: 'translated'; text: string; lang: string; onCopy: () => void }
   | { kind: 'signIn'; providers: readonly { id: string; name: string }[]; onPick: (id: string) => void }
   | { kind: 'error'; message: string; onBack: () => void };
 
@@ -80,11 +92,15 @@ function Trigger({
 }: {
   anchor: Anchor;
   field?: boolean;
-  badge?: number | 'error';
+  badge?: Badge;
   checking?: boolean;
   onPress: () => void;
 }) {
-  const label = !field
+  const label = badge === 'layout'
+    ? 'Wrong keyboard layout'
+    : badge === 'gibberish'
+    ? "Doesn't look like text"
+    : !field
     ? 'Translate selection'
     : checking
       ? 'Checking grammar…'
@@ -113,19 +129,24 @@ function Trigger({
   );
 }
 
-/** The grammar check's result as a pill: the error count, a check when clean, "!" when it failed. */
-function CountBadge({ count, className = '' }: { count: number | 'error'; className?: string }) {
+/**
+ * The check's result as a pill: the error count, a check when clean, a warning "!" for a wrong
+ * keyboard layout, a warning "?" for random keystrokes, a red "!" when the check failed.
+ */
+function CountBadge({ count, className = '' }: { count: Badge; className?: string }) {
   return (
     <span
       aria-hidden
       className={`flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold leading-none ${className} ${
-        count === 'error' ? 'bg-tm-danger-ink text-tm-on-accent' : count > 0 ? 'bg-tm-warning text-tm-ink' : 'bg-tm-success text-tm-ink'
+        count === 'error' ? 'bg-tm-danger-ink text-tm-on-accent' : count === 'layout' || count === 'gibberish' || count > 0 ? 'bg-tm-warning text-tm-ink' : 'bg-tm-success text-tm-ink'
       }`}
     >
-      {count === 'error' ? '!' : count > 0 ? (count > 9 ? '9+' : count) : <Icon name="check" size={9} strokeWidth={3.4} />}
+      {count === 'error' || count === 'layout' ? '!' : count === 'gibberish' ? '?' : count > 0 ? (count > 9 ? '9+' : count) : <Icon name="check" size={9} strokeWidth={3.4} />}
     </span>
   );
 }
+
+type Badge = number | 'error' | 'layout' | 'gibberish';
 
 function Panel({ anchor, view, callbacks }: { anchor: Anchor; view: WidgetView; callbacks: WidgetCallbacks }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -147,8 +168,8 @@ function Panel({ anchor, view, callbacks }: { anchor: Anchor; view: WidgetView; 
     <div
       ref={ref}
       role="dialog"
-      aria-label={view.kind === 'grammarFixed' ? 'Grammar fixed' : 'Translate selection'}
-      className={`fixed max-h-[420px] overflow-auto rounded-2xl bg-tm-surface p-1.5 shadow-tm-pop ${view.kind === 'grammarFixed' ? 'w-[340px]' : 'min-w-[200px] max-w-[280px]'
+      aria-label={view.kind === 'grammarFixed' ? 'Grammar fixed' : view.kind === 'layout' ? 'Wrong keyboard layout' : view.kind === 'notText' ? "Doesn't look like text" : 'Translate selection'}
+      className={`fixed max-h-[420px] overflow-auto rounded-2xl bg-tm-surface p-1.5 shadow-tm-pop ${view.kind === 'grammarFixed' || view.kind === 'translated' ? 'w-[340px]' : view.kind === 'layout' || view.kind === 'notText' ? 'w-[279px]' : 'min-w-[200px] max-w-[280px]'
         }`}
     >
       <PanelBody view={view} callbacks={callbacks} />
@@ -176,7 +197,7 @@ function PanelBody({ view, callbacks }: { view: WidgetView; callbacks: WidgetCal
             ))}
             {view.languages.length === 0 && <Status>No favorite languages yet.</Status>}
           </Section>
-          {view.grammar !== 'error' && (
+          {!view.readOnly && view.grammar !== 'error' && view.grammar !== 'layout' && view.grammar !== 'gibberish' && (
             <>
               <Divider />
               <Item
@@ -187,7 +208,7 @@ function PanelBody({ view, callbacks }: { view: WidgetView; callbacks: WidgetCal
               />
             </>
           )}
-          {view.layoutPreview !== undefined && (
+          {!view.readOnly && view.layoutPreview !== undefined && (
             <>
               <Divider />
               <Item label={view.layoutPreview} icon="keyboard" hint="layout" onPress={callbacks.onFixLayout} />
@@ -258,6 +279,70 @@ function PanelBody({ view, callbacks }: { view: WidgetView; callbacks: WidgetCal
         </>
       );
     }
+
+    case 'layout':
+      return (
+        <>
+          <div className="m-0.5 flex flex-col gap-2.5 rounded-[18px] bg-tm-soft p-3 text-tm-accent-text">
+            <div className="flex items-center gap-2">
+              <Icon name="keyboard" size={15} strokeWidth={1.9} />
+              <Text variant="label" tone="accent" className="grow">Wrong keyboard layout</Text>
+              <IconButton aria-label="Dismiss the layout suggestion" tone="accent" size={24} onPress={view.onDismiss}>
+                <Icon name="close" size={12} strokeWidth={2.6} />
+              </IconButton>
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <span lang={view.from} className="text-[12px] line-through">{view.typed}</span>
+              <span lang={view.to} className="text-[15px] font-semibold text-tm-ink">{view.fixed}</span>
+            </div>
+            <PillButton variant="primary" size="sm" fullWidth onPress={callbacks.onFixLayout}>
+              Fix the characters <Kbd tone="onAccent">F</Kbd>
+            </PillButton>
+          </div>
+          <div className="flex h-10 items-center gap-2 pl-2.5 pr-1">
+            <Icon name="script" size={14} strokeWidth={1.9} className="text-tm-placeholder" />
+            <Text variant="label" tone="muted" className="grow font-normal">Reads as {findLanguage(view.from)?.name ?? view.from}</Text>
+            {/* Not wired up yet, like the menu's Change. */}
+            <PillButton variant="ghost" size="xs" isDisabled aria-label="Change the detected language" className="gap-1.5 disabled:bg-transparent">
+              Change
+              <Kbd>C</Kbd>
+            </PillButton>
+          </div>
+        </>
+      );
+
+    case 'notText':
+      return (
+        <>
+          <div className="m-0.5 flex items-start gap-2 rounded-[18px] bg-tm-warning-soft p-3 text-tm-warning-ink">
+            <Icon name="question" size={15} strokeWidth={1.9} className="mt-0.5 shrink-0" />
+            <div className="flex flex-col gap-0.5">
+              <Text variant="label" className="text-tm-warning-ink">Doesn't look like text</Text>
+              <span className="tm-meta">It isn't a language on either keyboard layout, so there is nothing to fix.</span>
+            </div>
+          </div>
+          <Item label="Check anyway" icon="forward" onPress={view.onContinue} />
+        </>
+      );
+
+    case 'translated':
+      return (
+        <>
+          <div className="flex h-10 items-center gap-2 pl-2.5 pr-1">
+            <Flag lang={view.lang} width={18} />
+            <Text variant="label" className="grow">{findLanguage(view.lang)?.name ?? view.lang}</Text>
+          </div>
+          <p lang={view.lang} dir="auto" className="mx-1 my-0 rounded-2xl bg-tm-subtle px-3 py-2.5 tm-body leading-relaxed">
+            {view.text}
+          </p>
+          <div className="flex px-1 pb-1 pt-2">
+            <PillButton variant="primary" size="md" className="grow" onPress={view.onCopy}>Copy</PillButton>
+          </div>
+          <div className="flex items-center justify-center gap-1.5 px-2 pb-1 pt-1.5 tm-meta text-tm-muted">
+            <Kbd>Esc</Kbd> closes
+          </div>
+        </>
+      );
 
     case 'signIn':
       return (

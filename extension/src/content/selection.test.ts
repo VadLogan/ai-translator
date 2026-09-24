@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it } from 'vitest';
-import { getEditableSelection, getSelectionAnchor, isSelectionUnchanged } from './selection';
+import { getEditableSelection, getPageSelection, getSelectionAnchor, isSelectionUnchanged } from './selection';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -52,6 +52,34 @@ describe('getEditableSelection', () => {
     const result = getEditableSelection();
     expect(result).toMatchObject({ kind: 'content-editable', text: 'Hello' });
     expect(result?.element).toBe(document.querySelector('[contenteditable]'));
+  });
+});
+
+describe('getPageSelection', () => {
+  const select = (node: Node, start: number, end: number) => {
+    const range = document.createRange();
+    range.setStart(node, start);
+    range.setEnd(node, end);
+    document.getSelection()!.removeAllRanges();
+    document.getSelection()!.addRange(range);
+  };
+
+  it('reads plain page text and leaves fields to getEditableSelection', () => {
+    document.body.innerHTML = '<p id="plain">Page text</p><div contenteditable="true"><p id="p">Hello world</p></div><textarea>x</textarea>';
+    const plain = document.querySelector('#plain')!;
+
+    select(plain.firstChild!, 5, 9);
+    expect(getPageSelection()).toMatchObject({ kind: 'page', text: 'text', element: plain });
+
+    select(plain.firstChild!, 4, 4);
+    expect(getPageSelection()).toBeNull();
+
+    select(document.querySelector('#p')!.firstChild!, 0, 5);
+    expect(getPageSelection()).toBeNull();
+
+    select(plain.firstChild!, 5, 9);
+    document.querySelector('textarea')!.focus();
+    expect(getPageSelection()).toBeNull();
   });
 });
 

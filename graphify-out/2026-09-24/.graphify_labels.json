@@ -1,5 +1,5 @@
 {
-  "0": "controllers/fix-grammar.ts",
+  "0": "ref_vitest",
   "1": "Translator.tsx",
   "2": "inputs.stories.tsx",
   "3": "graphify skill (SKILL.md)",
@@ -25,7 +25,7 @@
   "23": "scripts",
   "24": "Extension id pinning for OAuth redirect",
   "25": "vitest.config.ts",
-  "26": "icons.stories.tsx",
+  "26": "@tailwindcss/vite",
   "27": "dependencies",
   "28": "@storybook/react-vite",
   "29": "ref_src_health_ts",

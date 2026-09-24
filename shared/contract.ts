@@ -53,6 +53,10 @@ export interface FixGrammarOk {
    * deletion is an empty span.
    */
   html: string;
+  /** Typed on the wrong keyboard layout (`ghbdtn` for `привет`): not a language, so nothing was fixed. */
+  mistyped: boolean;
+  /** Random keystrokes (`adfasdf`), no language on either layout: nothing to fix or re-type. Never with `mistyped`. */
+  gibberish: boolean;
   usage?: TokenUsage;
   model?: string;
 }

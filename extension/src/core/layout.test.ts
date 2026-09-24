@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { switchLayout } from './layout';
+import { layoutLanguages, switchLayout } from './layout';
 
 describe('switchLayout', () => {
   it('reads Latin keys typed on a Cyrillic layout', () => {
@@ -16,5 +16,12 @@ describe('switchLayout', () => {
 
   it('maps the Russian-only keys back to Latin', () => {
     expect(switchLayout('ы')).toBe('s');
+  });
+});
+
+describe('layoutLanguages', () => {
+  it('follows switchLayout: Latin reads as English and fixes to Ukrainian, Cyrillic the other way', () => {
+    expect(layoutLanguages('Ghbdsn')).toEqual({ from: 'en', to: 'uk' });
+    expect(layoutLanguages('ерші')).toEqual({ from: 'uk', to: 'en' });
   });
 });

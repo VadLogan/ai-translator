@@ -26,9 +26,15 @@ function buildMap(from: string, to: string): Map<string, string> {
   return map;
 }
 
+const isCyrillic = (text: string): boolean => /[Ѐ-ӿ]/.test(text);
+
 /** Re-types the text on the other layout. Characters that aren't on either one pass through. */
 export function switchLayout(text: string): string {
   // One direction for the whole selection: a mistyped word is never half in each script.
-  const map = /[Ѐ-ӿ]/.test(text) ? toLatin : toCyrillic;
+  const map = isCyrillic(text) ? toLatin : toCyrillic;
   return [...text].map((char) => map.get(char) ?? char).join('');
 }
+
+/** What the mistyped text reads as, and what switchLayout turns it into -- the same direction rule. */
+export const layoutLanguages = (text: string): { from: 'en' | 'uk'; to: 'en' | 'uk' } =>
+  isCyrillic(text) ? { from: 'uk', to: 'en' } : { from: 'en', to: 'uk' };

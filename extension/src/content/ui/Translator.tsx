@@ -1,12 +1,12 @@
 import { useEffect, useReducer, useRef, useSyncExternalStore } from 'react';
 import type { RewriteStyle } from '../../../../shared/contract';
-import { switchLayout } from '../../core/layout';
+import { layoutLanguages, switchLayout } from '../../core/layout';
 import { findLanguage, type Language } from '../../core/languages';
 import { PROVIDERS, isProviderId } from '../../auth/providers';
 import { sendMessage } from '../../messaging/messages';
 import { storageSettings } from '../../settings/storage-settings';
 import { replaceSelection } from '../replace';
-import { getEditableSelection, getFieldAnchor, getFocusedField, getSelectionAnchor, isSelectionUnchanged, wholeField } from '../selection';
+import { getEditableSelection, getFieldAnchor, getFocusedField, getPageSelection, getSelectionAnchor, isSelectionUnchanged, wholeField } from '../selection';
 import { TranslatorWidget, type WidgetView } from './TranslatorWidget';
 import { badge, countFixes, detectedLang, grammarCount, isChecking, hidden, isMenuOpen, menuLanguages, reducer, type Detection, type Screen, type State } from './translator-state';
 
@@ -49,10 +49,15 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
 
   function refresh(): void {
     if (isInvalid() || isMenuOpen(latest.current)) return;
-    const selection = getEditableSelection();
+    // Page text last: a selection inside a field is the field's.
+    const selection = getEditableSelection() ?? getPageSelection();
     if (selection) {
       mount();
-      return dispatch({ type: 'select', selection, anchor: getSelectionAnchor(selection) });
+      dispatch({ type: 'select', selection, anchor: getSelectionAnchor(selection) });
+      // Checked up front, so the icon can warn about a wrong layout before it is clicked. Page text
+      // can't be replaced, so it isn't checked.
+      if (selection.kind !== 'page') scheduleCheck(300);
+      return;
     }
     const field = getFocusedField();
     if (!field) return close();
@@ -74,7 +79,9 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
     dispatch({ type: 'open', languages: favorites.map(findLanguage).filter((l): l is Language => l !== undefined) });
     if (!latest.current.detection) void detect(id);
     // The menu's "Grammar fix" item shows the selection's error count, so it is asked up front.
-    void checkGrammar(latest.current.selection);
+    // Page text can't be replaced, so it gets no grammar fix.
+    const { selection } = latest.current;
+    if (selection?.kind !== 'page') void checkGrammar(selection);
   }
 
   /** Fills in the menu's detected line. Failures stay silent -- translating does not depend on it. */
@@ -100,6 +107,8 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
     if (!response.ok) {
       if (response.error.code === 'unauthenticated') show({ kind: 'signIn', targetLang });
       else fail(response.error.message);
+    } else if (selection.kind === 'page') {
+      show({ kind: 'translated', text: response.data.text, lang: targetLang });
     } else if (!isSelectionUnchanged(selection)) {
       fail('The text changed while translating. Select it again.');
     } else {
@@ -122,10 +131,15 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
   /** Re-types the selection on the other keyboard layout. No API call, no translation. */
   function fixLayout(): void {
     const { selection } = latest.current;
-    if (!selection) return;
+    if (!selection || selection.kind === 'page') return;
     if (!isSelectionUnchanged(selection)) return fail('The text changed. Select it again.');
     replaceSelection(selection, switchLayout(selection.text));
     close();
+    // close() dropped the check the replacement's input scheduled; the fixed text gets its own. Deferred: after the close renders.
+    setTimeout(() => {
+      refresh();
+      scheduleCheck();
+    }, 0);
   }
 
   /**
@@ -145,10 +159,31 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
     void checkGrammar();
   }
 
+  /**
+   * The icon's click. A text the check found mistyped opens the layout card, random keystrokes the
+   * not-text notice -- instead of the grammar panel (field) or the menu (selection).
+   */
+  function openFromIcon(): void {
+    const { screen, selection, check } = latest.current;
+    const field = screen.kind === 'icon' && !!screen.field;
+    const current = field ? wholeField(selection?.element ?? null) : selection;
+    const fix = current && check?.text === current.text && !check.dismissed ? check.fix : null;
+    if (!current || !(fix?.mistyped || fix?.gibberish)) return void (field ? fixGrammar() : openMenu());
+    if (field) dispatch({ type: 'select', selection: current, anchor: getFieldAnchor(current), field: true });
+    show({ kind: fix.mistyped ? 'layout' : 'notText', field });
+  }
+
+  /** The layout card's ✕ or the notice's "Check anyway": the regular widget takes their place. */
+  function dismissWarning(field: boolean): void {
+    dispatch({ type: 'dismissWarning' });
+    if (field) fixGrammar();
+    else void openMenu();
+  }
+
   /** The menu's "Grammar fix" item: the grammar panel for the selection, not the whole field. */
   function openGrammar(): void {
     const { selection, check } = latest.current;
-    if (!selection) return;
+    if (!selection || selection.kind === 'page') return;
     const mine = check?.text === selection.text ? check : null;
     if (mine?.error) return showCheckError(mine.error);
     show({ kind: 'grammarFixed', fix: mine?.fix ?? null });
@@ -179,13 +214,15 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
     const done = answer.ok ? { text: field.text, fix: answer.data } : { text: field.text, fix: null, error: answer.error };
     dispatch({ type: 'checked', check: done });
     const now = latest.current;
-    if (now.screen.kind === 'icon') {
+    if (now.screen.kind === 'icon' && now.screen.field) {
       // Re-select: a paste or autocomplete changes the text with no keyup to refresh it.
       const current = wholeField(field.element);
       if (current) dispatch({ type: 'select', selection: current, anchor: getFieldAnchor(current), field: true });
     } else if (now.screen.kind === 'grammarFixed' && !now.screen.fix && now.selection?.text === field.text) {
-      if (answer.ok) show({ kind: 'grammarFixed', fix: answer.data });
-      else showCheckError(answer.error);
+      if (!answer.ok) showCheckError(answer.error);
+      else if (answer.data.mistyped) show({ kind: 'layout', field: true });
+      else if (answer.data.gibberish) show({ kind: 'notText', field: true });
+      else show({ kind: 'grammarFixed', fix: answer.data });
     }
   }
 
@@ -196,14 +233,15 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
     void sendMessage({ type: 'cancel', id: pending.id });
   }
 
-  /** Debounced: one check per pause in typing, not per keystroke. */
-  function scheduleCheck(): void {
+  /** Debounced: one check per pause in typing (or per settled selection), not per keystroke. */
+  function scheduleCheck(delay = 500): void {
     clearTimeout(checkTimer.current);
     checkTimer.current = setTimeout(() => {
-      // Only the field flow checks: a selection's menu has its own requests.
-      const { screen } = latest.current;
+      const { screen, selection } = latest.current;
       if ((screen.kind === 'icon' && screen.field) || screen.kind === 'grammarFixed') void checkGrammar();
-    }, 500);
+      // A selection's own text, not its whole field. An open menu asks for itself (openMenu).
+      else if (screen.kind === 'icon' && selection && selection.kind !== 'page') void checkGrammar(selection);
+    }, delay);
   }
 
   /**
@@ -245,7 +283,7 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
 
   function apply(text: string): void {
     const { selection } = latest.current;
-    if (!selection) return;
+    if (!selection || selection.kind === 'page') return;
     if (!isSelectionUnchanged(selection)) return fail('The text changed. Try again.', 'close');
     replaceSelection(selection, text);
     close();
@@ -264,6 +302,11 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
         (event) => {
           const { key } = event as KeyboardEvent;
           if (key === 'Escape') return close();
+          if (latest.current.screen.kind === 'layout' && key === 'f') {
+            event.preventDefault();
+            event.stopPropagation();
+            return fixLayout();
+          }
           // Grammar panel shortcuts. Captured and swallowed, or the field would get the keystroke too.
           const { screen } = latest.current;
           // A skeleton panel has nothing to apply yet, so the keys stay the field's.
@@ -333,11 +376,12 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
         onReplace: apply,
         onClose: close,
         onRewrite: (style) => void rewrite(style),
+        onDismissWarning: dismissWarning,
       })}
       anchor={state.anchor}
       dark={dark}
       callbacks={{
-        onIconClick: () => void (state.screen.kind === 'icon' && state.screen.field ? fixGrammar() : openMenu()),
+        onIconClick: openFromIcon,
         onLanguagePick: (code) => void translate(code),
         onFixLayout: fixLayout,
         onFixGrammar: openGrammar,
@@ -359,12 +403,14 @@ function toView(
     onReplace,
     onRewrite,
     onClose,
+    onDismissWarning,
   }: {
     onPick: (provider: string, targetLang?: string) => void;
     onBack: () => void;
     onReplace: (text: string) => void;
     onRewrite: (style: RewriteStyle) => void;
     onClose: () => void;
+    onDismissWarning: (field: boolean) => void;
   },
 ): WidgetView {
   const { screen, selection, detection } = state;
@@ -373,7 +419,8 @@ function toView(
       return { kind: 'icon', field: screen.field, badge: badge(state), checking: isChecking(state) };
     case 'languages': {
       // The layout item is the exception, not a menu fixture: only when detect says the text was mistyped.
-      const fixed = selection && detection === 'mistyped' ? switchLayout(selection.text) : '';
+      const mistyped = detection === 'mistyped' || grammarCount(state) === 'layout';
+      const fixed = selection && mistyped ? switchLayout(selection.text) : '';
       return {
         kind: 'languages',
         languages: menuLanguages(state),
@@ -382,6 +429,7 @@ function toView(
           detection === null ? undefined : detection === 'mistyped' ? 'wrong keyboard layout' : detection === 'unknown' ? 'unknown' : languageName(detection.lang),
         detectedLang: detectedLang(state),
         grammar: grammarCount(state),
+        readOnly: selection?.kind === 'page',
       };
     }
     case 'busy':
@@ -396,6 +444,19 @@ function toView(
         onRewrite,
       };
     }
+    case 'layout': {
+      const typed = selection?.text ?? '';
+      return { kind: 'layout', typed, fixed: switchLayout(typed), ...layoutLanguages(typed), onDismiss: () => onDismissWarning(!!screen.field) };
+    }
+    case 'notText':
+      return { kind: 'notText', onContinue: () => onDismissWarning(!!screen.field) };
+    case 'translated':
+      return {
+        kind: 'translated',
+        text: screen.text,
+        lang: screen.lang,
+        onCopy: () => void navigator.clipboard.writeText(screen.text).then(onClose),
+      };
     case 'signIn':
       return { kind: 'signIn', providers: PROVIDERS, onPick: (provider) => onPick(provider, screen.targetLang) };
     case 'error':

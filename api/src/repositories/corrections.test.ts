@@ -8,6 +8,7 @@ it('maps a success to a row', () => {
   const result = {
     text: 'I went',
     html: '<span class="fix" data-original="i has went">I went</span>',
+    mistyped: false, gibberish: false,
     model: 'gpt-5.6-luna-2026-05-01',
     usage: { inputTokens: 12, outputTokens: 3, totalTokens: 15 },
   };

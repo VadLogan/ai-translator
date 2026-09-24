@@ -12,6 +12,13 @@ export type Screen =
   | { kind: 'busy'; label: string }
   /** `fix` is null while the field's check is still running: the panel shows a skeleton. */
   | { kind: 'grammarFixed'; fix: FixGrammarOk | null }
+  /** The check found a wrong keyboard layout: offered instead of the grammar panel / menu. */
+  /** `field`: opened from the field icon, so dismissing it falls back to the grammar panel, not the menu. */
+  | { kind: 'layout'; field?: boolean }
+  /** The check found random keystrokes: a notice, with "Check anyway" falling back like the layout card. */
+  | { kind: 'notText'; field?: boolean }
+  /** A page selection's translation: shown to copy, since page text can't be replaced. */
+  | { kind: 'translated'; text: string; lang: string }
   /** `targetLang`: the translation to resume after signing in; absent = re-run the grammar check. */
   | { kind: 'signIn'; targetLang?: string }
   /** `back` is where the Back item leads: the menu, or nowhere when retrying can't help. */
@@ -34,6 +41,8 @@ export interface Check {
   text: string;
   fix: FixGrammarOk | null;
   error?: { message: string; code?: string };
+  /** The user waved off the layout card or the not-text notice for this text: no "!" / "?" for it again. */
+  dismissed?: boolean;
 }
 
 export type Action =
@@ -42,7 +51,8 @@ export type Action =
   | { type: 'open'; languages: readonly Language[] }
   | { type: 'detected'; detection: Detection }
   | { type: 'show'; screen: Screen }
-  | { type: 'checked'; check: State['check'] };
+  | { type: 'checked'; check: State['check'] }
+  | { type: 'dismissWarning' };
 
 export const hidden: State = { selection: null, anchor: { x: 0, top: 0, bottom: 0 }, screen: { kind: 'icon' }, languages: [], detection: null, check: null };
 
@@ -62,6 +72,8 @@ export function reducer(state: State, action: Action): State {
       return state.selection ? { ...state, screen: action.screen } : state;
     case 'checked':
       return { ...state, check: action.check };
+    case 'dismissWarning':
+      return state.check ? { ...state, check: { ...state.check, dismissed: true } } : state;
   }
 }
 
@@ -80,21 +92,48 @@ export const menuLanguages = (state: State): readonly Language[] => {
 /** Each edit in `FixGrammarOk.html` is one `span.fix`; the text around them is escaped, so this can't miscount. */
 export const countFixes = (html: string): number => html.match(/<span class="fix"/g)?.length ?? 0;
 
-/** The grammar check of the current text: its error count, 'error' when it failed, 'checking' while in flight. */
-export function grammarCount({ selection, check }: State): number | 'error' | 'checking' | undefined {
+/**
+ * The grammar check of the current text: its error count, 'error' when it failed, 'checking' while
+ * in flight, 'layout' when it was typed on the wrong keyboard layout, 'gibberish' for random
+ * keystrokes (neither has grammar).
+ */
+export function grammarCount({ selection, check }: State): number | 'error' | 'checking' | 'layout' | 'gibberish' | undefined {
   if (!check || check.text !== selection?.text) return undefined;
   if (check.error) return 'error';
-  return check.fix ? countFixes(check.fix.html) : 'checking';
+  if (!check.fix) return 'checking';
+  if (check.fix.mistyped) return 'layout';
+  return check.fix.gibberish ? 'gibberish' : countFixes(check.fix.html);
 }
 
-/** The field icon's error count, or 'error' when the check failed -- only while it describes the text in the field. */
-export function badge(state: State): number | 'error' | undefined {
-  if (state.screen.kind !== 'icon' || !state.screen.field) return undefined;
+/** What the check says is off with the current text -- unless the user has waved it off. */
+export function warning(state: State): 'layout' | 'gibberish' | undefined {
   const count = grammarCount(state);
-  return count === 'checking' ? undefined : count;
+  return (count === 'layout' || count === 'gibberish') && !state.check?.dismissed ? count : undefined;
 }
 
-/** The field icon spins while its check is in flight -- or queued right after an edit cancelled one. */
-export const isChecking = ({ screen, check }: State): boolean =>
-  screen.kind === 'icon' && !!screen.field && check !== null && check.fix === null && !check.error;
+export const isMistyped = (state: State): boolean => warning(state) === 'layout';
+
+/**
+ * The icon's badge, only while the check describes the text under it: a wrong layout ('layout') or
+ * random keystrokes ('gibberish') on both icons; on the field icon also the error count, or 'error'
+ * when the check failed.
+ */
+export function badge(state: State): number | 'error' | 'layout' | 'gibberish' | undefined {
+  if (state.screen.kind !== 'icon') return undefined;
+  const warned = warning(state);
+  if (warned) return warned;
+  if (!state.screen.field) return undefined;
+  const count = grammarCount(state);
+  // A waved-off warning is no count either: it was never grammar.
+  return count === 'checking' || count === 'layout' || count === 'gibberish' ? undefined : count;
+}
+
+/**
+ * The icon spins while its check is in flight -- the field's also right after an edit cancelled
+ * one, before the text catches up. A selection icon spins only for its own text; page text is never checked.
+ */
+export function isChecking({ screen, selection, check }: State): boolean {
+  if (screen.kind !== 'icon' || !check || check.fix || check.error) return false;
+  return screen.field ? true : selection?.kind !== 'page' && check.text === selection?.text;
+}
 

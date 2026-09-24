@@ -40,6 +40,12 @@ export const FieldIconErrors = story({ kind: 'icon', field: true, badge: 3 });
 
 export const FieldIconError = story({ kind: 'icon', field: true, badge: 'error' });
 
+export const FieldIconLayout = story({ kind: 'icon', field: true, badge: 'layout' });
+
+export const SelectionIconLayout = story({ kind: 'icon', badge: 'layout' });
+
+export const FieldIconGibberish = story({ kind: 'icon', field: true, badge: 'gibberish' });
+
 export const FieldIconClean = story({ kind: 'icon', field: true, badge: 0 });
 
 export const Menu = story({ kind: 'languages', languages: FAVORITES, detectedName: 'English', detectedLang: 'en', grammar: 3 });
@@ -56,6 +62,10 @@ export const MenuWithLayoutFix = story({
 });
 
 export const MenuWithoutFavorites = story({ kind: 'languages', languages: [], detectedName: 'German' });
+
+export const MenuPageText = story({ kind: 'languages', languages: FAVORITES, detectedName: 'English', detectedLang: 'en', readOnly: true });
+
+export const Translated = story({ kind: 'translated', text: 'Привіт, як справи? Сподіваюся, у тебе все добре.', lang: 'uk', onCopy: noop });
 
 export const Busy = story({ kind: 'busy', label: 'Перекладаю українською…' });
 
@@ -84,3 +94,7 @@ export const GrammarNothingToFix = story({
 });
 
 export const GrammarChecking = story({ kind: 'grammarFixed', onReplace: noop, onCopy: noop, onRewrite: noop });
+
+export const Layout = story({ kind: 'layout', typed: 'Ghbdsn', fixed: 'Привіт', from: 'en', to: 'uk', onDismiss: noop });
+
+export const NotText = story({ kind: 'notText', onContinue: noop });

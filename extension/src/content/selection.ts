@@ -11,7 +11,17 @@ export type EditableSelection =
       element: HTMLElement;
       range: Range;
       text: string;
+    }
+  /** Selected page text outside any field: it can be translated, never replaced. */
+  | {
+      kind: 'page';
+      element: HTMLElement;
+      range: Range;
+      text: string;
     };
+
+/** The selections replaceSelection can write to. */
+export type WritableSelection = Exclude<EditableSelection, { kind: 'page' }>;
 
 // Input types that support the selectionStart/selectionEnd API.
 const SELECTABLE_INPUT_TYPES = new Set(['text', 'search', 'url', 'tel']);
@@ -52,7 +62,7 @@ function deepActiveElement(doc: Document): Element | null {
   return active;
 }
 
-export function getEditableSelection(doc: Document = document): EditableSelection | null {
+export function getEditableSelection(doc: Document = document): WritableSelection | null {
   const active = deepActiveElement(doc);
 
   if (isTextControl(active)) {
@@ -71,14 +81,27 @@ export function getEditableSelection(doc: Document = document): EditableSelectio
   return text.trim() ? { kind: 'content-editable', element: host, range: range.cloneRange(), text } : null;
 }
 
+/** Selected text outside any field. Fields belong to getEditableSelection, so they are left out here. */
+export function getPageSelection(doc: Document = document): EditableSelection | null {
+  if (isTextControl(deepActiveElement(doc))) return null;
+  const selection = doc.getSelection();
+  if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return null;
+  const range = selection.getRangeAt(0);
+  const container = range.commonAncestorContainer;
+  const element = container instanceof HTMLElement ? container : container.parentElement;
+  if (!element || findContentEditableHost(container)) return null;
+  const text = range.toString();
+  return text.trim() ? { kind: 'page', element, range: range.cloneRange(), text } : null;
+}
+
 /** The focused editable field's whole text, as a selection -- so replacing it rewrites the field. */
-export function getFocusedField(doc: Document = document): EditableSelection | null {
+export function getFocusedField(doc: Document = document): WritableSelection | null {
   const active = deepActiveElement(doc);
   return wholeField(isTextControl(active) ? active : findContentEditableHost(active));
 }
 
 /** The field's current text, re-read from the element rather than from focus. */
-export function wholeField(element: HTMLElement | null): EditableSelection | null {
+export function wholeField(element: HTMLElement | null): WritableSelection | null {
   if (!element) return null;
   if (isTextControl(element)) {
     return { kind: 'text-control', element, start: 0, end: element.value.length, text: element.value };

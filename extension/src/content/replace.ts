@@ -1,11 +1,11 @@
-import type { EditableSelection } from './selection';
+import type { WritableSelection } from './selection';
 
 /**
  * Replaces the selected text. Prefers execCommand('insertText') because it
  * keeps the browser undo stack and is picked up by React/Vue/editor frameworks;
  * falls back to direct DOM edits plus a synthetic input event.
  */
-export function replaceSelection(selection: EditableSelection, replacement: string): void {
+export function replaceSelection(selection: WritableSelection, replacement: string): void {
   if (selection.kind === 'text-control') replaceInTextControl(selection, replacement);
   else replaceInContentEditable(selection, replacement);
 }
@@ -30,7 +30,7 @@ function dispatchInput(element: HTMLElement, data: string): void {
 }
 
 function replaceInTextControl(
-  { element, start, end }: Extract<EditableSelection, { kind: 'text-control' }>,
+  { element, start, end }: Extract<WritableSelection, { kind: 'text-control' }>,
   replacement: string,
 ): void {
   element.focus();
@@ -43,7 +43,7 @@ function replaceInTextControl(
 }
 
 function replaceInContentEditable(
-  { element, range }: Extract<EditableSelection, { kind: 'content-editable' }>,
+  { element, range }: Extract<WritableSelection, { kind: 'content-editable' }>,
   replacement: string,
 ): void {
   const doc = element.ownerDocument;

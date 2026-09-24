@@ -15,7 +15,7 @@ vi.mock('./resources/aiClient/requests/translate.ts', () => ({
   translate: vi.fn(async ({ text, targetLang }) => ({ text: `[${targetLang}] ${text}` })),
 }));
 vi.mock('./resources/aiClient/requests/detect.ts', () => ({ detectLang: vi.fn(async () => ({ lang: 'en' })) }));
-vi.mock('./resources/aiClient/requests/fix-grammar/fix-grammar.ts', () => ({ fixGrammar: vi.fn(async ({ text }) => ({ text: `fixed: ${text}`, html: `fixed: ${text}` })) }));
+vi.mock('./resources/aiClient/requests/fix-grammar/fix-grammar.ts', () => ({ fixGrammar: vi.fn(async ({ text }) => ({ text: `fixed: ${text}`, html: `fixed: ${text}`, mistyped: false, gibberish: false })) }));
 vi.mock('./resources/aiClient/requests/rewrite.ts', () => ({ rewrite: vi.fn(async ({ text, style }) => ({ text: `[${style}] ${text}` })) }));
 vi.mock('./repositories/rewrites.ts', () => ({ rewritesRepository: { save: vi.fn(async () => {}) } }));
 vi.mock('./repositories/corrections.ts', () => ({ correctionsRepository: { save: vi.fn(async () => {}) } }));
@@ -224,12 +224,12 @@ describe('POST /fix-grammar', () => {
     const res = await fix({ text: 'i has went', url: 'https://teams.microsoft.com/chat' }, `Bearer ${userToken(sub)}`);
 
     expect(res.status).toBe(200);
-    await expect(res.json()).resolves.toEqual({ text: 'fixed: i has went', html: 'fixed: i has went' });
+    await expect(res.json()).resolves.toEqual({ text: 'fixed: i has went', html: 'fixed: i has went', mistyped: false, gibberish: false });
     expect(correctionsRepository.save).toHaveBeenLastCalledWith(
       expect.objectContaining({
         userId: sub,
         request: { text: 'i has went', url: 'https://teams.microsoft.com/chat' },
-        result: { text: 'fixed: i has went', html: 'fixed: i has went' },
+        result: { text: 'fixed: i has went', html: 'fixed: i has went', mistyped: false, gibberish: false },
       }),
     );
   });
