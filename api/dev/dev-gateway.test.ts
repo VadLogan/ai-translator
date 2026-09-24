@@ -2,19 +2,20 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { gateway } from './dev-gateway.ts';
 import { signJwt } from './dev-jwt.ts';
 import { checkDb } from '../src/resources/db.ts';
+import { translationsRepository } from '../src/repositories/translations.ts';
 
 // Same boundaries as app.test.ts: no key, no DB, no network.
-vi.mock('./translate.ts', () => ({
+vi.mock('../src/resources/aiClient/requests/translate.ts', () => ({
   translate: vi.fn(async ({ text, targetLang }) => ({ text: `[${targetLang}] ${text}` })),
 }));
-vi.mock('./detect.ts', () => ({ detectLang: vi.fn(async () => ({ lang: 'en' })) }));
-vi.mock('./fix-grammar.ts', () => ({ fixGrammar: vi.fn(async ({ text }) => ({ text, html: text })) }));
-vi.mock('./rewrite.ts', () => ({ rewrite: vi.fn(async ({ text, style }) => ({ text: `[${style}] ${text}` })) }));
-vi.mock('./repositories/rewrites.ts', () => ({ rewritesRepository: { save: vi.fn(async () => {}) } }));
-vi.mock('./repositories/corrections.ts', () => ({ correctionsRepository: { save: vi.fn(async () => {}) } }));
-vi.mock('./db.ts', () => ({ checkDb: vi.fn(async () => 'disabled') }));
-vi.mock('./repositories/translations.ts', () => ({ translationsRepository: { save: vi.fn(async () => {}) } }));
-vi.mock('./repositories/detections.ts', () => ({
+vi.mock('../src/resources/aiClient/requests/detect.ts', () => ({ detectLang: vi.fn(async () => ({ lang: 'en' })) }));
+vi.mock('../src/resources/aiClient/requests/fix-grammar/fix-grammar.ts', () => ({ fixGrammar: vi.fn(async ({ text }) => ({ text, html: text })) }));
+vi.mock('../src/resources/aiClient/requests/rewrite.ts', () => ({ rewrite: vi.fn(async ({ text, style }) => ({ text: `[${style}] ${text}` })) }));
+vi.mock('../src/repositories/rewrites.ts', () => ({ rewritesRepository: { save: vi.fn(async () => {}) } }));
+vi.mock('../src/repositories/corrections.ts', () => ({ correctionsRepository: { save: vi.fn(async () => {}) } }));
+vi.mock('../src/resources/db.ts', () => ({ checkDb: vi.fn(async () => 'disabled') }));
+vi.mock('../src/repositories/translations.ts', () => ({ translationsRepository: { save: vi.fn(async () => {}) } }));
+vi.mock('../src/repositories/detections.ts', () => ({
   detectionsRepository: { save: vi.fn(async () => {}), verify: vi.fn(async () => {}) },
 }));
 vi.spyOn(console, 'info').mockImplementation(() => {});
@@ -71,8 +72,16 @@ describe('local gateway emulation', () => {
     await expect(res.json()).resolves.toMatchObject({ code: 'UNAUTHORIZED_INVALID_JWT' });
   });
 
+  it('runs a request without an Authorization header as the dev user', async () => {
+    const res = await translate();
+
+    expect(res.status).toBe(200);
+    expect(translationsRepository.save).toHaveBeenCalledWith(
+      expect.objectContaining({ userId: '00000000-0000-4000-8000-000000000000' }),
+    );
+  });
+
   it.each([
-    ['no Authorization header', undefined, 'UNAUTHORIZED_NO_AUTH_HEADER'],
     ['a non-Bearer header', 'Basic aGk6dGhlcmU=', 'UNAUTHORIZED_INVALID_JWT_FORMAT'],
     ['a malformed token', 'Bearer not-a-jwt', 'UNAUTHORIZED_INVALID_JWT'],
   ])('rejects %s before the app is reached', async (_name, authorization, code) => {

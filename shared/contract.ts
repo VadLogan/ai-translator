@@ -88,12 +88,13 @@ export interface TranslateErr {
 
 /** User settings, stored server-side on `profiles.settings` and cached in chrome.storage. */
 export interface Settings {
-  /** Language codes shown in the in-page menu, in order. */
+  /** Language codes shown in the in-page menu, in order. Empty = not chosen yet: the extension
+   * falls back to the browser's languages, which only it can see. */
   favoriteLanguages: string[];
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-  favoriteLanguages: ['en', 'pl'],
+  favoriteLanguages: [],
 };
 
 /** Language code, e.g. "de" or "pt-BR". Shared by targetLang and favoriteLanguages validation. */

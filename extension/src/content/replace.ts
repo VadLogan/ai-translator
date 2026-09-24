@@ -51,6 +51,9 @@ function replaceInContentEditable(
   const selection = doc.getSelection();
   selection?.removeAllRanges();
   selection?.addRange(range);
+  // Model-based editors sync their own selection on selectionchange, which the browser fires
+  // later. Without this the paste lands at their old caret (appends instead of replacing the field).
+  doc.dispatchEvent(new Event('selectionchange'));
 
   // Model-based editors (CKEditor, Lexical, ProseMirror, ... e.g. Teams, Slack) revert
   // direct DOM edits, execCommand included, but they all handle paste and cancel it.

@@ -23,7 +23,7 @@ export async function fixGrammarController(c: Context<AppEnv>) {
 
   log.info(`→ ${new Date().toISOString()}`, body);
   try {
-    const result = await fixGrammar(body);
+    const result = await fixGrammar(body, c.req.raw.signal); // the client cancels checks for text it edited
     log.info(`← ${ms()}ms`, result);
     save({ result });
     return c.json(result);

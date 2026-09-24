@@ -1,9 +1,11 @@
 import { useLayoutEffect, useRef, type CSSProperties, type ReactNode } from 'react';
-import { Button, Spinner } from '@heroui/react';
+import { Button, Skeleton, Spinner } from '@heroui/react';
+import type { RewriteStyle } from '../../../../shared/contract';
 import type { Language } from '../../core/languages';
 import type { Anchor } from '../selection';
 import { Kbd, PillButton } from '../../ui/buttons';
 import { BrandMark, Flag, Icon, type IconName } from '../../ui/icons';
+import { Text } from '../../ui/typography';
 
 const ICON_SIZE = 26;
 const GAP = 6;
@@ -13,16 +15,16 @@ export interface WidgetCallbacks {
   onIconClick(): void;
   onLanguagePick(code: string): void;
   onFixLayout(): void;
+  onFixGrammar(): void;
   onOpenSettings(): void;
 }
 
-/**
- * Everything the widget can be showing. The imperative facade in translator-widget.ts turns each
- * of its show*() calls into one of these, so the content script keeps its old API.
- */
+/** Everything the widget can be showing. Translator.tsx derives it from the flow's state. */
 export type WidgetView =
   | { kind: 'hidden' }
-  | { kind: 'icon' }
+  /** `field`: sits in the focused field's bottom-right corner instead of above the selection. */
+  /** `badge`: errors the background grammar check found; 0 = clean, 'error' = the check failed, absent = not checked. */
+  | { kind: 'icon'; field?: boolean; badge?: number | 'error'; checking?: boolean }
   | {
     kind: 'languages';
     languages: readonly Language[];
@@ -30,12 +32,23 @@ export type WidgetView =
     layoutPreview?: string;
     /** Left out while POST /detect is still in flight, detection failed, or the text was mistyped. */
     detectedName?: string;
-    /** The detected language code, e.g. "en" -- present only alongside a real detectedName, so the
-     *  Rewrite section (which needs an actual source language) doesn't show for "unknown" or
-     *  "wrong keyboard layout". */
+    /** The detected language code, e.g. "en" -- present only alongside a real detectedName. */
     detectedLang?: string;
+    /** The selection's grammar check: its error count, or still running. 'error' hides the item. */
+    grammar?: number | 'error' | 'checking';
   }
-  | { kind: 'busy'; languageName: string }
+  | { kind: 'busy'; label: string }
+  | {
+    kind: 'grammarFixed';
+    /** `FixGrammarOk.html`: escaped text with each edit wrapped in `<span class="fix" data-original>`.
+     *  Absent while the check is still running: a skeleton, with nothing to press. */
+    html?: string;
+    /** The text's language code, for the preview's `lang`. */
+    lang?: string;
+    onReplace: () => void;
+    onCopy: () => void;
+    onRewrite: (style: RewriteStyle) => void;
+  }
   | { kind: 'signIn'; providers: readonly { id: string; name: string }[]; onPick: (id: string) => void }
   | { kind: 'error'; message: string; onBack: () => void };
 
@@ -53,23 +66,64 @@ export function TranslatorWidget({ view, anchor, dark, callbacks }: TranslatorWi
     // shadow tree, and the variables have no prefers-color-scheme fallback, so the class is what
     // decides -- both for the CSS variables and for Tailwind's `dark:` variant.
     <div className={`${dark ? 'dark' : 'light'} font-tm tm-body text-tm-ink`}>
-      {view.kind === 'icon' ? <Trigger anchor={anchor} onPress={callbacks.onIconClick} /> : <Panel anchor={anchor} view={view} callbacks={callbacks} />}
+      {view.kind === 'icon' ? <Trigger anchor={anchor} field={view.field} badge={view.badge} checking={view.checking} onPress={callbacks.onIconClick} /> : <Panel anchor={anchor} view={view} callbacks={callbacks} />}
     </div>
   );
 }
 
-function Trigger({ anchor, onPress }: { anchor: Anchor; onPress: () => void }) {
+function Trigger({
+  anchor,
+  field,
+  badge,
+  checking,
+  onPress,
+}: {
+  anchor: Anchor;
+  field?: boolean;
+  badge?: number | 'error';
+  checking?: boolean;
+  onPress: () => void;
+}) {
+  const label = !field
+    ? 'Translate selection'
+    : checking
+      ? 'Checking grammar…'
+      : badge === undefined
+        ? 'Fix grammar'
+        : badge === 'error'
+          ? 'Grammar check failed'
+          : `Fix grammar: ${badge === 1 ? '1 error' : `${badge} errors`}`;
   return (
     <Button
       isIconOnly
       variant="ghost"
-      aria-label="Translate selection"
-      className="fixed size-[26px] min-w-0 rounded-full p-0 shadow-tm-pop"
-      style={iconStyle(anchor)}
+      aria-label={label}
+      className="fixed size-[26px] min-w-0 overflow-visible rounded-full p-0 shadow-tm-pop"
+      style={field ? cornerStyle(anchor) : iconStyle(anchor)}
       onPress={onPress}
     >
       <BrandMark size={ICON_SIZE} shape="round" />
+      {checking && (
+        <span aria-hidden className="absolute inset-0 flex items-center justify-center rounded-full bg-tm-surface/70">
+          <Spinner size="sm" className="text-tm-accent" />
+        </span>
+      )}
+      {badge !== undefined && <CountBadge count={badge} className="absolute -right-1.5 -top-1.5 ring-2 ring-tm-surface" />}
     </Button>
+  );
+}
+
+/** The grammar check's result as a pill: the error count, a check when clean, "!" when it failed. */
+function CountBadge({ count, className = '' }: { count: number | 'error'; className?: string }) {
+  return (
+    <span
+      aria-hidden
+      className={`flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold leading-none ${className} ${
+        count === 'error' ? 'bg-tm-danger-ink text-tm-on-accent' : count > 0 ? 'bg-tm-warning text-tm-ink' : 'bg-tm-success text-tm-ink'
+      }`}
+    >
+      {count === 'error' ? '!' : count > 0 ? (count > 9 ? '9+' : count) : <Icon name="check" size={9} strokeWidth={3.4} />}
+    </span>
   );
 }
 
@@ -93,8 +147,9 @@ function Panel({ anchor, view, callbacks }: { anchor: Anchor; view: WidgetView; 
     <div
       ref={ref}
       role="dialog"
-      aria-label="Translate selection"
-      className="fixed max-h-[420px] min-w-[200px] max-w-[280px] overflow-auto rounded-2xl bg-tm-surface p-1.5 shadow-tm-pop"
+      aria-label={view.kind === 'grammarFixed' ? 'Grammar fixed' : 'Translate selection'}
+      className={`fixed max-h-[420px] overflow-auto rounded-2xl bg-tm-surface p-1.5 shadow-tm-pop ${view.kind === 'grammarFixed' ? 'w-[340px]' : 'min-w-[200px] max-w-[280px]'
+        }`}
     >
       <PanelBody view={view} callbacks={callbacks} />
     </div>
@@ -121,13 +176,16 @@ function PanelBody({ view, callbacks }: { view: WidgetView; callbacks: WidgetCal
             ))}
             {view.languages.length === 0 && <Status>No favorite languages yet.</Status>}
           </Section>
-          {view.detectedLang !== undefined && (
-            <Section title={`Rewrite in ${view.detectedName}`}>
-              {/* Not wired up yet: shown to match the design, no service behind it. */}
-              <Item label="More native" icon="moreNative" shortcut="N" disabled onPress={noop} />
-              <Item label="More official" icon="moreOfficial" shortcut="O" disabled onPress={noop} />
-              <Item label="Shorter" icon="shorter" shortcut="S" disabled onPress={noop} />
-            </Section>
+          {view.grammar !== 'error' && (
+            <>
+              <Divider />
+              <Item
+                label="Grammar fix"
+                icon="fixGrammar"
+                hint={view.grammar === 'checking' ? <Spinner size="sm" className="text-tm-accent" /> : view.grammar === undefined ? undefined : <CountBadge count={view.grammar} />}
+                onPress={callbacks.onFixGrammar}
+              />
+            </>
           )}
           {view.layoutPreview !== undefined && (
             <>
@@ -147,9 +205,59 @@ function PanelBody({ view, callbacks }: { view: WidgetView; callbacks: WidgetCal
       return (
         <Status>
           <Spinner size="sm" className="text-tm-accent" />
-          <span>Translating to {view.languageName}…</span>
+          <span dir="auto">{view.label}</span>
         </Status>
       );
+
+    case 'grammarFixed': {
+      const loading = view.html === undefined;
+      const { nodes, changes } = loading ? { nodes: [], changes: 0 } : fixedText(view.html!);
+      // Nothing to fix: echoing the text and offering to "replace" it with itself helps no one.
+      const clean = !loading && changes === 0;
+      return (
+        <>
+          <div className="flex h-10 items-center gap-2 pl-2.5 pr-1">
+            {loading ? (
+              <Spinner size="sm" className="text-tm-accent" />
+            ) : (
+              <span className="flex size-5 items-center justify-center rounded-full bg-tm-success text-tm-ink">
+                <Icon name="check" size={11} strokeWidth={3.4} />
+              </span>
+            )}
+            <Text variant="label" className="grow">{loading ? 'Checking grammar…' : changes ? 'Grammar fixed' : 'Nothing to fix'}</Text>
+            {changes > 0 && <Text variant="meta" className="pr-1.5">{changes === 1 ? '1 change' : `${changes} changes`}</Text>}
+          </div>
+          {loading ? (
+            <div aria-busy className="mx-1 flex flex-col gap-2 rounded-2xl bg-tm-subtle px-3 py-3.5">
+              <Skeleton className="h-3 w-full rounded-full" />
+              <Skeleton className="h-3 w-4/5 rounded-full" />
+              <Skeleton className="h-3 w-3/5 rounded-full" />
+            </div>
+          ) : clean ? (
+            <Text variant="meta" className="block px-2.5 pb-1">
+              No grammar issues. Want it to sound more native or more official? Try a rewrite below.
+            </Text>
+          ) : (
+            <p lang={view.lang} className="mx-1 my-0 rounded-2xl bg-tm-subtle px-3 py-2.5 tm-body leading-relaxed">
+              {nodes}
+            </p>
+          )}
+          {!clean && (
+            <div className="flex gap-1.5 px-1 pb-1 pt-2">
+              <PillButton variant="primary" size="md" className="grow" isDisabled={loading} onPress={view.onReplace}>
+                Replace <Kbd tone="onAccent">↵</Kbd>
+              </PillButton>
+              <PillButton size="md" isDisabled={loading} onPress={view.onCopy}>Copy</PillButton>
+            </div>
+          )}
+          <Divider />
+          <Section title={clean ? 'Rewrite' : 'Rewrite further'}>
+            <Item label="More native" icon="moreNative" shortcut="N" disabled={loading} onPress={() => view.onRewrite('natural')} />
+            <Item label="More official" icon="moreOfficial" shortcut="O" disabled={loading} onPress={() => view.onRewrite('formal')} />
+          </Section>
+        </>
+      );
+    }
 
     case 'signIn':
       return (
@@ -230,7 +338,7 @@ function Item({
   onPress,
 }: {
   label: string;
-  hint?: string;
+  hint?: ReactNode;
   shortcut?: string;
   icon?: IconName;
   /** A language code; rows without a flag for it keep the slot so labels stay aligned. */
@@ -267,7 +375,26 @@ function Item({
   );
 }
 
-const noop = () => undefined;
+/**
+ * `FixGrammarOk.html` as React nodes: text stays text, each `span.fix` becomes a highlight titled
+ * with what it replaced. Parsed rather than injected, so nothing but text reaches the page.
+ */
+function fixedText(html: string): { nodes: ReactNode[]; changes: number } {
+  const body = new DOMParser().parseFromString(html, 'text/html').body;
+  let changes = 0;
+  const nodes = [...body.childNodes].map((node, index) => {
+    if (!(node instanceof Element) || !node.classList.contains('fix')) return node.textContent;
+    changes++;
+    const original = node.getAttribute('data-original') ?? '';
+    return (
+      <span key={index} title={original ? `was: ${original}` : 'added'} className="rounded bg-tm-soft px-0.5 text-tm-accent-text">
+        {node.textContent}
+      </span>
+    );
+  });
+  return { nodes, changes };
+}
+
 
 function iconStyle(anchor: Anchor): CSSProperties {
   const viewport = { width: document.documentElement.clientWidth, height: document.documentElement.clientHeight };
@@ -277,6 +404,11 @@ function iconStyle(anchor: Anchor): CSSProperties {
     left: clamp(anchor.x - ICON_SIZE / 2, VIEWPORT_MARGIN, viewport.width - ICON_SIZE - VIEWPORT_MARGIN),
     top: clamp(top, VIEWPORT_MARGIN, viewport.height - ICON_SIZE - VIEWPORT_MARGIN),
   };
+}
+
+/** Inside the field's bottom-right corner, clear of its border. */
+function cornerStyle(anchor: Anchor): CSSProperties {
+  return { left: anchor.x - ICON_SIZE - GAP, top: anchor.bottom - ICON_SIZE - GAP };
 }
 
 function clamp(value: number, min: number, max: number): number {

@@ -71,6 +71,29 @@ export function getEditableSelection(doc: Document = document): EditableSelectio
   return text.trim() ? { kind: 'content-editable', element: host, range: range.cloneRange(), text } : null;
 }
 
+/** The focused editable field's whole text, as a selection -- so replacing it rewrites the field. */
+export function getFocusedField(doc: Document = document): EditableSelection | null {
+  const active = deepActiveElement(doc);
+  return wholeField(isTextControl(active) ? active : findContentEditableHost(active));
+}
+
+/** The field's current text, re-read from the element rather than from focus. */
+export function wholeField(element: HTMLElement | null): EditableSelection | null {
+  if (!element) return null;
+  if (isTextControl(element)) {
+    return { kind: 'text-control', element, start: 0, end: element.value.length, text: element.value };
+  }
+  const range = element.ownerDocument.createRange();
+  range.selectNodeContents(element);
+  return { kind: 'content-editable', element, range, text: range.toString() };
+}
+
+/** The field's bottom-right corner, where its icon sits. */
+export function getFieldAnchor({ element }: EditableSelection): Anchor {
+  const box = element.getBoundingClientRect();
+  return { x: box.right, top: box.top, bottom: box.bottom };
+}
+
 /** False if the page changed the selected text since the snapshot was taken. */
 export function isSelectionUnchanged(snapshot: EditableSelection): boolean {
   if (!snapshot.element.isConnected) return false;

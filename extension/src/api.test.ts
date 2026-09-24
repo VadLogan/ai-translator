@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ApiError, detect, getSettings, saveSettings, translate } from './api';
+import { ApiError, detect, fixGrammar, getSettings, saveSettings, translate } from './api';
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -68,6 +68,18 @@ describe('detect', () => {
   it('keeps the error code, so a signed-out detection is silent rather than a sign-in prompt', async () => {
     reply(401, { error: { message: 'Sign in to detect the language', code: 'unauthenticated' } });
     await expect(detect({ text: 'Hello' }, null)).rejects.toMatchObject({ code: 'unauthenticated' });
+  });
+});
+
+describe('fixGrammar', () => {
+  it('passes the signal to fetch and reports an abort as cancelled, not as an unreachable API', async () => {
+    vi.stubGlobal('fetch', vi.fn(async (_url: string, init: RequestInit) => {
+      init.signal?.throwIfAborted();
+      return new Response('{}');
+    }));
+    const controller = new AbortController();
+    controller.abort();
+    await expect(fixGrammar({ text: 'i has' }, 'token', controller.signal)).rejects.toThrow('Cancelled');
   });
 });
 

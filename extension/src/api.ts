@@ -2,6 +2,10 @@ import type {
   ApiErrorCode,
   DetectBody,
   DetectOk,
+  FixGrammarBody,
+  FixGrammarOk,
+  RewriteBody,
+  RewriteOk,
   Settings,
   TranslateBody,
   TranslateErr,
@@ -31,6 +35,13 @@ export const translate = (body: TranslateBody, accessToken: string | null, baseU
 export const detect = (body: DetectBody, accessToken: string | null, baseUrl = BASE_URL) =>
   call<DetectOk>('/detect', { method: 'POST', body }, accessToken, baseUrl);
 
+/** The whole field's text with grammar, spelling and punctuation fixed. `signal` cancels it. */
+export const fixGrammar = (body: FixGrammarBody, accessToken: string | null, signal?: AbortSignal, baseUrl = BASE_URL) =>
+  call<FixGrammarOk>('/fix-grammar', { method: 'POST', body, signal }, accessToken, baseUrl);
+
+export const rewrite = (body: RewriteBody, accessToken: string | null, baseUrl = BASE_URL) =>
+  call<RewriteOk>('/rewrite', { method: 'POST', body }, accessToken, baseUrl);
+
 /** Settings live server-side so they follow the user across devices. */
 export const getSettings = (accessToken: string | null, baseUrl = BASE_URL) =>
   call<Settings>('/settings', {}, accessToken, baseUrl);
@@ -40,7 +51,7 @@ export const saveSettings = (settings: Settings, accessToken: string | null, bas
 
 async function call<T>(
   path: string,
-  { method = 'GET', body }: { method?: string; body?: unknown },
+  { method = 'GET', body, signal }: { method?: string; body?: unknown; signal?: AbortSignal },
   accessToken: string | null,
   baseUrl: string,
 ): Promise<T> {
@@ -54,12 +65,15 @@ async function call<T>(
         ...(accessToken ? { authorization: `Bearer ${accessToken}` } : {}),
       },
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+      signal,
     });
   } catch (error) {
+    if (signal?.aborted) throw new ApiError('Cancelled', undefined, { cause: error });
     throw new ApiError(`Cannot reach the API at ${baseUrl}. Is it running?`, undefined, { cause: error });
   }
 
   const data: unknown = await response.json().catch(() => null);
+  if (signal?.aborted) throw new ApiError('Cancelled'); // aborted mid-body: json() gave up, data is not the answer
   // A 401 can come from the Supabase gateway before the API's handler runs, and its body has a
   // different shape ({code, message} rather than {error:{...}}). Derive this one from the status
   // so a signed-out user still gets the sign-in prompt instead of a generic failure.

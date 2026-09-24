@@ -3,8 +3,11 @@ import { MODEL, client } from '../../client.ts';
 import { diff } from './utils/diff.ts';
 import { fromSegments } from './utils/fromSegments.ts';
 
-/** Grammar fix only: FixGrammarBody in, FixGrammarOk out. Logging and saving live in the controller. */
-export async function fixGrammar({ text }: FixGrammarBody): Promise<FixGrammarOk> {
+/**
+ * Grammar fix only: FixGrammarBody in, FixGrammarOk out. Logging and saving live in the controller.
+ * `signal` aborts the provider call when the client goes away, so a cancelled check stops billing.
+ */
+export async function fixGrammar({ text }: FixGrammarBody, signal?: AbortSignal): Promise<FixGrammarOk> {
   const response = await client.responses.create({
     model: MODEL,
     instructions: AGENT_INSTRUCTION,
@@ -24,7 +27,7 @@ export async function fixGrammar({ text }: FixGrammarBody): Promise<FixGrammarOk
         },
       },
     },
-  });
+  }, { signal });
   const corrected = (JSON.parse(response.output_text) as { text: string }).text;
   const { usage } = response;
   return {

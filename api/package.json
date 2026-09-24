@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch --env-file-if-exists=../.env --env-file-if-exists=../supabase/functions/.env src/server.ts",
-    "token": "node --env-file-if-exists=../.env src/dev-token.ts",
+    "token": "node --env-file-if-exists=../.env dev/dev-token.ts",
     "compile": "tsc --noEmit",
     "test": "vitest run"
   },

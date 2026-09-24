@@ -1,10 +1,14 @@
 import { browser } from 'wxt/browser';
-import type { ApiErrorCode, DetectOk, Settings, TranslateOk } from '../../../shared/contract';
+import type { ApiErrorCode, DetectOk, FixGrammarOk, RewriteOk, RewriteStyle, Settings, TranslateOk } from '../../../shared/contract';
 import type { ProviderId } from '../auth/providers';
 
 export type Message =
   | { type: 'translate'; text: string; targetLang: string; sourceLang?: string }
   | { type: 'detect'; text: string }
+  /** `id` names the request so `cancel` can abort it. */
+  | { type: 'fix-grammar'; text: string; id: string }
+  | { type: 'cancel'; id: string }
+  | { type: 'rewrite'; text: string; style: RewriteStyle }
   | { type: 'open-options' }
   | { type: 'sign-in'; provider: ProviderId }
   | { type: 'sign-out' }
@@ -20,6 +24,9 @@ export interface Account {
 export interface ResponseMap {
   translate: TranslateOk;
   detect: DetectOk;
+  'fix-grammar': FixGrammarOk;
+  cancel: void;
+  rewrite: RewriteOk;
   'open-options': void;
   'sign-in': Account;
   'sign-out': void;

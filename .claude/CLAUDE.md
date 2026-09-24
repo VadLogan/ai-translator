@@ -3,7 +3,11 @@
 When the user types `/graphify`, use the installed graphify skill or instructions before doing anything else.
 
 # Prompts
-When a request is ambiguous, underspecified, or typo-ridden, open with one `**Understood as:** …` line stating the cleaned-up request (plus any assumption), then proceed without waiting.
+When a request is only typo-ridden or loosely worded but its meaning is clear, open with one `**Understood as:** …` line stating the cleaned-up request, then proceed without waiting.
+
+**Always ask before acting** (AskUserQuestion) when:
+- you are in doubt about what is wanted, or could have misunderstood the request;
+- there are two (or more) comparable solutions: lay out each with its trade-offs and let the user pick the better one. Don't choose silently.
 
 # Rules
 Binding conventions live in `.claude/rules/`. Read the relevant file before changing code it covers.

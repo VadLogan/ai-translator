@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { DEFAULT_SETTINGS } from '../../../shared/contract.ts';
 
 const rows = vi.fn();
-vi.mock('../db.ts', () => ({ sql: Object.assign((..._args: unknown[]) => rows(), { json: (v: unknown) => v }) }));
+vi.mock('../resources/db.ts', () => ({ sql: Object.assign((..._args: unknown[]) => rows(), { json: (v: unknown) => v }) }));
 
 const { profilesRepository } = await import('./profiles.ts');
 

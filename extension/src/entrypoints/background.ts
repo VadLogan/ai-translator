@@ -1,12 +1,15 @@
 import { browser, type Browser } from 'wxt/browser';
 import { defineBackground } from 'wxt/utils/define-background';
-import { ApiError, detect, getSettings, saveSettings, translate } from '../api';
+import { ApiError, detect, fixGrammar, getSettings, rewrite, saveSettings, translate } from '../api';
 import { getAccessToken, signIn, signOut } from '../auth/oauth';
 import { storageSession } from '../auth/session';
 import { isMessage, type Account, type Message, type Response } from '../messaging/messages';
 import { storageSettings } from '../settings/storage-settings';
 
 export default defineBackground(() => {
+  // In-flight grammar checks by the content script's id. The fetch lives here, so only the worker can abort it.
+  const checks = new Map<string, AbortController>();
+
   async function handle(message: Message, sender: Browser.runtime.MessageSender): Promise<Response<unknown>> {
     try {
       switch (message.type) {
@@ -33,6 +36,30 @@ export default defineBackground(() => {
           return {
             ok: true,
             data: await asUser((token) => detect({ text: message.text, url: sender.tab?.url ?? sender.url }, token)),
+          };
+        case 'fix-grammar': {
+          const controller = new AbortController();
+          checks.set(message.id, controller);
+          try {
+            return {
+              ok: true,
+              data: await asUser((token) =>
+                fixGrammar({ text: message.text, url: sender.tab?.url ?? sender.url }, token, controller.signal),
+              ),
+            };
+          } finally {
+            checks.delete(message.id);
+          }
+        }
+        case 'cancel':
+          checks.get(message.id)?.abort(); // unknown id: already answered, nothing to stop
+          return { ok: true, data: undefined };
+        case 'rewrite':
+          return {
+            ok: true,
+            data: await asUser((token) =>
+              rewrite({ text: message.text, style: message.style, url: sender.tab?.url ?? sender.url }, token),
+            ),
           };
         case 'open-options':
           await browser.runtime.openOptionsPage();

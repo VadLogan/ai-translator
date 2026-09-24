@@ -11,12 +11,12 @@ import { rewrite } from './resources/aiClient/requests/rewrite.ts';
 import { rewritesRepository } from './repositories/rewrites.ts';
 
 // The real providers call OpenAI; tests only cover the HTTP layer.
-vi.mock('./translate.ts', () => ({
+vi.mock('./resources/aiClient/requests/translate.ts', () => ({
   translate: vi.fn(async ({ text, targetLang }) => ({ text: `[${targetLang}] ${text}` })),
 }));
-vi.mock('./detect.ts', () => ({ detectLang: vi.fn(async () => ({ lang: 'en' })) }));
-vi.mock('./fix-grammar.ts', () => ({ fixGrammar: vi.fn(async ({ text }) => ({ text: `fixed: ${text}`, html: `fixed: ${text}` })) }));
-vi.mock('./rewrite.ts', () => ({ rewrite: vi.fn(async ({ text, style }) => ({ text: `[${style}] ${text}` })) }));
+vi.mock('./resources/aiClient/requests/detect.ts', () => ({ detectLang: vi.fn(async () => ({ lang: 'en' })) }));
+vi.mock('./resources/aiClient/requests/fix-grammar/fix-grammar.ts', () => ({ fixGrammar: vi.fn(async ({ text }) => ({ text: `fixed: ${text}`, html: `fixed: ${text}` })) }));
+vi.mock('./resources/aiClient/requests/rewrite.ts', () => ({ rewrite: vi.fn(async ({ text, style }) => ({ text: `[${style}] ${text}` })) }));
 vi.mock('./repositories/rewrites.ts', () => ({ rewritesRepository: { save: vi.fn(async () => {}) } }));
 vi.mock('./repositories/corrections.ts', () => ({ correctionsRepository: { save: vi.fn(async () => {}) } }));
 vi.mock('./repositories/translations.ts',() => ({ translationsRepository: { save: vi.fn(async () => {}) } }));
@@ -232,6 +232,12 @@ describe('POST /fix-grammar', () => {
         result: { text: 'fixed: i has went', html: 'fixed: i has went' },
       }),
     );
+  });
+
+  it("hands the provider the request's signal, so a cancelled check stops the call", async () => {
+    await fix({ text: 'Hello' });
+
+    expect(vi.mocked(fixGrammar).mock.lastCall?.[1]).toBeInstanceOf(AbortSignal);
   });
 
   it('401s without a user token', async () => {

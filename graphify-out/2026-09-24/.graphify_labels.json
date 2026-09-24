@@ -1,9 +1,9 @@
 {
-  "0": "ref_vitest",
+  "0": "controllers/fix-grammar.ts",
   "1": "Translator.tsx",
   "2": "inputs.stories.tsx",
   "3": "graphify skill (SKILL.md)",
-  "4": "app.ts",
+  "4": "contract.ts",
   "5": "background.ts",
   "6": "AI Translator API README",
   "7": "dev-gateway.ts",
@@ -20,7 +20,7 @@
   "18": "icons.tsx",
   "19": "compilerOptions",
   "20": "imports",
-  "21": "preview.tsx",
+  "21": "OptionsPage.stories.tsx",
   "22": "Extension Icon 128px (translation speech bubbles)",
   "23": "scripts",
   "24": "Extension id pinning for OAuth redirect",
@@ -29,11 +29,6 @@
   "27": "dependencies",
   "28": "@storybook/react-vite",
   "29": "ref_src_health_ts",
-  "30": "controllers/translate.ts",
-  "31": "translator-widget.ts",
-  "32": "app.test.ts",
-  "33": "contract.ts",
-  "34": "corrections.ts",
-  "35": "rewrites.ts",
-  "36": "translations.ts"
+  "30": "WidgetCallbacks",
+  "31": "translator-widget.ts"
 }

@@ -1,7 +1,8 @@
 import { Hono } from 'hono';
 import { app } from '../src/app.ts';
-import { handler as health } from '../src/health.ts';
-import { verifyJwt } from './dev-jwt.ts';
+import { handler as health } from './health.ts';
+import { env } from '../src/env.ts';
+import { signJwt, verifyJwt } from './dev-jwt.ts';
 
 /**
  * Emulates the Supabase gateway for local development: the same URL prefixes, the same 401 bodies,
@@ -19,10 +20,17 @@ export const gateway = new Hono();
 // [functions.health] verify_jwt = false
 gateway.get('/functions/v1/health', () => health());
 
+// Dev-only auth bypass: a request with no Authorization header runs as DEV_USER_ID, so the extension
+// works signed out. A token that IS sent is still verified, so the sign-in path stays testable.
+// Production is untouched: the real gateway enforces verify_jwt = true.
+// ponytail: DEV_USER_ID must be a real auth.users row for saves to land (FK); otherwise they're logged and dropped.
+const DEV_USER_ID = env('DEV_USER_ID') ?? '00000000-0000-4000-8000-000000000000';
+const devToken = () => signJwt({ role: 'authenticated', sub: DEV_USER_ID, exp: Math.floor(Date.now() / 1000) + 60 });
+
 // [functions.api] verify_jwt = true
 gateway.use('/functions/v1/api/*', async (c, next) => {
-  const authorization = c.req.header('authorization');
-  if (!authorization) return reject('UNAUTHORIZED_NO_AUTH_HEADER', 'Missing authorization header');
+  const authorization = c.req.header('authorization') ?? `Bearer ${await devToken()}`;
+  c.req.raw.headers.set('authorization', authorization);
 
   const token = authorization.match(/^Bearer (\S+)$/)?.[1];
   if (!token) return reject('UNAUTHORIZED_INVALID_JWT_FORMAT', 'Invalid JWT format');
