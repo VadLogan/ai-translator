@@ -6,7 +6,7 @@ import { PROVIDERS, type ProviderId } from '../../auth/providers';
 import { findLanguage } from '../../core/languages';
 import { isSiteDisabled, parseSites } from '../../core/sites';
 import { sendMessage } from '../../messaging/messages';
-import { popupHistory, usedLately, type HistoryEntry } from '../../settings/history';
+import { defaultPair, historyStore, orient, topPairs, usedLately, type HistoryEntry, type Pair } from '../../settings/history';
 import { storageSettings } from '../../settings/storage-settings';
 import { followColorScheme } from '../../ui/color-scheme';
 import { Popup, type PopupScreen } from './Popup';
@@ -33,6 +33,8 @@ function App() {
   const [picked, setPicked] = useState<string | null>(null);
   const [detected, setDetected] = useState<string>();
   const [target, setTarget] = useState<string>();
+  // A pair chip the user clicked; otherwise the pair comes from history and favorites.
+  const [pair, setPair] = useState<Pair | null>(null);
   const [result, setResult] = useState<{ lang: string; versions: string[] } | null>(null);
   const [version, setVersion] = useState(0);
   const [busy, setBusy] = useState(false);
@@ -45,7 +47,7 @@ function App() {
     void storageSettings.get().then(setSettings);
     void sendMessage({ type: 'get-settings' }).then((response) => response.ok && setSettings(response.data));
     void activeTab().then(setTab);
-    void popupHistory.get().then(setHistory);
+    void historyStore.get().then(setHistory);
   }, []);
 
   // Detect on a typing pause, like the in-page menu does on open. A failure or "und" is just "not detected".
@@ -64,8 +66,14 @@ function App() {
   }, [text, picked]);
 
   const favorites = settings?.favoriteLanguages ?? [];
-  const from = picked ?? detected;
-  const into = target ?? favorites.find((lang) => lang !== from) ?? favorites[0] ?? 'en';
+  // Detection orients the base pair; the pair's source is shown but only a picked or detected one is sent.
+  const base = pair ?? defaultPair(history, favorites);
+  // A picked source orients it too: `detected` keeps its last value while detection is off.
+  const oriented = base && orient(base, picked ?? detected);
+  const from = picked ?? oriented?.from ?? detected;
+  const into = target ?? (oriented && oriented.to !== from ? oriented.to : undefined) ?? favorites.find((lang) => lang !== from) ?? favorites[0] ?? 'en';
+  // ponytail: a ⌘↵ before detection answers lets the API detect; if it finds the target language, that one goes X→X.
+  const sent = picked ?? detected;
   const fail = (message: string) => setNotice({ message, isError: true });
 
   /**
@@ -92,22 +100,28 @@ function App() {
     setVersion(versions.length - 1);
     if (!base.length) {
       const entry = { text, result: response.data.text, to: into, site: tab.host, at: Date.now(), ...(source ? { from: source } : {}) };
-      setHistory(await popupHistory.add(entry));
+      setHistory(await historyStore.add(entry));
     }
   };
 
   const restore = (entry: HistoryEntry) => {
+    setUndo(null);
+    setScreen('home');
+    // A grammar fix has no language pair: its fixed text goes back into the input, ready to translate.
+    if (entry.kind === 'grammar') {
+      setText(entry.result);
+      setResult(null);
+      return;
+    }
     setText(entry.text);
     setPicked(entry.from ?? null);
     setTarget(entry.to);
     setResult({ lang: entry.to, versions: [entry.result] });
     setVersion(0);
-    setUndo(null);
-    setScreen('home');
   };
 
   // History edits write the whole list. Delete and clear keep the list before them for Undo.
-  const saveHistory = async (list: HistoryEntry[]) => setHistory(await popupHistory.set(list));
+  const saveHistory = async (list: HistoryEntry[]) => setHistory(await historyStore.set(list));
   const remove = (list: HistoryEntry[], label: string) => {
     setUndo({ label, previous: history });
     void saveHistory(list);
@@ -145,6 +159,12 @@ function App() {
       from={from}
       fromDetected={!picked && detected !== undefined}
       into={into}
+      pairs={topPairs(history)}
+      onPair={(chosen) => {
+        setPair(chosen);
+        setPicked(null);
+        setTarget(undefined);
+      }}
       onPick={(side) => setScreen({ pick: side })}
       onSwap={() => {
         if (!from) return;
@@ -158,12 +178,12 @@ function App() {
       }}
       text={text}
       onTextChange={setText}
-      onTranslate={() => void translate(text, from, into)}
+      onTranslate={() => void translate(text, sent, into)}
       busy={busy}
       result={result}
       version={version}
       onVersion={setVersion}
-      onRetry={() => result && void translate(text, from, result.lang, result.versions)}
+      onRetry={() => result && void translate(text, sent, result.lang, result.versions)}
       onCopy={() =>
         shown !== undefined &&
         void navigator.clipboard.writeText(shown).then(() => setNotice({ message: 'Copied', isError: false }))
@@ -192,7 +212,7 @@ function App() {
       onClearAll={() => remove([], `Cleared ${history.length} translations`)}
       undo={undo && { label: undo.label, onUndo: () => (void saveHistory(undo.previous), setUndo(null)) }}
       favorites={favorites}
-      lately={usedLately(history, favorites)}
+      lately={usedLately(history, favorites, typeof screen === 'object' && screen.pick === 'from' ? 'from' : 'to')}
       onChoose={(lang) => {
         if (typeof screen === 'object' && screen.pick === 'from') setPicked(lang);
         else if (lang) setTarget(lang);

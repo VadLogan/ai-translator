@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { findLanguage, LANGUAGES, nativeName, searchLanguages } from '../../core/languages';
-import { byDay, HISTORY_LIMIT, pairLabel, topPairs, type HistoryEntry } from '../../settings/history';
+import { byDay, HISTORY_LIMIT, pairLabel, topPairs, type HistoryEntry, type Pair, type TranslationEntry } from '../../settings/history';
 import { IconButton, Kbd, PillButton } from '../../ui/buttons';
 import { Flag, BrandMark, Icon } from '../../ui/icons';
 import { LanguageCard, SearchField, Segmented, StatusChip, Switch, TextAreaCard } from '../../ui/inputs';
@@ -21,6 +21,9 @@ export interface PopupProps {
   from?: string;
   fromDetected: boolean;
   into: string;
+  /** The most used pairs; shown as chips above the selects once there are two. */
+  pairs: readonly Pair[];
+  onPair(pair: Pair): void;
   onPick(side: 'from' | 'into'): void;
   onSwap(): void;
   text: string;
@@ -46,7 +49,7 @@ export interface PopupProps {
   onRate(entry: HistoryEntry, rating: HistoryEntry['rating']): void;
   onCopyEntry(entry: HistoryEntry): void;
   /** Opens the entry on Home and asks for another translation. */
-  onRetryEntry(entry: HistoryEntry): void;
+  onRetryEntry(entry: TranslationEntry): void;
   onDelete(entry: HistoryEntry): void;
   onClearAll(): void;
   /** Set right after a delete or clear: what was removed, until undone or superseded. */
@@ -73,6 +76,12 @@ export function Popup(props: PopupProps) {
 }
 
 const nameOf = (lang: string) => findLanguage(lang)?.name ?? lang;
+/** What made the entry, at a glance: a translation or a grammar fix / rewrite. */
+const KindIcon = ({ entry }: { entry: HistoryEntry }) => (
+  <span role="img" aria-label={entry.kind === 'grammar' ? 'Grammar fix' : 'Translation'} className="flex shrink-0 text-tm-muted">
+    <Icon name={entry.kind === 'grammar' ? 'fixGrammar' : 'translate'} size={16} strokeWidth={1.9} />
+  </span>
+);
 const time = (at: number) => new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
 function Home(props: PopupProps) {
@@ -107,6 +116,19 @@ function Home(props: PopupProps) {
       </header>
 
       <div className="flex min-h-0 grow flex-col gap-3 overflow-y-auto px-4 pb-4 pt-1">
+        {props.pairs.length >= 2 && (
+          <div className="flex gap-1.5" role="group" aria-label="Your usual pairs">
+            {props.pairs.map((pair) => {
+              const active = pair.from === from && pair.to === into;
+              const label = pairLabel(pair);
+              return (
+                <button key={label} type="button" aria-pressed={active} onClick={() => props.onPair(pair)} className="cursor-pointer rounded-2xl outline-none focus-visible:shadow-tm-ring">
+                  <StatusChip tone={active ? 'accent' : 'neutral'}>{label}</StatusChip>
+                </button>
+              );
+            })}
+          </div>
+        )}
         <div className="flex items-center gap-1.5">
           <LanguageCard
             flag={from ? <Flag lang={from} /> : <Icon name="search" size={16} className="text-tm-muted" />}
@@ -219,6 +241,7 @@ function HistoryRow({ entry, onPress }: { entry: HistoryEntry; onPress: () => vo
       onClick={onPress}
       className="flex h-[52px] w-full cursor-pointer items-center gap-2.5 rounded-2xl bg-tm-surface px-3 text-left shadow-tm-card outline-none focus-visible:shadow-tm-ring"
     >
+      <KindIcon entry={entry} />
       <span className="flex min-w-0 grow flex-col gap-px">
         <span className="truncate text-[13px]">{entry.text}</span>
         <Text variant="meta">{[entry.site, time(entry.at)].filter(Boolean).join(' · ')}</Text>
@@ -247,7 +270,7 @@ function History(props: PopupProps) {
   const [filter, setFilter] = useState('all');
   const [searching, setSearching] = useState(false);
   const [query, setQuery] = useState('');
-  const pairs = topPairs(history);
+  const pairs = topPairs(history).map(pairLabel);
   const q = query.trim().toLowerCase();
   const shown = history.filter(
     (entry) =>
@@ -314,6 +337,7 @@ function HistoryCard({ entry, onRestore, onRate, onCopyEntry, onRetryEntry, onDe
   return (
     <article className="flex flex-col gap-1.5 rounded-[20px] bg-tm-surface py-3 pl-3.5 pr-3 shadow-tm-card">
       <div className="flex items-center gap-1.5">
+        <KindIcon entry={entry} />
         <StatusChip>{pairLabel(entry)}</StatusChip>
         <Text variant="meta" className="min-w-0 grow truncate text-[12px]">{[entry.site, time(entry.at)].filter(Boolean).join(' · ')}</Text>
         <IconButton aria-label="Mark as a good translation" aria-pressed={entry.rating === 'good'} tone={entry.rating === 'good' ? 'accent' : 'ghost'} size={28} onPress={() => rate('good')}>
@@ -323,7 +347,7 @@ function HistoryCard({ entry, onRestore, onRate, onCopyEntry, onRetryEntry, onDe
           <Icon name="dislike" size={14} strokeWidth={1.9} />
         </IconButton>
         {/* A bad translation's next step is another try, so it takes the copy slot. */}
-        {entry.rating === 'bad' ? (
+        {entry.rating === 'bad' && entry.kind !== 'grammar' ? (
           <IconButton aria-label="Translate this again" tone="accent" size={28} onPress={() => onRetryEntry(entry)}>
             <Icon name="retry" size={14} strokeWidth={2} />
           </IconButton>
@@ -337,8 +361,8 @@ function HistoryCard({ entry, onRestore, onRate, onCopyEntry, onRetryEntry, onDe
         </IconButton>
       </div>
       <button type="button" onClick={() => onRestore(entry)} className="flex cursor-pointer flex-col gap-1.5 rounded-lg text-left outline-none focus-visible:shadow-tm-ring">
-        <span lang={entry.from} className="w-full truncate text-[12.5px] text-tm-muted">{entry.text}</span>
-        <span lang={entry.to} className="text-[14px] leading-[1.45]">{entry.result}</span>
+        <span lang={entry.kind === 'grammar' ? undefined : entry.from} className="w-full truncate text-[12.5px] text-tm-muted">{entry.text}</span>
+        <span lang={entry.kind === 'grammar' ? undefined : entry.to} className="text-[14px] leading-[1.45]">{entry.result}</span>
       </button>
     </article>
   );

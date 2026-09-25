@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { badge, countFixes, grammarCount, isChecking, isMistyped, detectedLang, hidden, isMenuOpen, menuLanguages, reducer } from './translator-state';
+import { badge, cleanCheck, countFixes, grammarCount, hasEnoughWords, isChecking, isMistyped, detectedLang, hidden, isMenuOpen, menuLanguages, reducer } from './translator-state';
 import type { EditableSelection } from '../selection';
 import { findLanguage } from '../../core/languages';
 
@@ -128,4 +128,17 @@ it('badges random keystrokes "?" on both icons -- never a clean check -- until w
   expect(badge(field)).toBe('gibberish');
   expect(badge(picked)).toBe('gibberish');
   expect(badge(reducer(field, { type: 'dismissWarning' }))).toBeUndefined();
+});
+
+it('an applied fix is a clean check: green ✓ on the field icon, html escaped', () => {
+  const state = { ...reducer(hidden, { type: 'select', selection: { text: 'a < b & c' } as EditableSelection, anchor, field: true }), check: cleanCheck('a < b & c') };
+  expect(badge(state)).toBe(0);
+  expect(state.check.fix?.html).toBe('a &lt; b &amp; c');
+});
+
+it('counts words for the background check, CJK included', () => {
+  expect(hasEnoughWords('hello there')).toBe(false);
+  expect(hasEnoughWords('hello there , !')).toBe(false);
+  expect(hasEnoughWords('hello there friend')).toBe(true);
+  expect(hasEnoughWords('我今天去学校')).toBe(true);
 });

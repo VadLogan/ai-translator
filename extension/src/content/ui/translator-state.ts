@@ -92,6 +92,12 @@ export const menuLanguages = (state: State): readonly Language[] => {
 /** Each edit in `FixGrammarOk.html` is one `span.fix`; the text around them is escaped, so this can't miscount. */
 export const countFixes = (html: string): number => html.match(/<span class="fix"/g)?.length ?? 0;
 
+/** A check that found nothing to fix: text the user just applied from a fix is clean by construction, no request needed. */
+export const cleanCheck = (text: string): Check => ({
+  text,
+  fix: { text, html: text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'), mistyped: false, gibberish: false },
+});
+
 /**
  * The grammar check of the current text: its error count, 'error' when it failed, 'checking' while
  * in flight, 'layout' when it was typed on the wrong keyboard layout, 'gibberish' for random
@@ -112,6 +118,10 @@ export function warning(state: State): 'layout' | 'gibberish' | undefined {
 }
 
 export const isMistyped = (state: State): boolean => warning(state) === 'layout';
+
+/** Enough words for the background check to be worth a request. A click checks anything. */
+export const hasEnoughWords = (text: string): boolean =>
+  [...new Intl.Segmenter(undefined, { granularity: 'word' }).segment(text)].filter((s) => s.isWordLike).length >= 3;
 
 /**
  * The icon's badge, only while the check describes the text under it: a wrong layout ('layout') or

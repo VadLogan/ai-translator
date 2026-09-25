@@ -12,6 +12,7 @@ const at = (daysAgo: number, hour: number, minute: number) => {
 };
 const HISTORY: HistoryEntry[] = [
   { text: 'Cześć, przesyłam wycenę na prace wykończeniowe…', result: "Hi, I'm sending over the quote for the finishing works.", from: 'pl', to: 'en', site: 'mail.google.com', at: at(0, 10, 24), rating: 'good' },
+  { kind: 'grammar', text: 'I has sent the invoice yesterday, pls check.', result: 'I sent the invoice yesterday, please check.', site: 'mail.google.com', at: at(0, 10, 2) },
   { text: 'Підтверджую доставку плитки на четвер…', result: 'Confirming the tile delivery for Thursday.', from: 'uk', to: 'en', site: 'web.whatsapp.com', at: at(0, 9, 41) },
   { text: 'Could you split the estimate room by room?', result: 'Czy możesz rozbić kosztorys na pomieszczenia?', from: 'en', to: 'pl', site: 'app.slack.com', at: at(1, 18, 7), rating: 'bad' },
   { text: 'Dziękuję, termin pasuje.', result: 'Thank you, the date works.', from: 'pl', to: 'en', site: 'mail.google.com', at: at(1, 12, 5) },
@@ -31,6 +32,8 @@ const meta = {
     from: 'pl',
     fromDetected: true,
     into: 'en',
+    pairs: [{ from: 'pl', to: 'en' }, { from: 'uk', to: 'en' }],
+    onPair: noop,
     onPick: noop,
     onSwap: noop,
     text: 'Cześć, przesyłam wycenę na prace wykończeniowe. Daj znać, czy terminy Wam pasują.',
@@ -63,7 +66,10 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Empty: Story = { args: { text: '', from: undefined, fromDetected: false, history: [] } };
+export const Empty: Story = { args: { text: '', from: undefined, fromDetected: false, history: [], pairs: [] } };
+
+/** One pair used so far: it is the default, and no chips. */
+export const OnePair: Story = { args: { text: '', fromDetected: false, result: null, pairs: [{ from: 'pl', to: 'en' }] } };
 
 export const Translated: Story = {
   args: {

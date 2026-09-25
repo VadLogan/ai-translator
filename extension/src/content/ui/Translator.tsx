@@ -6,11 +6,12 @@ import { isSiteDisabled } from '../../core/sites';
 import { PROVIDERS, isProviderId } from '../../auth/providers';
 import { sendMessage } from '../../messaging/messages';
 import { disabledFields, type DisabledField } from '../../settings/disabled-fields';
+import { historyStore, type HistoryEntry } from '../../settings/history';
 import { storageSettings } from '../../settings/storage-settings';
 import { replaceSelection } from '../replace';
 import { fieldKey, fieldLabel, getEditableSelection, getFieldAnchor, getFocusedField, getPageSelection, getSelectionAnchor, isSelectionUnchanged, wholeField } from '../selection';
 import { TranslatorWidget, type WidgetView } from './TranslatorWidget';
-import { badge, countFixes, detectedLang, grammarCount, isChecking, hidden, isMenuOpen, menuLanguages, reducer, type Detection, type Screen, type State } from './translator-state';
+import { badge, cleanCheck, countFixes, detectedLang, grammarCount, hasEnoughWords, isChecking, hidden, isMenuOpen, menuLanguages, reducer, type Detection, type Screen, type State } from './translator-state';
 
 export interface TranslatorProps {
   /** The shadow host: events inside it are the widget's own, not "outside clicks". */
@@ -90,7 +91,8 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
     // The menu's "Grammar fix" item shows the selection's error count, so it is asked up front.
     // Page text can't be replaced, so it gets no grammar fix.
     const { selection } = latest.current;
-    if (selection?.kind !== 'page') void checkGrammar(selection);
+    // Under 3 words the item shows no count and asks when clicked (openGrammar).
+    if (selection && selection.kind !== 'page' && hasEnoughWords(selection.text)) void checkGrammar(selection);
   }
 
   /** Fills in the menu's detected line. Failures stay silent -- translating does not depend on it. */
@@ -116,14 +118,25 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
     if (!response.ok) {
       if (response.error.code === 'unauthenticated') show({ kind: 'signIn', targetLang });
       else fail(response.error.message);
-    } else if (selection.kind === 'page') {
+      return;
+    }
+    const from = sourceLang ?? response.data.detectedSourceLang;
+    const entry = { text: selection.text, result: response.data.text, to: targetLang, ...(from ? { from } : {}) };
+    if (selection.kind === 'page') {
       show({ kind: 'translated', text: response.data.text, lang: targetLang });
+      remember(entry);
     } else if (!isSelectionUnchanged(selection)) {
       fail('The text changed while translating. Select it again.');
     } else {
       replaceSelection(selection, response.data.text);
       close();
+      remember(entry);
     }
+  }
+
+  /** Into the popup's History. Best effort: an orphaned script or full storage must not break the flow. */
+  function remember(entry: DistributiveOmit<HistoryEntry, 'site' | 'at'>): void {
+    void historyStore.add({ ...entry, site: location.hostname, at: Date.now() }).catch(() => {});
   }
 
   /** The API rejected us: sign in, then resume what was interrupted -- a translation or the grammar check. */
@@ -250,9 +263,12 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
       // A single-line input (search box, filter, form field) shows its icon but costs no request
       // until the icon is clicked: clicks call checkGrammar themselves.
       if (screen.kind === 'icon' && selection?.element instanceof HTMLInputElement) return;
-      if ((screen.kind === 'icon' && screen.field) || screen.kind === 'grammarFixed') void checkGrammar();
+      // An open panel was asked for, so it always checks; the icon only for 3+ words (the click asks for less).
+      if (screen.kind === 'grammarFixed') return void checkGrammar();
+      if (screen.kind !== 'icon') return;
       // A selection's own text, not its whole field. An open menu asks for itself (openMenu).
-      else if (screen.kind === 'icon' && selection && selection.kind !== 'page') void checkGrammar(selection);
+      const target = screen.field ? wholeField(selection?.element ?? null) : selection?.kind !== 'page' ? selection : null;
+      if (target && hasEnoughWords(target.text)) void checkGrammar(target);
     }, delay);
   }
 
@@ -271,6 +287,12 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
       clearTimeout(checkTimer.current);
       dispatch({ type: 'checked', check: null });
       if (screen.kind === 'grammarFixed') close();
+      return;
+    }
+    // Too short to check on its own: no spinner waiting on a check that won't come. A click still asks.
+    if (screen.kind !== 'grammarFixed' && !hasEnoughWords(field.text)) {
+      clearTimeout(checkTimer.current);
+      dispatch({ type: 'checked', check: null });
       return;
     }
     if (screen.kind === 'grammarFixed') {
@@ -297,8 +319,21 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
     const { selection } = latest.current;
     if (!selection || selection.kind === 'page') return;
     if (!isSelectionUnchanged(selection)) return fail('The text changed. Try again.', 'close');
+    const wholeText = wholeField(selection.element)?.text;
     replaceSelection(selection, text);
     close();
+    // The whole field is now the applied fix: mark it clean so the input's re-check is skipped and
+    // the icon shows ✓. After close(), to overwrite the skeleton check onInput wrote. A part of the
+    // field leaves the rest unchecked, so that one is asked as usual.
+    if (selection.text === wholeText) dispatch({ type: 'checked', check: cleanCheck(text) });
+    remember({ kind: 'grammar', text: selection.text, result: text });
+  }
+
+  /** The grammar panel's Copy: page text is never replaced, so a copied fix is what gets used. */
+  function copyFix(text: string): void {
+    const { selection } = latest.current;
+    if (selection) remember({ kind: 'grammar', text: selection.text, result: text });
+    void navigator.clipboard.writeText(text).then(close);
   }
 
   useEffect(() => {
@@ -413,6 +448,7 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
         onPick: signIn,
         onBack: () => (state.screen.kind === 'error' && state.screen.back === 'close' ? close() : void openMenu()),
         onReplace: apply,
+        onCopyFix: copyFix,
         onClose: close,
         onRewrite: (style) => void rewrite(style),
         onDismissWarning: dismissWarning,
@@ -441,6 +477,7 @@ function toView(
     onPick,
     onBack,
     onReplace,
+    onCopyFix,
     onRewrite,
     onClose,
     onDismissWarning,
@@ -448,6 +485,7 @@ function toView(
     onPick: (provider: string, targetLang?: string) => void;
     onBack: () => void;
     onReplace: (text: string) => void;
+    onCopyFix: (text: string) => void;
     onRewrite: (style: RewriteStyle) => void;
     onClose: () => void;
     onDismissWarning: (field: boolean) => void;
@@ -480,7 +518,7 @@ function toView(
         kind: 'grammarFixed',
         html: fix?.html,
         onReplace: () => fix && onReplace(fix.text),
-        onCopy: () => fix && void navigator.clipboard.writeText(fix.text).then(onClose),
+        onCopy: () => fix && onCopyFix(fix.text),
         onRewrite,
       };
     }
@@ -521,3 +559,6 @@ function subscribeDark(onChange: () => void): () => void {
   query.addEventListener('change', onChange);
   return () => query.removeEventListener('change', onChange);
 }
+
+/** Omit that keeps a union a union: `Omit<A | B, K>` would collapse it to their common keys. */
+type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never;
