@@ -6,9 +6,9 @@
     "semantic_hash": "5cd31cd6f33b4507444048e090387d33"
   },
   "CLAUDE.md": {
-    "mtime": 1790254481.5612168,
-    "seen": 1790254492.981302,
-    "ast_hash": "5dcbaabad4b911b5e078efab29701d88",
+    "mtime": 1790255864.5714152,
+    "seen": 1790255874.6497831,
+    "ast_hash": "34044a80383b6220673433cd47ac8c5c",
     "semantic_hash": ""
   },
   ".claude/settings.json": {
@@ -84,9 +84,9 @@
     "semantic_hash": ""
   },
   "api/src/app.test.ts": {
-    "mtime": 1790254144.4929845,
-    "seen": 1790254492.9798772,
-    "ast_hash": "8e4e322768c53cdaf0f606bfca3cb64a",
+    "mtime": 1790255680.5087757,
+    "seen": 1790255874.6481621,
+    "ast_hash": "19e1308db98b04caf56e1ba8fa37f26e",
     "semantic_hash": ""
   },
   "api/src/app.ts": {
@@ -186,9 +186,9 @@
     "semantic_hash": "ee7b032526ddd9d35820fb9f51e73140"
   },
   "shared/contract.ts": {
-    "mtime": 1790254144.4852018,
-    "seen": 1790254492.981117,
-    "ast_hash": "9179e46d6fa4f4a4d2ba7ce0de52a4fd",
+    "mtime": 1790255680.5080333,
+    "seen": 1790255874.64957,
+    "ast_hash": "a9338fb80263308ab6a2cfc39efedc6e",
     "semantic_hash": ""
   },
   "extension/playground/index.html": {
@@ -396,15 +396,15 @@
     "semantic_hash": "92acf6461f12e097805920186033782d"
   },
   "extension/src/content/ui/TranslatorWidget.stories.tsx": {
-    "mtime": 1790254298.7556548,
-    "seen": 1790254492.9807382,
-    "ast_hash": "36d20ffa04dc68c6ce0bb4816d084080",
+    "mtime": 1790255744.3395777,
+    "seen": 1790255874.6490839,
+    "ast_hash": "df0b78812e34a629ebb879f0380487ff",
     "semantic_hash": ""
   },
   "extension/src/content/ui/TranslatorWidget.tsx": {
-    "mtime": 1790254346.0743258,
-    "seen": 1790254492.980739,
-    "ast_hash": "2516dae63e2d56f2cd9c98e6b8c723f3",
+    "mtime": 1790255783.794647,
+    "seen": 1790255874.6490839,
+    "ast_hash": "979841549a52aaf6bee112dda4d3c2d7",
     "semantic_hash": ""
   },
   "extension/src/entrypoints/options/OptionsPage.stories.tsx": {
@@ -432,9 +432,9 @@
     "semantic_hash": ""
   },
   "api/src/repositories/corrections.test.ts": {
-    "mtime": 1790254178.1623504,
-    "seen": 1790254492.9800751,
-    "ast_hash": "7b59534f16602d6626f53a13843c59f1",
+    "mtime": 1790255680.5091808,
+    "seen": 1790255874.6483562,
+    "ast_hash": "dd56e3000ca418b329fdc50286082eb2",
     "semantic_hash": ""
   },
   "api/src/repositories/corrections.ts": {
@@ -474,9 +474,9 @@
     "semantic_hash": ""
   },
   "extension/src/ui/icons.tsx": {
-    "mtime": 1790254298.7539918,
-    "seen": 1790254492.981001,
-    "ast_hash": "a5cdfbe87800d6d5d8eddcbb2f1f5354",
+    "mtime": 1790255744.3386564,
+    "seen": 1790255874.649444,
+    "ast_hash": "2ee1dbab6bed6ba7d1f93c2c9b771f1e",
     "semantic_hash": ""
   },
   "api/src/controllers/rewrite.ts": {
@@ -510,9 +510,9 @@
     "semantic_hash": "071d325db9d522a57abc56a7a9ba277c"
   },
   "api/src/resources/aiClient/requests/fix-grammar/fix-grammar.ts": {
-    "mtime": 1790254144.4797978,
-    "seen": 1790254492.980261,
-    "ast_hash": "5a7fadbfb488bb99c6a9b6fdca25ea12",
+    "mtime": 1790255671.2314646,
+    "seen": 1790255874.6485481,
+    "ast_hash": "bced43c90c9aba5353dd997e5544fae2",
     "semantic_hash": ""
   },
   "api/src/resources/aiClient/requests/fix-grammar/index.ts": {
@@ -696,21 +696,21 @@
     "semantic_hash": ""
   },
   "extension/src/content/ui/Translator.tsx": {
-    "mtime": 1790254418.3787296,
-    "seen": 1790254492.9807382,
-    "ast_hash": "b209b2921ab05cb295292a65f2285394",
+    "mtime": 1790255726.0213168,
+    "seen": 1790255874.649083,
+    "ast_hash": "d3c4f81cc2e4d02731bc2dcb3e40203a",
     "semantic_hash": ""
   },
   "extension/src/content/ui/translator-state.test.ts": {
-    "mtime": 1790254231.0547295,
-    "seen": 1790254492.9807749,
-    "ast_hash": "39a7cc7fdcbc85ed2b57b0b19277627d",
+    "mtime": 1790255726.0207722,
+    "seen": 1790255874.649123,
+    "ast_hash": "0195dce63ae2c3d67d486cc9ac32928a",
     "semantic_hash": ""
   },
   "extension/src/content/ui/translator-state.ts": {
-    "mtime": 1790254267.0905528,
-    "seen": 1790254492.9807758,
-    "ast_hash": "efe01c8617310e3add878ffa36c1143e",
+    "mtime": 1790255726.0202076,
+    "seen": 1790255874.6491241,
+    "ast_hash": "37691673176e5ead747b7a0ba6bdcf3f",
     "semantic_hash": ""
   },
   "extension/src/core/languages.test.ts": {

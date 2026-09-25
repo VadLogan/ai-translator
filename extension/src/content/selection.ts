@@ -23,18 +23,39 @@ export type EditableSelection =
 /** The selections replaceSelection can write to. */
 export type WritableSelection = Exclude<EditableSelection, { kind: 'page' }>;
 
-// Input types that support the selectionStart/selectionEnd API.
-const SELECTABLE_INPUT_TYPES = new Set(['text', 'search', 'url', 'tel']);
+// Input types that support the selectionStart/selectionEnd API and hold prose (url/tel don't).
+const SELECTABLE_INPUT_TYPES = new Set(['text', 'search']);
+
+// ponytail: name/autocomplete heuristic for credential and form-data fields; extend the lists when a real miss shows up.
+const EXCLUDED_AUTOCOMPLETE = /^(username|email|current-password|new-password|one-time-code|tel.*|cc-.*|postal-code|url)$/;
+const EXCLUDED_NAME = /(^|[\W_])(login|user(name)?|e-?mail|otp|pin|captcha|card|cvv|cvc|iban|phone|zip|postcode)([\W_]|$)/i;
+const EXCLUDED_INPUT_MODES = new Set(['email', 'tel', 'numeric']);
+// Page-side opt-outs: ours, and the ones pages already set for Grammarly.
+const OPT_OUT = '[data-ai-translator="off"], [data-gramm="false"], [data-enable-grammarly="false"]';
+
+/** A field the page opted out of, anywhere up its tree. */
+function isOptedOut(element: Element): boolean {
+  return element.closest(OPT_OUT) !== null;
+}
+
+/** Login, contact and payment inputs: never worth translating, and not worth sending to the provider. */
+export function isExcludedField(element: HTMLInputElement | HTMLTextAreaElement): boolean {
+  if (isOptedOut(element)) return true;
+  // A textarea is prose whatever it is called; the rest only applies to single-line inputs.
+  if (!(element instanceof HTMLInputElement)) return false;
+  if (element.getAttribute('spellcheck') === 'false') return true;
+  const autocomplete = element.getAttribute('autocomplete')?.trim().toLowerCase().split(/\s+/) ?? [];
+  if (autocomplete.some((token) => EXCLUDED_AUTOCOMPLETE.test(token))) return true;
+  if (EXCLUDED_INPUT_MODES.has(element.inputMode)) return true;
+  return [element.name, element.id, element.getAttribute('aria-label') ?? ''].some((value) => EXCLUDED_NAME.test(value));
+}
 
 export function isTextControl(element: Element | null): element is HTMLInputElement | HTMLTextAreaElement {
   if (!element) return false;
-  if (element instanceof HTMLTextAreaElement) return !element.readOnly && !element.disabled;
-  return (
-    element instanceof HTMLInputElement &&
-    SELECTABLE_INPUT_TYPES.has(element.type) &&
-    !element.readOnly &&
-    !element.disabled
-  );
+  const isControl =
+    element instanceof HTMLTextAreaElement ||
+    (element instanceof HTMLInputElement && SELECTABLE_INPUT_TYPES.has(element.type));
+  return isControl && !element.readOnly && !element.disabled && !isExcludedField(element);
 }
 
 function isEditableHost(element: Element): element is HTMLElement {
@@ -52,11 +73,11 @@ export function findContentEditableHost(node: Node | null): HTMLElement | null {
     else if (host) break;
     element = element.parentElement;
   }
-  return host;
+  return host && !isOptedOut(host) ? host : null;
 }
 
 /** Follows focus into open shadow roots (web-component editors). */
-function deepActiveElement(doc: Document): Element | null {
+export function deepActiveElement(doc: Document): Element | null {
   let active = doc.activeElement;
   while (active?.shadowRoot?.activeElement) active = active.shadowRoot.activeElement;
   return active;
@@ -89,7 +110,7 @@ export function getPageSelection(doc: Document = document): EditableSelection | 
   const range = selection.getRangeAt(0);
   const container = range.commonAncestorContainer;
   const element = container instanceof HTMLElement ? container : container.parentElement;
-  if (!element || findContentEditableHost(container)) return null;
+  if (!element || isOptedOut(element) || findContentEditableHost(container)) return null;
   const text = range.toString();
   return text.trim() ? { kind: 'page', element, range: range.cloneRange(), text } : null;
 }
@@ -196,4 +217,32 @@ function textControlAnchor(snapshot: Extract<EditableSelection, { kind: 'text-co
   };
   // A selection scrolled out of the field would otherwise drag the icon off it.
   return anchor.bottom < box.top || anchor.top > box.bottom ? field : anchor;
+}
+
+// Generated id parts (uuids, hex hashes, counters) that change on every load.
+const VOLATILE = /[0-9a-f]{8,}(-[0-9a-f]{4,})*|\d+/gi;
+
+/**
+ * A key for a field that survives a reload, so "Turn off in this field" sticks. Ids are often
+ * generated (Teams: new-message-<uuid>), so they come last and with their volatile parts removed.
+ * ponytail: two fields on one page with no distinguishing attributes share a key; add a DOM-path
+ * fallback if that shows up.
+ */
+export function fieldKey(element: HTMLElement): string {
+  const tag = element.localName;
+  for (const attr of ['data-tid', 'name', 'aria-label', 'placeholder']) {
+    const value = element.getAttribute(attr)?.trim();
+    if (value) return `${tag}|${attr}=${value}`;
+  }
+  const id = element.id.replace(VOLATILE, '#');
+  return id ? `${tag}|id=${id}` : tag;
+}
+
+/** What the options page shows for a turned-off field. */
+export function fieldLabel(element: HTMLElement): string {
+  for (const attr of ['aria-label', 'placeholder', 'name', 'id']) {
+    const value = element.getAttribute(attr)?.trim();
+    if (value) return value;
+  }
+  return element.localName;
 }

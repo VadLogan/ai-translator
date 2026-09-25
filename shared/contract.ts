@@ -95,15 +95,22 @@ export interface Settings {
   /** Language codes shown in the in-page menu, in order. Empty = not chosen yet: the extension
    * falls back to the browser's languages, which only it can see. */
   favoriteLanguages: string[];
+  /** Hostnames where the extension stays off; a subdomain matches its parent (example.com covers mail.example.com). */
+  disabledSites: string[];
 }
 
 export const DEFAULT_SETTINGS: Settings = {
   favoriteLanguages: [],
+  disabledSites: [],
 };
+
+/** A bare hostname, lower case: no scheme, port or path. */
+export const HOSTNAME = /^[a-z0-9-]+(\.[a-z0-9-]+)*$/;
 
 /** Language code, e.g. "de" or "pt-BR". Shared by targetLang and favoriteLanguages validation. */
 export const LANGUAGE_CODE = /^[a-zA-Z-]{2,8}$/;
 
 export const MAX_TEXT_LENGTH = 5000;
 export const MAX_FAVORITE_LANGUAGES = 20;
+export const MAX_DISABLED_SITES = 100;
 export const MAX_URL_LENGTH = 2048;

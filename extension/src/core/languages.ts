@@ -53,3 +53,23 @@ export function browserLanguages(
   const codes = preferred.map((tag) => tag.split('-')[0]!.toLowerCase()).filter((code) => findLanguage(code));
   return codes.length ? [...new Set(codes)] : ['en'];
 }
+
+/** The language's name in itself ("Polski"), from the browser's own CLDR data. Falls back to the English name. */
+export function nativeName(code: string): string {
+  try {
+    const name = new Intl.DisplayNames([code], { type: 'language' }).of(code);
+    if (name && name !== code) return name[0]!.toLocaleUpperCase(code) + name.slice(1);
+  } catch {
+    // An engine without the locale; the English name below will do.
+  }
+  return findLanguage(code)?.name ?? code;
+}
+
+/** LANGUAGES matching a typed query by English name, native name or code. Empty query: all of them. */
+export function searchLanguages(query: string): Language[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return [...LANGUAGES];
+  return LANGUAGES.filter(
+    ({ code, name }) => code === q || name.toLowerCase().includes(q) || nativeName(code).toLowerCase().includes(q),
+  );
+}

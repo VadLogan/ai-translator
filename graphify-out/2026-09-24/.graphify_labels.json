@@ -27,8 +27,7 @@
   "25": "vitest.config.ts",
   "26": "@tailwindcss/vite",
   "27": "dependencies",
-  "28": "@storybook/react-vite",
+  "28": "icons.stories.tsx",
   "29": "ref_src_health_ts",
-  "30": "WidgetCallbacks",
   "31": "translator-widget.ts"
 }

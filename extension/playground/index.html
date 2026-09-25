@@ -21,5 +21,14 @@
     <div id="editor" contenteditable="true">Good morning, dear colleagues.</div>
     <label for="password">Password (ignored)</label>
     <input id="password" type="password" value="secret" />
+    <h2>Login form (all ignored)</h2>
+    <label for="username">Username</label>
+    <input id="username" name="username" value="john.doe" />
+    <label for="email">Email</label>
+    <input id="email" autocomplete="email" value="john@example.com" />
+    <label for="otp">One-time code</label>
+    <input id="otp" autocomplete="one-time-code" value="123456" />
+    <label for="opted-out">Opted out (data-ai-translator="off")</label>
+    <textarea id="opted-out" data-ai-translator="off">This page asked us to stay out.</textarea>
   </body>
 </html>

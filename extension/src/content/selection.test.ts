@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it } from 'vitest';
-import { getEditableSelection, getPageSelection, getSelectionAnchor, isSelectionUnchanged } from './selection';
+import { fieldKey, getEditableSelection, getFocusedField, getPageSelection, getSelectionAnchor, isSelectionUnchanged, isTextControl } from './selection';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -80,6 +80,72 @@ describe('getPageSelection', () => {
     select(plain.firstChild!, 5, 9);
     document.querySelector('textarea')!.focus();
     expect(getPageSelection()).toBeNull();
+  });
+});
+
+describe('field exclusions', () => {
+  const field = (html: string) => {
+    document.body.innerHTML = html;
+    return document.querySelector('input, textarea');
+  };
+
+  it.each([
+    '<input type="email">',
+    '<input type="tel">',
+    '<input type="url">',
+    '<input autocomplete="username">',
+    '<input autocomplete="section-login one-time-code">',
+    '<input autocomplete="cc-number">',
+    '<input name="login">',
+    '<input id="user_name">',
+    '<input name="userEmail" aria-label="E-mail">',
+    '<input inputmode="numeric">',
+    '<input spellcheck="false">',
+    '<form data-ai-translator="off"><textarea></textarea></form>',
+    '<textarea data-gramm="false"></textarea>',
+  ])('skips %s', (html) => {
+    expect(isTextControl(field(html))).toBe(false);
+  });
+
+  it.each([
+    '<input>',
+    '<input type="search" name="q">',
+    '<input name="message" autocomplete="off">',
+    '<input name="userMessage">',
+    '<textarea name="user_comment"></textarea>',
+  ])('keeps %s', (html) => {
+    expect(isTextControl(field(html))).toBe(true);
+  });
+
+  it('skips opted-out contenteditable editors, as a field and as page text', () => {
+    document.body.innerHTML = '<div data-ai-translator="off"><div contenteditable="true">Hello world</div></div>';
+    const editor = document.querySelector<HTMLElement>('[contenteditable]')!;
+    editor.focus();
+    expect(getFocusedField()).toBeNull();
+
+    const range = document.createRange();
+    range.selectNodeContents(editor);
+    document.getSelection()!.addRange(range);
+    expect(getEditableSelection()).toBeNull();
+    expect(getPageSelection()).toBeNull();
+  });
+});
+
+describe('fieldKey', () => {
+  const key = (html: string) => {
+    document.body.innerHTML = html;
+    return fieldKey(document.body.firstElementChild as HTMLElement);
+  };
+
+  it('prefers stable attributes over a generated id', () => {
+    expect(key('<div id="new-message-33bf7bb3-7d00-40c3-b98d-e755b140224a" data-tid="ckeditor" aria-label="Type a message"></div>')).toBe('div|data-tid=ckeditor');
+    expect(key('<input id=":r3n:" name="name">')).toBe('input|name=name');
+  });
+
+  it('strips volatile parts from an id and falls back to the tag', () => {
+    expect(key('<textarea id="note-33bf7bb3-7d00"></textarea>')).toBe(key('<textarea id="note-a1b2c3d4-9f9f"></textarea>'));
+    expect(key('<textarea id="comment-12"></textarea>')).toBe('textarea|id=comment-#');
+    expect(key('<textarea></textarea>')).toBe('textarea');
   });
 });
 

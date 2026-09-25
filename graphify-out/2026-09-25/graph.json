@@ -102,7 +102,7 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "diff.ts",
+      "community_name": "ref_vitest",
       "file_type": "code",
       "norm_label": "segment",
       "source_file": "api/src/resources/aiClient/requests/fix-grammar/utils/diff.ts",
@@ -115,24 +115,11 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "insertmessage",
       "source_file": "extension/src/content/insert.ts",
       "source_location": "L5"
-    },
-    {
-      "id": "extension_src_content_selection_editableselection",
-      "label": "EditableSelection",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "editableselection",
-      "source_file": "extension/src/content/selection.ts",
-      "source_location": "L1"
     },
     {
       "id": "extension_src_content_selection_writableselection",
@@ -141,89 +128,11 @@
       "_callable_class": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "writableselection",
       "source_file": "extension/src/content/selection.ts",
       "source_location": "L24"
-    },
-    {
-      "id": "extension_src_content_ui_translator_state_action",
-      "label": "Action",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "action",
-      "source_file": "extension/src/content/ui/translator-state.ts",
-      "source_location": "L48"
-    },
-    {
-      "id": "extension_src_content_ui_translator_state_detection",
-      "label": "Detection",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "detection",
-      "source_file": "extension/src/content/ui/translator-state.ts",
-      "source_location": "L6"
-    },
-    {
-      "id": "extension_src_content_ui_translator_state_screen",
-      "label": "Screen",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "screen",
-      "source_file": "extension/src/content/ui/translator-state.ts",
-      "source_location": "L8"
-    },
-    {
-      "id": "extension_src_content_ui_translator_state_state",
-      "label": "State",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "state",
-      "source_file": "extension/src/content/ui/translator-state.ts",
-      "source_location": "L27"
-    },
-    {
-      "id": "extension_src_content_ui_translator_translatorprops",
-      "label": "TranslatorProps",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "translatorprops",
-      "source_file": "extension/src/content/ui/Translator.tsx",
-      "source_location": "L15"
-    },
-    {
-      "id": "extension_src_core_languages_language",
-      "label": "Language",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "language",
-      "source_file": "extension/src/core/languages.ts",
-      "source_location": "L1"
     },
     {
       "id": "extension_src_content_ui_translatorwidget_stories_story",
@@ -327,7 +236,7 @@
       "file_type": "code",
       "norm_label": "iconname",
       "source_file": "extension/src/ui/icons.tsx",
-      "source_location": "L51"
+      "source_location": "L48"
     },
     {
       "id": "extension_src_ui_buttons_iconbuttonprops",
@@ -395,6 +304,97 @@
       "source_location": "L4"
     },
     {
+      "id": "extension_src_content_selection_editableselection",
+      "label": "EditableSelection",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "editableselection",
+      "source_file": "extension/src/content/selection.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_content_ui_translator_state_action",
+      "label": "Action",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "action",
+      "source_file": "extension/src/content/ui/translator-state.ts",
+      "source_location": "L48"
+    },
+    {
+      "id": "extension_src_content_ui_translator_state_detection",
+      "label": "Detection",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "detection",
+      "source_file": "extension/src/content/ui/translator-state.ts",
+      "source_location": "L6"
+    },
+    {
+      "id": "extension_src_content_ui_translator_state_screen",
+      "label": "Screen",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "screen",
+      "source_file": "extension/src/content/ui/translator-state.ts",
+      "source_location": "L8"
+    },
+    {
+      "id": "extension_src_content_ui_translator_state_state",
+      "label": "State",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "state",
+      "source_file": "extension/src/content/ui/translator-state.ts",
+      "source_location": "L27"
+    },
+    {
+      "id": "extension_src_content_ui_translator_translatorprops",
+      "label": "TranslatorProps",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "translatorprops",
+      "source_file": "extension/src/content/ui/Translator.tsx",
+      "source_location": "L15"
+    },
+    {
+      "id": "extension_src_core_languages_language",
+      "label": "Language",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "language",
+      "source_file": "extension/src/core/languages.ts",
+      "source_location": "L1"
+    },
+    {
       "id": "extension_src_entrypoints_popup_popup_popupprops",
       "label": "PopupProps",
       "_callable": true,
@@ -408,17 +408,17 @@
       "source_location": "L11"
     },
     {
-      "id": "extension_src_settings_history_historyentry",
-      "label": "HistoryEntry",
+      "id": "extension_src_auth_providers_providerid",
+      "label": "ProviderId",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
-      "community": 32,
-      "community_name": "PopupProps",
+      "community": 33,
+      "community_name": "popup/main.tsx",
       "file_type": "code",
-      "norm_label": "historyentry",
-      "source_file": "extension/src/settings/history.ts",
-      "source_location": "L4"
+      "norm_label": "providerid",
+      "source_file": "extension/src/auth/providers.ts",
+      "source_location": "L7"
     },
     {
       "id": "extension_src_entrypoints_popup_main_notice",
@@ -457,7 +457,7 @@
       "file_type": "code",
       "norm_label": "story",
       "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L64"
+      "source_location": "L51"
     },
     {
       "id": "extension_src_content_ui_translatorwidget_widgetcallbacks",
@@ -473,19 +473,6 @@
       "source_location": "L14"
     },
     {
-      "id": "extension_src_auth_providers_providerid",
-      "label": "ProviderId",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "community": 37,
-      "community_name": "OptionsPage.stories.tsx",
-      "file_type": "code",
-      "norm_label": "providerid",
-      "source_file": "extension/src/auth/providers.ts",
-      "source_location": "L7"
-    },
-    {
       "id": "extension_src_entrypoints_options_optionspage_stories_story",
       "label": "Story",
       "_callable": true,
@@ -497,6 +484,19 @@
       "norm_label": "story",
       "source_file": "extension/src/entrypoints/options/OptionsPage.stories.tsx",
       "source_location": "L32"
+    },
+    {
+      "id": "extension_src_settings_history_historyentry",
+      "label": "HistoryEntry",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "community": 38,
+      "community_name": "history.ts",
+      "file_type": "code",
+      "norm_label": "historyentry",
+      "source_file": "extension/src/settings/history.ts",
+      "source_location": "L4"
     },
     {
       "id": "api_src_repositories_corrections_correctionrecord",
@@ -829,7 +829,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "diff.ts",
+      "community_name": "ref_vitest",
       "file_type": "code",
       "norm_label": "diff()",
       "source_file": "api/src/resources/aiClient/requests/fix-grammar/utils/diff.ts",
@@ -841,7 +841,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "diff.ts",
+      "community_name": "ref_vitest",
       "file_type": "code",
       "norm_label": "escapehtml()",
       "source_file": "api/src/resources/aiClient/requests/fix-grammar/utils/escapeHtml.ts",
@@ -853,7 +853,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "diff.ts",
+      "community_name": "ref_vitest",
       "file_type": "code",
       "norm_label": "fromsegments()",
       "source_file": "api/src/resources/aiClient/requests/fix-grammar/utils/fromSegments.ts",
@@ -865,7 +865,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 0,
-      "community_name": "diff.ts",
+      "community_name": "ref_vitest",
       "file_type": "code",
       "norm_label": "tokenize()",
       "source_file": "api/src/resources/aiClient/requests/fix-grammar/utils/tokenize.ts",
@@ -877,7 +877,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "isproviderid()",
       "source_file": "extension/src/auth/providers.ts",
@@ -889,7 +889,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "caretin()",
       "source_file": "extension/src/content/insert.ts",
@@ -901,7 +901,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "insertintofocusedfield()",
       "source_file": "extension/src/content/insert.ts",
@@ -913,7 +913,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "dispatchinput()",
       "source_file": "extension/src/content/replace.ts",
@@ -925,7 +925,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "replaceincontenteditable()",
       "source_file": "extension/src/content/replace.ts",
@@ -937,7 +937,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "replaceintextcontrol()",
       "source_file": "extension/src/content/replace.ts",
@@ -949,7 +949,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "replaceselection()",
       "source_file": "extension/src/content/replace.ts",
@@ -961,7 +961,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "tryinserttext()",
       "source_file": "extension/src/content/replace.ts",
@@ -973,7 +973,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "trypaste()",
       "source_file": "extension/src/content/replace.ts",
@@ -985,7 +985,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "deepactiveelement()",
       "source_file": "extension/src/content/selection.ts",
@@ -997,7 +997,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "fieldkey()",
       "source_file": "extension/src/content/selection.ts",
@@ -1009,7 +1009,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "fieldlabel()",
       "source_file": "extension/src/content/selection.ts",
@@ -1021,7 +1021,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "findcontenteditablehost()",
       "source_file": "extension/src/content/selection.ts",
@@ -1033,7 +1033,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "geteditableselection()",
       "source_file": "extension/src/content/selection.ts",
@@ -1045,7 +1045,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "getfieldanchor()",
       "source_file": "extension/src/content/selection.ts",
@@ -1057,7 +1057,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "getfocusedfield()",
       "source_file": "extension/src/content/selection.ts",
@@ -1069,7 +1069,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "getpageselection()",
       "source_file": "extension/src/content/selection.ts",
@@ -1081,7 +1081,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "getselectionanchor()",
       "source_file": "extension/src/content/selection.ts",
@@ -1093,7 +1093,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "iseditablehost()",
       "source_file": "extension/src/content/selection.ts",
@@ -1105,7 +1105,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "isexcludedfield()",
       "source_file": "extension/src/content/selection.ts",
@@ -1117,7 +1117,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "isoptedout()",
       "source_file": "extension/src/content/selection.ts",
@@ -1129,7 +1129,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "isselectionunchanged()",
       "source_file": "extension/src/content/selection.ts",
@@ -1141,7 +1141,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "istextcontrol()",
       "source_file": "extension/src/content/selection.ts",
@@ -1153,7 +1153,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "lastrect()",
       "source_file": "extension/src/content/selection.ts",
@@ -1165,7 +1165,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "textcontrolanchor()",
       "source_file": "extension/src/content/selection.ts",
@@ -1177,179 +1177,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "wholefield()",
       "source_file": "extension/src/content/selection.ts",
       "source_location": "L125"
-    },
-    {
-      "id": "extension_src_content_ui_translator_darkquery",
-      "label": "darkQuery()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "darkquery()",
-      "source_file": "extension/src/content/ui/Translator.tsx",
-      "source_location": "L517"
-    },
-    {
-      "id": "extension_src_content_ui_translator_languagename",
-      "label": "languageName()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "languagename()",
-      "source_file": "extension/src/content/ui/Translator.tsx",
-      "source_location": "L513"
-    },
-    {
-      "id": "extension_src_content_ui_translator_preview",
-      "label": "preview()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "preview()",
-      "source_file": "extension/src/content/ui/Translator.tsx",
-      "source_location": "L515"
-    },
-    {
-      "id": "extension_src_content_ui_translator_state_badge",
-      "label": "badge()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "badge()",
-      "source_file": "extension/src/content/ui/translator-state.ts",
-      "source_location": "L121"
-    },
-    {
-      "id": "extension_src_content_ui_translator_state_countfixes",
-      "label": "countFixes()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "countfixes()",
-      "source_file": "extension/src/content/ui/translator-state.ts",
-      "source_location": "L93"
-    },
-    {
-      "id": "extension_src_content_ui_translator_state_detectedlang",
-      "label": "detectedLang()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "detectedlang()",
-      "source_file": "extension/src/content/ui/translator-state.ts",
-      "source_location": "L83"
-    },
-    {
-      "id": "extension_src_content_ui_translator_state_grammarcount",
-      "label": "grammarCount()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "grammarcount()",
-      "source_file": "extension/src/content/ui/translator-state.ts",
-      "source_location": "L100"
-    },
-    {
-      "id": "extension_src_content_ui_translator_state_ischecking",
-      "label": "isChecking()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "ischecking()",
-      "source_file": "extension/src/content/ui/translator-state.ts",
-      "source_location": "L135"
-    },
-    {
-      "id": "extension_src_content_ui_translator_state_ismenuopen",
-      "label": "isMenuOpen()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "ismenuopen()",
-      "source_file": "extension/src/content/ui/translator-state.ts",
-      "source_location": "L80"
-    },
-    {
-      "id": "extension_src_content_ui_translator_state_ismistyped",
-      "label": "isMistyped()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "ismistyped()",
-      "source_file": "extension/src/content/ui/translator-state.ts",
-      "source_location": "L114"
-    },
-    {
-      "id": "extension_src_content_ui_translator_state_menulanguages",
-      "label": "menuLanguages()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "menulanguages()",
-      "source_file": "extension/src/content/ui/translator-state.ts",
-      "source_location": "L87"
-    },
-    {
-      "id": "extension_src_content_ui_translator_state_reducer",
-      "label": "reducer()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "reducer()",
-      "source_file": "extension/src/content/ui/translator-state.ts",
-      "source_location": "L59"
-    },
-    {
-      "id": "extension_src_content_ui_translator_state_warning",
-      "label": "warning()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "warning()",
-      "source_file": "extension/src/content/ui/translator-state.ts",
-      "source_location": "L109"
-    },
-    {
-      "id": "extension_src_content_ui_translator_subscribedark",
-      "label": "subscribeDark()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "subscribedark()",
-      "source_file": "extension/src/content/ui/Translator.tsx",
-      "source_location": "L519"
     },
     {
       "id": "extension_src_content_ui_translator_todetection",
@@ -1357,23 +1189,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "todetection()",
       "source_file": "extension/src/content/ui/Translator.tsx",
       "source_location": "L508"
-    },
-    {
-      "id": "extension_src_content_ui_translator_toview",
-      "label": "toView()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "toview()",
-      "source_file": "extension/src/content/ui/Translator.tsx",
-      "source_location": "L438"
     },
     {
       "id": "extension_src_content_ui_translator_translator",
@@ -1381,7 +1201,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "translator()",
       "source_file": "extension/src/content/ui/Translator.tsx",
@@ -1393,7 +1213,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "apply()",
       "source_file": "extension/src/content/ui/Translator.tsx",
@@ -1405,7 +1225,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "cancelcheck()",
       "source_file": "extension/src/content/ui/Translator.tsx",
@@ -1417,7 +1237,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "checkgrammar()",
       "source_file": "extension/src/content/ui/Translator.tsx",
@@ -1429,7 +1249,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "close()",
       "source_file": "extension/src/content/ui/Translator.tsx",
@@ -1441,7 +1261,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "detect()",
       "source_file": "extension/src/content/ui/Translator.tsx",
@@ -1453,7 +1273,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "disablefield()",
       "source_file": "extension/src/content/ui/Translator.tsx",
@@ -1465,7 +1285,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "dismisswarning()",
       "source_file": "extension/src/content/ui/Translator.tsx",
@@ -1477,7 +1297,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "fixgrammar()",
       "source_file": "extension/src/content/ui/Translator.tsx",
@@ -1489,7 +1309,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "fixlayout()",
       "source_file": "extension/src/content/ui/Translator.tsx",
@@ -1501,7 +1321,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "oninput()",
       "source_file": "extension/src/content/ui/Translator.tsx",
@@ -1513,7 +1333,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "openfromicon()",
       "source_file": "extension/src/content/ui/Translator.tsx",
@@ -1525,7 +1345,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "opengrammar()",
       "source_file": "extension/src/content/ui/Translator.tsx",
@@ -1537,7 +1357,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "openmenu()",
       "source_file": "extension/src/content/ui/Translator.tsx",
@@ -1549,7 +1369,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "refresh()",
       "source_file": "extension/src/content/ui/Translator.tsx",
@@ -1561,7 +1381,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "rewrite()",
       "source_file": "extension/src/content/ui/Translator.tsx",
@@ -1573,7 +1393,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "schedulecheck()",
       "source_file": "extension/src/content/ui/Translator.tsx",
@@ -1585,7 +1405,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "showcheckerror()",
       "source_file": "extension/src/content/ui/Translator.tsx",
@@ -1597,7 +1417,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "signin()",
       "source_file": "extension/src/content/ui/Translator.tsx",
@@ -1609,71 +1429,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "translate()",
       "source_file": "extension/src/content/ui/Translator.tsx",
       "source_location": "L105"
-    },
-    {
-      "id": "extension_src_content_ui_translatorwidget_stories_fix",
-      "label": "fix()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "fix()",
-      "source_file": "extension/src/content/ui/TranslatorWidget.stories.tsx",
-      "source_location": "L79"
-    },
-    {
-      "id": "extension_src_core_layout_buildmap",
-      "label": "buildMap()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "buildmap()",
-      "source_file": "extension/src/core/layout.ts",
-      "source_location": "L19"
-    },
-    {
-      "id": "extension_src_core_layout_iscyrillic",
-      "label": "isCyrillic()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "iscyrillic()",
-      "source_file": "extension/src/core/layout.ts",
-      "source_location": "L29"
-    },
-    {
-      "id": "extension_src_core_layout_layoutlanguages",
-      "label": "layoutLanguages()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "layoutlanguages()",
-      "source_file": "extension/src/core/layout.ts",
-      "source_location": "L39"
-    },
-    {
-      "id": "extension_src_core_layout_switchlayout",
-      "label": "switchLayout()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "switchlayout()",
-      "source_file": "extension/src/core/layout.ts",
-      "source_location": "L32"
     },
     {
       "id": "extension_src_messaging_messages_sendmessage",
@@ -1681,11 +1441,23 @@
       "_callable": true,
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "sendmessage()",
       "source_file": "extension/src/messaging/messages.ts",
       "source_location": "L47"
+    },
+    {
+      "id": "extension_src_content_ui_translatorwidget_stories_fix",
+      "label": "fix()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "TranslatorWidget.stories.tsx",
+      "file_type": "code",
+      "norm_label": "fix()",
+      "source_file": "extension/src/content/ui/TranslatorWidget.stories.tsx",
+      "source_location": "L79"
     },
     {
       "id": "extension_src_content_ui_translatorwidget_stories_noop",
@@ -1949,7 +1721,7 @@
       "file_type": "code",
       "norm_label": "meter()",
       "source_file": "extension/src/ui/inputs.tsx",
-      "source_location": "L143"
+      "source_location": "L140"
     },
     {
       "id": "extension_src_ui_inputs_removablechip",
@@ -1961,7 +1733,7 @@
       "file_type": "code",
       "norm_label": "removablechip()",
       "source_file": "extension/src/ui/inputs.tsx",
-      "source_location": "L121"
+      "source_location": "L118"
     },
     {
       "id": "extension_src_ui_inputs_searchfield",
@@ -2009,7 +1781,7 @@
       "file_type": "code",
       "norm_label": "statuschip()",
       "source_file": "extension/src/ui/inputs.tsx",
-      "source_location": "L139"
+      "source_location": "L136"
     },
     {
       "id": "extension_src_ui_inputs_stories_controlsdemo",
@@ -2156,6 +1928,18 @@
       "source_location": "L27"
     },
     {
+      "id": "extension_src_settings_disabled_fields_same",
+      "label": "same()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "OptionsPage.tsx",
+      "file_type": "code",
+      "norm_label": "same()",
+      "source_file": "extension/src/settings/disabled-fields.ts",
+      "source_location": "L13"
+    },
+    {
       "id": "extension_src_ui_icons_brandmark",
       "label": "BrandMark()",
       "_callable": true,
@@ -2165,7 +1949,7 @@
       "file_type": "code",
       "norm_label": "brandmark()",
       "source_file": "extension/src/ui/icons.tsx",
-      "source_location": "L69"
+      "source_location": "L66"
     },
     {
       "id": "extension_src_ui_icons_fixed",
@@ -2177,7 +1961,7 @@
       "file_type": "code",
       "norm_label": "fixed()",
       "source_file": "extension/src/ui/icons.tsx",
-      "source_location": "L58"
+      "source_location": "L55"
     },
     {
       "id": "extension_src_ui_icons_flag",
@@ -2189,7 +1973,7 @@
       "file_type": "code",
       "norm_label": "flag()",
       "source_file": "extension/src/ui/icons.tsx",
-      "source_location": "L142"
+      "source_location": "L139"
     },
     {
       "id": "extension_src_ui_icons_icon",
@@ -2201,43 +1985,259 @@
       "file_type": "code",
       "norm_label": "icon()",
       "source_file": "extension/src/ui/icons.tsx",
-      "source_location": "L60"
+      "source_location": "L57"
     },
     {
-      "id": "extension_src_entrypoints_options_main_options",
-      "label": "Options()",
+      "id": "extension_src_content_ui_translator_darkquery",
+      "label": "darkQuery()",
       "_callable": true,
       "_origin": "ast",
       "community": 30,
-      "community_name": "options/main.tsx",
+      "community_name": "Translator.tsx",
       "file_type": "code",
-      "norm_label": "options()",
-      "source_file": "extension/src/entrypoints/options/main.tsx",
-      "source_location": "L14"
+      "norm_label": "darkquery()",
+      "source_file": "extension/src/content/ui/Translator.tsx",
+      "source_location": "L517"
     },
     {
-      "id": "extension_src_settings_disabled_fields_same",
-      "label": "same()",
+      "id": "extension_src_content_ui_translator_languagename",
+      "label": "languageName()",
       "_callable": true,
       "_origin": "ast",
       "community": 30,
-      "community_name": "options/main.tsx",
+      "community_name": "Translator.tsx",
       "file_type": "code",
-      "norm_label": "same()",
-      "source_file": "extension/src/settings/disabled-fields.ts",
-      "source_location": "L13"
+      "norm_label": "languagename()",
+      "source_file": "extension/src/content/ui/Translator.tsx",
+      "source_location": "L513"
     },
     {
-      "id": "extension_src_ui_color_scheme_followcolorscheme",
-      "label": "followColorScheme()",
+      "id": "extension_src_content_ui_translator_preview",
+      "label": "preview()",
       "_callable": true,
       "_origin": "ast",
       "community": 30,
-      "community_name": "options/main.tsx",
+      "community_name": "Translator.tsx",
       "file_type": "code",
-      "norm_label": "followcolorscheme()",
-      "source_file": "extension/src/ui/color-scheme.ts",
-      "source_location": "L5"
+      "norm_label": "preview()",
+      "source_file": "extension/src/content/ui/Translator.tsx",
+      "source_location": "L515"
+    },
+    {
+      "id": "extension_src_content_ui_translator_state_badge",
+      "label": "badge()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "badge()",
+      "source_file": "extension/src/content/ui/translator-state.ts",
+      "source_location": "L121"
+    },
+    {
+      "id": "extension_src_content_ui_translator_state_countfixes",
+      "label": "countFixes()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "countfixes()",
+      "source_file": "extension/src/content/ui/translator-state.ts",
+      "source_location": "L93"
+    },
+    {
+      "id": "extension_src_content_ui_translator_state_detectedlang",
+      "label": "detectedLang()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "detectedlang()",
+      "source_file": "extension/src/content/ui/translator-state.ts",
+      "source_location": "L83"
+    },
+    {
+      "id": "extension_src_content_ui_translator_state_grammarcount",
+      "label": "grammarCount()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "grammarcount()",
+      "source_file": "extension/src/content/ui/translator-state.ts",
+      "source_location": "L100"
+    },
+    {
+      "id": "extension_src_content_ui_translator_state_ischecking",
+      "label": "isChecking()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "ischecking()",
+      "source_file": "extension/src/content/ui/translator-state.ts",
+      "source_location": "L135"
+    },
+    {
+      "id": "extension_src_content_ui_translator_state_ismenuopen",
+      "label": "isMenuOpen()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "ismenuopen()",
+      "source_file": "extension/src/content/ui/translator-state.ts",
+      "source_location": "L80"
+    },
+    {
+      "id": "extension_src_content_ui_translator_state_ismistyped",
+      "label": "isMistyped()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "ismistyped()",
+      "source_file": "extension/src/content/ui/translator-state.ts",
+      "source_location": "L114"
+    },
+    {
+      "id": "extension_src_content_ui_translator_state_menulanguages",
+      "label": "menuLanguages()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "menulanguages()",
+      "source_file": "extension/src/content/ui/translator-state.ts",
+      "source_location": "L87"
+    },
+    {
+      "id": "extension_src_content_ui_translator_state_reducer",
+      "label": "reducer()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "reducer()",
+      "source_file": "extension/src/content/ui/translator-state.ts",
+      "source_location": "L59"
+    },
+    {
+      "id": "extension_src_content_ui_translator_state_warning",
+      "label": "warning()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "warning()",
+      "source_file": "extension/src/content/ui/translator-state.ts",
+      "source_location": "L109"
+    },
+    {
+      "id": "extension_src_content_ui_translator_subscribedark",
+      "label": "subscribeDark()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "subscribedark()",
+      "source_file": "extension/src/content/ui/Translator.tsx",
+      "source_location": "L519"
+    },
+    {
+      "id": "extension_src_content_ui_translator_toview",
+      "label": "toView()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "toview()",
+      "source_file": "extension/src/content/ui/Translator.tsx",
+      "source_location": "L438"
+    },
+    {
+      "id": "extension_src_core_languages_browserlanguages",
+      "label": "browserLanguages()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "browserlanguages()",
+      "source_file": "extension/src/core/languages.ts",
+      "source_location": "L50"
+    },
+    {
+      "id": "extension_src_core_languages_findlanguage",
+      "label": "findLanguage()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "findlanguage()",
+      "source_file": "extension/src/core/languages.ts",
+      "source_location": "L42"
+    },
+    {
+      "id": "extension_src_core_layout_buildmap",
+      "label": "buildMap()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "buildmap()",
+      "source_file": "extension/src/core/layout.ts",
+      "source_location": "L19"
+    },
+    {
+      "id": "extension_src_core_layout_iscyrillic",
+      "label": "isCyrillic()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "iscyrillic()",
+      "source_file": "extension/src/core/layout.ts",
+      "source_location": "L29"
+    },
+    {
+      "id": "extension_src_core_layout_layoutlanguages",
+      "label": "layoutLanguages()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "layoutlanguages()",
+      "source_file": "extension/src/core/layout.ts",
+      "source_location": "L39"
+    },
+    {
+      "id": "extension_src_core_layout_switchlayout",
+      "label": "switchLayout()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "switchlayout()",
+      "source_file": "extension/src/core/layout.ts",
+      "source_location": "L32"
     },
     {
       "id": "extension_src_content_insert_isinsertmessage",
@@ -2300,16 +2300,16 @@
       "source_location": "L11"
     },
     {
-      "id": "extension_src_entrypoints_popup_popup_historycard",
-      "label": "HistoryCard()",
+      "id": "extension_src_entrypoints_popup_popup_history",
+      "label": "History()",
       "_callable": true,
       "_origin": "ast",
       "community": 32,
       "community_name": "PopupProps",
       "file_type": "code",
-      "norm_label": "historycard()",
+      "norm_label": "history()",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L312"
+      "source_location": "L235"
     },
     {
       "id": "extension_src_entrypoints_popup_popup_home",
@@ -2321,7 +2321,7 @@
       "file_type": "code",
       "norm_label": "home()",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L78"
+      "source_location": "L69"
     },
     {
       "id": "extension_src_entrypoints_popup_popup_popupprops_onback",
@@ -2336,18 +2336,6 @@
       "source_location": "L18"
     },
     {
-      "id": "extension_src_entrypoints_popup_popup_popupprops_onclearall",
-      "label": ".onClearAll()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 32,
-      "community_name": "PopupProps",
-      "file_type": "code",
-      "norm_label": ".onclearall()",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L51"
-    },
-    {
       "id": "extension_src_entrypoints_popup_popup_popupprops_oncopy",
       "label": ".onCopy()",
       "_callable": true,
@@ -2358,30 +2346,6 @@
       "norm_label": ".oncopy()",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
       "source_location": "L35"
-    },
-    {
-      "id": "extension_src_entrypoints_popup_popup_popupprops_oncopyentry",
-      "label": ".onCopyEntry()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 32,
-      "community_name": "PopupProps",
-      "file_type": "code",
-      "norm_label": ".oncopyentry()",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L47"
-    },
-    {
-      "id": "extension_src_entrypoints_popup_popup_popupprops_ondelete",
-      "label": ".onDelete()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 32,
-      "community_name": "PopupProps",
-      "file_type": "code",
-      "norm_label": ".ondelete()",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L50"
     },
     {
       "id": "extension_src_entrypoints_popup_popup_popupprops_oninsert",
@@ -2432,18 +2396,6 @@
       "source_location": "L24"
     },
     {
-      "id": "extension_src_entrypoints_popup_popup_popupprops_onrate",
-      "label": ".onRate()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 32,
-      "community_name": "PopupProps",
-      "file_type": "code",
-      "norm_label": ".onrate()",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L46"
-    },
-    {
       "id": "extension_src_entrypoints_popup_popup_popupprops_onrestore",
       "label": ".onRestore()",
       "_callable": true,
@@ -2453,7 +2405,7 @@
       "file_type": "code",
       "norm_label": ".onrestore()",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L44"
+      "source_location": "L43"
     },
     {
       "id": "extension_src_entrypoints_popup_popup_popupprops_onretry",
@@ -2466,18 +2418,6 @@
       "norm_label": ".onretry()",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
       "source_location": "L34"
-    },
-    {
-      "id": "extension_src_entrypoints_popup_popup_popupprops_onretryentry",
-      "label": ".onRetryEntry()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 32,
-      "community_name": "PopupProps",
-      "file_type": "code",
-      "norm_label": ".onretryentry()",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L49"
     },
     {
       "id": "extension_src_entrypoints_popup_popup_popupprops_onsignin",
@@ -2576,6 +2516,18 @@
       "source_location": "L13"
     },
     {
+      "id": "extension_src_entrypoints_options_main_options",
+      "label": "Options()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 33,
+      "community_name": "popup/main.tsx",
+      "file_type": "code",
+      "norm_label": "options()",
+      "source_file": "extension/src/entrypoints/options/main.tsx",
+      "source_location": "L14"
+    },
+    {
       "id": "extension_src_entrypoints_popup_main_activetab",
       "label": "activeTab()",
       "_callable": true,
@@ -2600,40 +2552,16 @@
       "source_location": "L26"
     },
     {
-      "id": "extension_src_entrypoints_popup_popup_popup",
-      "label": "Popup()",
+      "id": "extension_src_ui_color_scheme_followcolorscheme",
+      "label": "followColorScheme()",
       "_callable": true,
       "_origin": "ast",
       "community": 33,
       "community_name": "popup/main.tsx",
       "file_type": "code",
-      "norm_label": "popup()",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L61"
-    },
-    {
-      "id": "extension_src_core_languages_browserlanguages",
-      "label": "browserLanguages()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "languages.ts",
-      "file_type": "code",
-      "norm_label": "browserlanguages()",
-      "source_file": "extension/src/core/languages.ts",
-      "source_location": "L50"
-    },
-    {
-      "id": "extension_src_core_languages_findlanguage",
-      "label": "findLanguage()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "languages.ts",
-      "file_type": "code",
-      "norm_label": "findlanguage()",
-      "source_file": "extension/src/core/languages.ts",
-      "source_location": "L42"
+      "norm_label": "followcolorscheme()",
+      "source_file": "extension/src/ui/color-scheme.ts",
+      "source_location": "L5"
     },
     {
       "id": "extension_src_core_languages_nativename",
@@ -2641,7 +2569,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 34,
-      "community_name": "languages.ts",
+      "community_name": "Popup.tsx",
       "file_type": "code",
       "norm_label": "nativename()",
       "source_file": "extension/src/core/languages.ts",
@@ -2653,7 +2581,7 @@
       "_callable": true,
       "_origin": "ast",
       "community": 34,
-      "community_name": "languages.ts",
+      "community_name": "Popup.tsx",
       "file_type": "code",
       "norm_label": "searchlanguages()",
       "source_file": "extension/src/core/languages.ts",
@@ -2665,11 +2593,47 @@
       "_callable": true,
       "_origin": "ast",
       "community": 34,
-      "community_name": "languages.ts",
+      "community_name": "Popup.tsx",
       "file_type": "code",
       "norm_label": "ago()",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L348"
+      "source_location": "L251"
+    },
+    {
+      "id": "extension_src_entrypoints_popup_popup_code",
+      "label": "code()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 34,
+      "community_name": "Popup.tsx",
+      "file_type": "code",
+      "norm_label": "code()",
+      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
+      "source_location": "L65"
+    },
+    {
+      "id": "extension_src_entrypoints_popup_popup_group",
+      "label": "Group()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 34,
+      "community_name": "Popup.tsx",
+      "file_type": "code",
+      "norm_label": "group()",
+      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
+      "source_location": "L336"
+    },
+    {
+      "id": "extension_src_entrypoints_popup_popup_historyrow",
+      "label": "HistoryRow()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 34,
+      "community_name": "Popup.tsx",
+      "file_type": "code",
+      "norm_label": "historyrow()",
+      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
+      "source_location": "L206"
     },
     {
       "id": "extension_src_entrypoints_popup_popup_languagerow",
@@ -2677,11 +2641,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 34,
-      "community_name": "languages.ts",
+      "community_name": "Popup.tsx",
       "file_type": "code",
       "norm_label": "languagerow()",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L456"
+      "source_location": "L359"
     },
     {
       "id": "extension_src_entrypoints_popup_popup_languages",
@@ -2689,11 +2653,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 34,
-      "community_name": "languages.ts",
+      "community_name": "Popup.tsx",
       "file_type": "code",
       "norm_label": "languages()",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L357"
+      "source_location": "L260"
     },
     {
       "id": "extension_src_entrypoints_popup_popup_nameof",
@@ -2701,11 +2665,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 34,
-      "community_name": "languages.ts",
+      "community_name": "Popup.tsx",
       "file_type": "code",
       "norm_label": "nameof()",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L75"
+      "source_location": "L66"
     },
     {
       "id": "extension_src_entrypoints_popup_popup_popupprops_onchoose",
@@ -2713,23 +2677,59 @@
       "_callable": true,
       "_origin": "ast",
       "community": 34,
-      "community_name": "languages.ts",
+      "community_name": "Popup.tsx",
       "file_type": "code",
       "norm_label": ".onchoose()",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L58"
+      "source_location": "L48"
     },
     {
-      "id": "extension_src_entrypoints_popup_popup_stories_at",
-      "label": "at()",
+      "id": "extension_src_entrypoints_popup_popup_row",
+      "label": "Row()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 34,
+      "community_name": "Popup.tsx",
+      "file_type": "code",
+      "norm_label": "row()",
+      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
+      "source_location": "L345"
+    },
+    {
+      "id": "extension_src_entrypoints_popup_popup_subheader",
+      "label": "SubHeader()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 34,
+      "community_name": "Popup.tsx",
+      "file_type": "code",
+      "norm_label": "subheader()",
+      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
+      "source_location": "L224"
+    },
+    {
+      "id": "extension_src_entrypoints_popup_popup_time",
+      "label": "time()",
+      "_callable": true,
+      "_origin": "ast",
+      "community": 34,
+      "community_name": "Popup.tsx",
+      "file_type": "code",
+      "norm_label": "time()",
+      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
+      "source_location": "L67"
+    },
+    {
+      "id": "extension_src_entrypoints_popup_popup_popup",
+      "label": "Popup()",
       "_callable": true,
       "_origin": "ast",
       "community": 35,
       "community_name": "Popup.stories.tsx",
       "file_type": "code",
-      "norm_label": "at()",
-      "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L8"
+      "norm_label": "popup()",
+      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
+      "source_location": "L51"
     },
     {
       "id": "extension_src_entrypoints_popup_popup_stories_noop",
@@ -2852,136 +2852,16 @@
       "source_location": "L6"
     },
     {
-      "id": "extension_src_entrypoints_popup_popup_group",
-      "label": "Group()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "Popup.tsx",
-      "file_type": "code",
-      "norm_label": "group()",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L433"
-    },
-    {
-      "id": "extension_src_entrypoints_popup_popup_history",
-      "label": "History()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "Popup.tsx",
-      "file_type": "code",
-      "norm_label": "history()",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L245"
-    },
-    {
-      "id": "extension_src_entrypoints_popup_popup_historyrow",
-      "label": "HistoryRow()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "Popup.tsx",
-      "file_type": "code",
-      "norm_label": "historyrow()",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L215"
-    },
-    {
-      "id": "extension_src_entrypoints_popup_popup_onundo",
-      "label": "onUndo()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "Popup.tsx",
-      "file_type": "code",
-      "norm_label": "onundo()",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L53"
-    },
-    {
-      "id": "extension_src_entrypoints_popup_popup_row",
-      "label": "Row()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "Popup.tsx",
-      "file_type": "code",
-      "norm_label": "row()",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L442"
-    },
-    {
-      "id": "extension_src_entrypoints_popup_popup_subheader",
-      "label": "SubHeader()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "Popup.tsx",
-      "file_type": "code",
-      "norm_label": "subheader()",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L233"
-    },
-    {
-      "id": "extension_src_entrypoints_popup_popup_time",
-      "label": "time()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "Popup.tsx",
-      "file_type": "code",
-      "norm_label": "time()",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L76"
-    },
-    {
-      "id": "extension_src_settings_history_byday",
-      "label": "byDay()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "Popup.tsx",
-      "file_type": "code",
-      "norm_label": "byday()",
-      "source_file": "extension/src/settings/history.ts",
-      "source_location": "L41"
-    },
-    {
-      "id": "extension_src_settings_history_pairlabel",
-      "label": "pairLabel()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "Popup.tsx",
-      "file_type": "code",
-      "norm_label": "pairlabel()",
-      "source_file": "extension/src/settings/history.ts",
-      "source_location": "L30"
-    },
-    {
       "id": "extension_src_settings_history_test_entry",
       "label": "entry()",
       "_callable": true,
       "_origin": "ast",
       "community": 38,
-      "community_name": "Popup.tsx",
+      "community_name": "history.ts",
       "file_type": "code",
       "norm_label": "entry()",
       "source_file": "extension/src/settings/history.test.ts",
-      "source_location": "L10"
-    },
-    {
-      "id": "extension_src_settings_history_toppairs",
-      "label": "topPairs()",
-      "_callable": true,
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "Popup.tsx",
-      "file_type": "code",
-      "norm_label": "toppairs()",
-      "source_file": "extension/src/settings/history.ts",
-      "source_location": "L34"
+      "source_location": "L8"
     },
     {
       "id": "extension_src_settings_history_usedlately",
@@ -2989,11 +2869,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 38,
-      "community_name": "Popup.tsx",
+      "community_name": "history.ts",
       "file_type": "code",
       "norm_label": "usedlately()",
       "source_file": "extension/src/settings/history.ts",
-      "source_location": "L59"
+      "source_location": "L25"
     },
     {
       "id": "extension_src_settings_history_withentry",
@@ -3001,11 +2881,11 @@
       "_callable": true,
       "_origin": "ast",
       "community": 38,
-      "community_name": "Popup.tsx",
+      "community_name": "history.ts",
       "file_type": "code",
       "norm_label": "withentry()",
       "source_file": "extension/src/settings/history.ts",
-      "source_location": "L26"
+      "source_location": "L21"
     },
     {
       "id": "extension_storybook_preview_withtheme",
@@ -3912,7 +3792,7 @@
       "label": "diff.ts",
       "_origin": "ast",
       "community": 0,
-      "community_name": "diff.ts",
+      "community_name": "ref_vitest",
       "file_type": "code",
       "norm_label": "diff.ts",
       "source_file": "api/src/resources/aiClient/requests/fix-grammar/utils/diff.ts",
@@ -3923,7 +3803,7 @@
       "label": "diff.test.ts",
       "_origin": "ast",
       "community": 0,
-      "community_name": "diff.ts",
+      "community_name": "ref_vitest",
       "file_type": "code",
       "norm_label": "diff.test.ts",
       "source_file": "api/src/resources/aiClient/requests/fix-grammar/utils/diff.test.ts",
@@ -3934,7 +3814,7 @@
       "label": "escapeHtml.ts",
       "_origin": "ast",
       "community": 0,
-      "community_name": "diff.ts",
+      "community_name": "ref_vitest",
       "file_type": "code",
       "norm_label": "escapehtml.ts",
       "source_file": "api/src/resources/aiClient/requests/fix-grammar/utils/escapeHtml.ts",
@@ -3945,7 +3825,7 @@
       "label": "escapeHtml.test.ts",
       "_origin": "ast",
       "community": 0,
-      "community_name": "diff.ts",
+      "community_name": "ref_vitest",
       "file_type": "code",
       "norm_label": "escapehtml.test.ts",
       "source_file": "api/src/resources/aiClient/requests/fix-grammar/utils/escapeHtml.test.ts",
@@ -3956,7 +3836,7 @@
       "label": "fromSegments.ts",
       "_origin": "ast",
       "community": 0,
-      "community_name": "diff.ts",
+      "community_name": "ref_vitest",
       "file_type": "code",
       "norm_label": "fromsegments.ts",
       "source_file": "api/src/resources/aiClient/requests/fix-grammar/utils/fromSegments.ts",
@@ -3967,7 +3847,7 @@
       "label": "fromSegments.test.ts",
       "_origin": "ast",
       "community": 0,
-      "community_name": "diff.ts",
+      "community_name": "ref_vitest",
       "file_type": "code",
       "norm_label": "fromsegments.test.ts",
       "source_file": "api/src/resources/aiClient/requests/fix-grammar/utils/fromSegments.test.ts",
@@ -3978,7 +3858,7 @@
       "label": "tokenize.ts",
       "_origin": "ast",
       "community": 0,
-      "community_name": "diff.ts",
+      "community_name": "ref_vitest",
       "file_type": "code",
       "norm_label": "tokenize.ts",
       "source_file": "api/src/resources/aiClient/requests/fix-grammar/utils/tokenize.ts",
@@ -3989,7 +3869,7 @@
       "label": "insert.ts",
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "insert.ts",
       "source_file": "extension/src/content/insert.ts",
@@ -4000,7 +3880,7 @@
       "label": "insert.test.ts",
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "insert.test.ts",
       "source_file": "extension/src/content/insert.test.ts",
@@ -4011,7 +3891,7 @@
       "label": "replace.ts",
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "replace.ts",
       "source_file": "extension/src/content/replace.ts",
@@ -4022,7 +3902,7 @@
       "label": "replace.test.ts",
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "replace.test.ts",
       "source_file": "extension/src/content/replace.test.ts",
@@ -4033,7 +3913,7 @@
       "label": "selection.ts",
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "selection.ts",
       "source_file": "extension/src/content/selection.ts",
@@ -4044,7 +3924,7 @@
       "label": "EXCLUDED_INPUT_MODES",
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "excluded_input_modes",
       "source_file": "extension/src/content/selection.ts",
@@ -4055,7 +3935,7 @@
       "label": "MIRROR_STYLES",
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "mirror_styles",
       "source_file": "extension/src/content/selection.ts",
@@ -4066,7 +3946,7 @@
       "label": "SELECTABLE_INPUT_TYPES",
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "selectable_input_types",
       "source_file": "extension/src/content/selection.ts",
@@ -4077,132 +3957,11 @@
       "label": "selection.test.ts",
       "_origin": "ast",
       "community": 1,
-      "community_name": "Translator.tsx",
+      "community_name": "Translator",
       "file_type": "code",
       "norm_label": "selection.test.ts",
       "source_file": "extension/src/content/selection.test.ts",
       "source_location": "L1"
-    },
-    {
-      "id": "extension_src_content_ui_translator",
-      "label": "Translator.tsx",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "translator.tsx",
-      "source_file": "extension/src/content/ui/Translator.tsx",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_content_ui_translator_state",
-      "label": "translator-state.ts",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "translator-state.ts",
-      "source_file": "extension/src/content/ui/translator-state.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_content_ui_translator_state_hidden",
-      "label": "hidden",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "hidden",
-      "source_file": "extension/src/content/ui/translator-state.ts",
-      "source_location": "L57"
-    },
-    {
-      "id": "extension_src_content_ui_translator_state_test",
-      "label": "translator-state.test.ts",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "translator-state.test.ts",
-      "source_file": "extension/src/content/ui/translator-state.test.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_content_ui_translator_state_test_anchor",
-      "label": "anchor",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "anchor",
-      "source_file": "extension/src/content/ui/translator-state.test.ts",
-      "source_location": "L7"
-    },
-    {
-      "id": "extension_src_content_ui_translator_state_test_selection",
-      "label": "selection",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "selection",
-      "source_file": "extension/src/content/ui/translator-state.test.ts",
-      "source_location": "L6"
-    },
-    {
-      "id": "extension_src_core_layout",
-      "label": "layout.ts",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "layout.ts",
-      "source_file": "extension/src/core/layout.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_core_layout_russian_only",
-      "label": "RUSSIAN_ONLY",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "russian_only",
-      "source_file": "extension/src/core/layout.ts",
-      "source_location": "L11"
-    },
-    {
-      "id": "extension_src_core_layout_test",
-      "label": "layout.test.ts",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "layout.test.ts",
-      "source_file": "extension/src/core/layout.test.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_core_layout_tocyrillic",
-      "label": "toCyrillic",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "tocyrillic",
-      "source_file": "extension/src/core/layout.ts",
-      "source_location": "L13"
-    },
-    {
-      "id": "extension_src_core_layout_tolatin",
-      "label": "toLatin",
-      "_origin": "ast",
-      "community": 1,
-      "community_name": "Translator.tsx",
-      "file_type": "code",
-      "norm_label": "tolatin",
-      "source_file": "extension/src/core/layout.ts",
-      "source_location": "L14"
     },
     {
       "id": "package",
@@ -4621,6 +4380,17 @@
       "norm_label": "error",
       "source_file": "extension/src/content/ui/TranslatorWidget.stories.tsx",
       "source_location": "L77"
+    },
+    {
+      "id": "extension_src_content_ui_translatorwidget_stories_favorites",
+      "label": "FAVORITES",
+      "_origin": "ast",
+      "community": 12,
+      "community_name": "TranslatorWidget.stories.tsx",
+      "file_type": "code",
+      "norm_label": "favorites",
+      "source_file": "extension/src/content/ui/TranslatorWidget.stories.tsx",
+      "source_location": "L5"
     },
     {
       "id": "extension_src_content_ui_translatorwidget_stories_fieldicon",
@@ -5423,7 +5193,7 @@
       "file_type": "code",
       "norm_label": "lang_flag",
       "source_file": "extension/src/ui/icons.tsx",
-      "source_location": "L131"
+      "source_location": "L128"
     },
     {
       "id": "extension_src_ui_icons_paths",
@@ -5533,7 +5303,7 @@
       "file_type": "code",
       "norm_label": "chip_tone",
       "source_file": "extension/src/ui/inputs.tsx",
-      "source_location": "L133"
+      "source_location": "L130"
     },
     {
       "id": "extension_src_ui_inputs_stories",
@@ -5578,6 +5348,17 @@
       "norm_label": "meta",
       "source_file": "extension/src/ui/inputs.stories.tsx",
       "source_location": "L7"
+    },
+    {
+      "id": "ref_heroui_react",
+      "label": "@heroui/react",
+      "_origin": "ast",
+      "community": 2,
+      "community_name": "inputs.stories.tsx",
+      "file_type": "concept",
+      "norm_label": "@heroui/react",
+      "source_file": "extension/package.json",
+      "source_location": "L35"
     },
     {
       "id": "api_deno",
@@ -5646,15 +5427,37 @@
       "source_location": "L1"
     },
     {
-      "id": "ref_heroui_react",
-      "label": "@heroui/react",
+      "id": "extension_src_settings_disabled_fields",
+      "label": "disabled-fields.ts",
       "_origin": "ast",
       "community": 21,
       "community_name": "OptionsPage.tsx",
-      "file_type": "concept",
-      "norm_label": "@heroui/react",
-      "source_file": "extension/package.json",
-      "source_location": "L35"
+      "file_type": "code",
+      "norm_label": "disabled-fields.ts",
+      "source_file": "extension/src/settings/disabled-fields.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_settings_disabled_fields_disabledfields",
+      "label": "disabledFields",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "OptionsPage.tsx",
+      "file_type": "code",
+      "norm_label": "disabledfields",
+      "source_file": "extension/src/settings/disabled-fields.ts",
+      "source_location": "L15"
+    },
+    {
+      "id": "extension_src_settings_disabled_fields_item",
+      "label": "item",
+      "_origin": "ast",
+      "community": 21,
+      "community_name": "OptionsPage.tsx",
+      "file_type": "code",
+      "norm_label": "item",
+      "source_file": "extension/src/settings/disabled-fields.ts",
+      "source_location": "L11"
     },
     {
       "id": "extension_package_scripts",
@@ -5962,7 +5765,7 @@
       "file_type": "code",
       "norm_label": "icon_names",
       "source_file": "extension/src/ui/icons.tsx",
-      "source_location": "L52"
+      "source_location": "L49"
     },
     {
       "id": "extension_src_ui_icons_stories",
@@ -6020,59 +5823,169 @@
       "source_location": "L5"
     },
     {
-      "id": "extension_src_entrypoints_options_main",
-      "label": "options/main.tsx",
+      "id": "extension_src_content_ui_translator",
+      "label": "Translator.tsx",
       "_origin": "ast",
       "community": 30,
-      "community_name": "options/main.tsx",
+      "community_name": "Translator.tsx",
       "file_type": "code",
-      "norm_label": "options/main.tsx",
-      "source_file": "extension/src/entrypoints/options/main.tsx",
+      "norm_label": "translator.tsx",
+      "source_file": "extension/src/content/ui/Translator.tsx",
       "source_location": "L1"
     },
     {
-      "id": "extension_src_settings_disabled_fields",
-      "label": "disabled-fields.ts",
+      "id": "extension_src_content_ui_translator_state",
+      "label": "translator-state.ts",
       "_origin": "ast",
       "community": 30,
-      "community_name": "options/main.tsx",
+      "community_name": "Translator.tsx",
       "file_type": "code",
-      "norm_label": "disabled-fields.ts",
-      "source_file": "extension/src/settings/disabled-fields.ts",
+      "norm_label": "translator-state.ts",
+      "source_file": "extension/src/content/ui/translator-state.ts",
       "source_location": "L1"
     },
     {
-      "id": "extension_src_settings_disabled_fields_disabledfields",
-      "label": "disabledFields",
+      "id": "extension_src_content_ui_translator_state_hidden",
+      "label": "hidden",
       "_origin": "ast",
       "community": 30,
-      "community_name": "options/main.tsx",
+      "community_name": "Translator.tsx",
       "file_type": "code",
-      "norm_label": "disabledfields",
-      "source_file": "extension/src/settings/disabled-fields.ts",
-      "source_location": "L15"
+      "norm_label": "hidden",
+      "source_file": "extension/src/content/ui/translator-state.ts",
+      "source_location": "L57"
     },
     {
-      "id": "extension_src_settings_disabled_fields_item",
-      "label": "item",
+      "id": "extension_src_content_ui_translator_state_test",
+      "label": "translator-state.test.ts",
       "_origin": "ast",
       "community": 30,
-      "community_name": "options/main.tsx",
+      "community_name": "Translator.tsx",
       "file_type": "code",
-      "norm_label": "item",
-      "source_file": "extension/src/settings/disabled-fields.ts",
+      "norm_label": "translator-state.test.ts",
+      "source_file": "extension/src/content/ui/translator-state.test.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_content_ui_translator_state_test_anchor",
+      "label": "anchor",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "anchor",
+      "source_file": "extension/src/content/ui/translator-state.test.ts",
+      "source_location": "L7"
+    },
+    {
+      "id": "extension_src_content_ui_translator_state_test_selection",
+      "label": "selection",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "selection",
+      "source_file": "extension/src/content/ui/translator-state.test.ts",
+      "source_location": "L6"
+    },
+    {
+      "id": "extension_src_core_languages",
+      "label": "languages.ts",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "languages.ts",
+      "source_file": "extension/src/core/languages.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_core_layout",
+      "label": "layout.ts",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "layout.ts",
+      "source_file": "extension/src/core/layout.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_core_layout_russian_only",
+      "label": "RUSSIAN_ONLY",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "russian_only",
+      "source_file": "extension/src/core/layout.ts",
       "source_location": "L11"
     },
     {
-      "id": "extension_src_ui_color_scheme",
-      "label": "color-scheme.ts",
+      "id": "extension_src_core_layout_test",
+      "label": "layout.test.ts",
       "_origin": "ast",
       "community": 30,
-      "community_name": "options/main.tsx",
+      "community_name": "Translator.tsx",
       "file_type": "code",
-      "norm_label": "color-scheme.ts",
-      "source_file": "extension/src/ui/color-scheme.ts",
+      "norm_label": "layout.test.ts",
+      "source_file": "extension/src/core/layout.test.ts",
       "source_location": "L1"
+    },
+    {
+      "id": "extension_src_core_layout_tocyrillic",
+      "label": "toCyrillic",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "tocyrillic",
+      "source_file": "extension/src/core/layout.ts",
+      "source_location": "L13"
+    },
+    {
+      "id": "extension_src_core_layout_tolatin",
+      "label": "toLatin",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "tolatin",
+      "source_file": "extension/src/core/layout.ts",
+      "source_location": "L14"
+    },
+    {
+      "id": "extension_src_settings_storage_settings",
+      "label": "storage-settings.ts",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "storage-settings.ts",
+      "source_file": "extension/src/settings/storage-settings.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_settings_storage_settings_settingsitem",
+      "label": "settingsItem",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "settingsitem",
+      "source_file": "extension/src/settings/storage-settings.ts",
+      "source_location": "L5"
+    },
+    {
+      "id": "extension_src_settings_storage_settings_storagesettings",
+      "label": "storageSettings",
+      "_origin": "ast",
+      "community": 30,
+      "community_name": "Translator.tsx",
+      "file_type": "code",
+      "norm_label": "storagesettings",
+      "source_file": "extension/src/settings/storage-settings.ts",
+      "source_location": "L9"
     },
     {
       "id": "extension_src_content_ui_shadow_css",
@@ -6119,6 +6032,28 @@
       "source_location": "L1"
     },
     {
+      "id": "extension_src_auth_providers",
+      "label": "providers.ts",
+      "_origin": "ast",
+      "community": 33,
+      "community_name": "popup/main.tsx",
+      "file_type": "code",
+      "norm_label": "providers.ts",
+      "source_file": "extension/src/auth/providers.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_auth_providers_providers",
+      "label": "PROVIDERS",
+      "_origin": "ast",
+      "community": 33,
+      "community_name": "popup/main.tsx",
+      "file_type": "code",
+      "norm_label": "providers",
+      "source_file": "extension/src/auth/providers.ts",
+      "source_location": "L2"
+    },
+    {
       "id": "extension_src_core_sites",
       "label": "sites.ts",
       "_origin": "ast",
@@ -6141,6 +6076,17 @@
       "source_location": "L1"
     },
     {
+      "id": "extension_src_entrypoints_options_main",
+      "label": "options/main.tsx",
+      "_origin": "ast",
+      "community": 33,
+      "community_name": "popup/main.tsx",
+      "file_type": "code",
+      "norm_label": "options/main.tsx",
+      "source_file": "extension/src/entrypoints/options/main.tsx",
+      "source_location": "L1"
+    },
+    {
       "id": "extension_src_entrypoints_popup_main",
       "label": "popup/main.tsx",
       "_origin": "ast",
@@ -6152,25 +6098,14 @@
       "source_location": "L1"
     },
     {
-      "id": "extension_src_content_ui_translatorwidget_stories_favorites",
-      "label": "FAVORITES",
+      "id": "extension_src_ui_color_scheme",
+      "label": "color-scheme.ts",
       "_origin": "ast",
-      "community": 34,
-      "community_name": "languages.ts",
+      "community": 33,
+      "community_name": "popup/main.tsx",
       "file_type": "code",
-      "norm_label": "favorites",
-      "source_file": "extension/src/content/ui/TranslatorWidget.stories.tsx",
-      "source_location": "L5"
-    },
-    {
-      "id": "extension_src_core_languages",
-      "label": "languages.ts",
-      "_origin": "ast",
-      "community": 34,
-      "community_name": "languages.ts",
-      "file_type": "code",
-      "norm_label": "languages.ts",
-      "source_file": "extension/src/core/languages.ts",
+      "norm_label": "color-scheme.ts",
+      "source_file": "extension/src/ui/color-scheme.ts",
       "source_location": "L1"
     },
     {
@@ -6178,11 +6113,33 @@
       "label": "languages.test.ts",
       "_origin": "ast",
       "community": 34,
-      "community_name": "languages.ts",
+      "community_name": "Popup.tsx",
       "file_type": "code",
       "norm_label": "languages.test.ts",
       "source_file": "extension/src/core/languages.test.ts",
       "source_location": "L1"
+    },
+    {
+      "id": "extension_src_entrypoints_popup_popup",
+      "label": "Popup.tsx",
+      "_origin": "ast",
+      "community": 34,
+      "community_name": "Popup.tsx",
+      "file_type": "code",
+      "norm_label": "popup.tsx",
+      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
+      "source_location": "L1"
+    },
+    {
+      "id": "extension_src_entrypoints_popup_popup_relative",
+      "label": "relative",
+      "_origin": "ast",
+      "community": 34,
+      "community_name": "Popup.tsx",
+      "file_type": "code",
+      "norm_label": "relative",
+      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
+      "source_location": "L250"
     },
     {
       "id": "extension_src_entrypoints_popup_popup_stories",
@@ -6204,7 +6161,7 @@
       "file_type": "code",
       "norm_label": "busy",
       "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L82"
+      "source_location": "L69"
     },
     {
       "id": "extension_src_entrypoints_popup_popup_stories_empty",
@@ -6215,7 +6172,7 @@
       "file_type": "code",
       "norm_label": "empty",
       "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L66"
+      "source_location": "L53"
     },
     {
       "id": "extension_src_entrypoints_popup_popup_stories_error",
@@ -6226,7 +6183,7 @@
       "file_type": "code",
       "norm_label": "error",
       "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L84"
+      "source_location": "L71"
     },
     {
       "id": "extension_src_entrypoints_popup_popup_stories_history",
@@ -6237,29 +6194,7 @@
       "file_type": "code",
       "norm_label": "history",
       "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L94"
-    },
-    {
-      "id": "extension_src_entrypoints_popup_popup_stories_historyempty",
-      "label": "HistoryEmpty",
-      "_origin": "ast",
-      "community": 35,
-      "community_name": "Popup.stories.tsx",
-      "file_type": "code",
-      "norm_label": "historyempty",
-      "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L98"
-    },
-    {
-      "id": "extension_src_entrypoints_popup_popup_stories_historyundo",
-      "label": "HistoryUndo",
-      "_origin": "ast",
-      "community": 35,
-      "community_name": "Popup.stories.tsx",
-      "file_type": "code",
-      "norm_label": "historyundo",
-      "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L96"
+      "source_location": "L81"
     },
     {
       "id": "extension_src_entrypoints_popup_popup_stories_languagesfrom",
@@ -6270,7 +6205,7 @@
       "file_type": "code",
       "norm_label": "languagesfrom",
       "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L92"
+      "source_location": "L79"
     },
     {
       "id": "extension_src_entrypoints_popup_popup_stories_languagesinto",
@@ -6281,7 +6216,7 @@
       "file_type": "code",
       "norm_label": "languagesinto",
       "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L90"
+      "source_location": "L77"
     },
     {
       "id": "extension_src_entrypoints_popup_popup_stories_meta",
@@ -6292,7 +6227,7 @@
       "file_type": "code",
       "norm_label": "meta",
       "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L20"
+      "source_location": "L13"
     },
     {
       "id": "extension_src_entrypoints_popup_popup_stories_now",
@@ -6314,7 +6249,7 @@
       "file_type": "code",
       "norm_label": "signedout",
       "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L86"
+      "source_location": "L73"
     },
     {
       "id": "extension_src_entrypoints_popup_popup_stories_siteoff",
@@ -6325,7 +6260,7 @@
       "file_type": "code",
       "norm_label": "siteoff",
       "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L88"
+      "source_location": "L75"
     },
     {
       "id": "extension_src_entrypoints_popup_popup_stories_translated",
@@ -6336,29 +6271,7 @@
       "file_type": "code",
       "norm_label": "translated",
       "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L68"
-    },
-    {
-      "id": "extension_src_auth_providers",
-      "label": "providers.ts",
-      "_origin": "ast",
-      "community": 37,
-      "community_name": "OptionsPage.stories.tsx",
-      "file_type": "code",
-      "norm_label": "providers.ts",
-      "source_file": "extension/src/auth/providers.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_auth_providers_providers",
-      "label": "PROVIDERS",
-      "_origin": "ast",
-      "community": 37,
-      "community_name": "OptionsPage.stories.tsx",
-      "file_type": "code",
-      "norm_label": "providers",
-      "source_file": "extension/src/auth/providers.ts",
-      "source_location": "L2"
+      "source_location": "L55"
     },
     {
       "id": "extension_src_entrypoints_options_optionspage_stories",
@@ -6449,33 +6362,11 @@
       "source_location": "L34"
     },
     {
-      "id": "extension_src_entrypoints_popup_popup",
-      "label": "Popup.tsx",
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "Popup.tsx",
-      "file_type": "code",
-      "norm_label": "popup.tsx",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_entrypoints_popup_popup_relative",
-      "label": "relative",
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "Popup.tsx",
-      "file_type": "code",
-      "norm_label": "relative",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L347"
-    },
-    {
       "id": "extension_src_settings_history",
       "label": "history.ts",
       "_origin": "ast",
       "community": 38,
-      "community_name": "Popup.tsx",
+      "community_name": "history.ts",
       "file_type": "code",
       "norm_label": "history.ts",
       "source_file": "extension/src/settings/history.ts",
@@ -6486,55 +6377,44 @@
       "label": "HISTORY_LIMIT",
       "_origin": "ast",
       "community": 38,
-      "community_name": "Popup.tsx",
+      "community_name": "history.ts",
       "file_type": "code",
       "norm_label": "history_limit",
       "source_file": "extension/src/settings/history.ts",
-      "source_location": "L21"
+      "source_location": "L16"
     },
     {
       "id": "extension_src_settings_history_item",
       "label": "item",
       "_origin": "ast",
       "community": 38,
-      "community_name": "Popup.tsx",
+      "community_name": "history.ts",
       "file_type": "code",
       "norm_label": "item",
       "source_file": "extension/src/settings/history.ts",
-      "source_location": "L23"
+      "source_location": "L18"
     },
     {
       "id": "extension_src_settings_history_popuphistory",
       "label": "popupHistory",
       "_origin": "ast",
       "community": 38,
-      "community_name": "Popup.tsx",
+      "community_name": "history.ts",
       "file_type": "code",
       "norm_label": "popuphistory",
       "source_file": "extension/src/settings/history.ts",
-      "source_location": "L70"
+      "source_location": "L36"
     },
     {
       "id": "extension_src_settings_history_test",
       "label": "history.test.ts",
       "_origin": "ast",
       "community": 38,
-      "community_name": "Popup.tsx",
+      "community_name": "history.ts",
       "file_type": "code",
       "norm_label": "history.test.ts",
       "source_file": "extension/src/settings/history.test.ts",
       "source_location": "L1"
-    },
-    {
-      "id": "extension_src_settings_history_test_now",
-      "label": "NOW",
-      "_origin": "ast",
-      "community": 38,
-      "community_name": "Popup.tsx",
-      "file_type": "code",
-      "norm_label": "now",
-      "source_file": "extension/src/settings/history.test.ts",
-      "source_location": "L9"
     },
     {
       "id": "extension_storybook_preview",
@@ -7043,6 +6923,17 @@
       "source_location": "L1"
     },
     {
+      "id": "api_src_resources_db_sql",
+      "label": "sql",
+      "_origin": "ast",
+      "community": 4,
+      "community_name": "contract.ts",
+      "file_type": "code",
+      "norm_label": "sql",
+      "source_file": "api/src/resources/db.ts",
+      "source_location": "L9"
+    },
+    {
       "id": "api_src_resources_logger",
       "label": "logger.ts",
       "_origin": "ast",
@@ -7274,39 +7165,6 @@
       "source_location": "L1"
     },
     {
-      "id": "extension_src_settings_storage_settings",
-      "label": "storage-settings.ts",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "storage-settings.ts",
-      "source_file": "extension/src/settings/storage-settings.ts",
-      "source_location": "L1"
-    },
-    {
-      "id": "extension_src_settings_storage_settings_settingsitem",
-      "label": "settingsItem",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "settingsitem",
-      "source_file": "extension/src/settings/storage-settings.ts",
-      "source_location": "L5"
-    },
-    {
-      "id": "extension_src_settings_storage_settings_storagesettings",
-      "label": "storageSettings",
-      "_origin": "ast",
-      "community": 5,
-      "community_name": "background.ts",
-      "file_type": "code",
-      "norm_label": "storagesettings",
-      "source_file": "extension/src/settings/storage-settings.ts",
-      "source_location": "L9"
-    },
-    {
       "id": "docref_rfc_7636",
       "label": "RFC-7636",
       "_origin": "ast",
@@ -7448,17 +7306,6 @@
       "norm_label": "db.ts",
       "source_file": "api/src/resources/db.ts",
       "source_location": "L1"
-    },
-    {
-      "id": "api_src_resources_db_sql",
-      "label": "sql",
-      "_origin": "ast",
-      "community": 7,
-      "community_name": "dev-gateway.ts",
-      "file_type": "code",
-      "norm_label": "sql",
-      "source_file": "api/src/resources/db.ts",
-      "source_location": "L9"
     },
     {
       "id": "api_src_server",
@@ -9269,8 +9116,8 @@
       "id": "ref_vitest",
       "label": "ref_vitest",
       "_origin": "semantic",
-      "community": 1,
-      "community_name": "Translator.tsx",
+      "community": 0,
+      "community_name": "ref_vitest",
       "external": true,
       "file_type": "concept",
       "norm_label": "ref_vitest",
@@ -9677,8 +9524,8 @@
       "id": "ref_react_dom_client",
       "label": "ref_react_dom_client",
       "_origin": "semantic",
-      "community": 30,
-      "community_name": "options/main.tsx",
+      "community": 31,
+      "community_name": "translator-widget.ts",
       "external": true,
       "file_type": "concept",
       "norm_label": "ref_react_dom_client",
@@ -12648,7 +12495,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/popup/main.tsx",
-      "source_location": "L130",
+      "source_location": "L107",
       "weight": 1.0
     },
     {
@@ -12660,7 +12507,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/popup/main.tsx",
-      "source_location": "L195",
+      "source_location": "L168",
       "weight": 1.0
     },
     {
@@ -12672,7 +12519,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/popup/main.tsx",
-      "source_location": "L46",
+      "source_location": "L45",
       "weight": 1.0
     },
     {
@@ -12684,7 +12531,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/popup/main.tsx",
-      "source_location": "L47",
+      "source_location": "L46",
       "weight": 1.0
     },
     {
@@ -12696,119 +12543,11 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/popup/main.tsx",
-      "source_location": "L58",
+      "source_location": "L57",
       "weight": 1.0
     },
     {
       "source": "extension_src_entrypoints_popup_popup_history",
-      "target": "extension_src_settings_history_toppairs",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L250",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup_history",
-      "target": "extension_src_settings_history_pairlabel",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L254",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup_history",
-      "target": "extension_src_settings_history_byday",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L284",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup_historycard",
-      "target": "extension_src_entrypoints_popup_popup_popupprops_onrate",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L313",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup_historycard",
-      "target": "extension_src_settings_history_pairlabel",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L317",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup_historycard",
-      "target": "extension_src_entrypoints_popup_popup_time",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L318",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup_historycard",
-      "target": "extension_src_entrypoints_popup_popup_popupprops_onretryentry",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L327",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup_historycard",
-      "target": "extension_src_entrypoints_popup_popup_popupprops_oncopyentry",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L331",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup_historycard",
-      "target": "extension_src_entrypoints_popup_popup_popupprops_ondelete",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L335",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup_historycard",
       "target": "extension_src_entrypoints_popup_popup_popupprops_onrestore",
       "relation": "calls",
       "_origin": "ast",
@@ -12816,7 +12555,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L339",
+      "source_location": "L241",
       "weight": 1.0
     },
     {
@@ -12828,19 +12567,19 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L224",
+      "source_location": "L215",
       "weight": 1.0
     },
     {
       "source": "extension_src_entrypoints_popup_popup_historyrow",
-      "target": "extension_src_settings_history_pairlabel",
+      "target": "extension_src_entrypoints_popup_popup_code",
       "relation": "calls",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L227",
+      "source_location": "L218",
       "weight": 1.0
     },
     {
@@ -12852,7 +12591,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L114",
+      "source_location": "L105",
       "weight": 1.0
     },
     {
@@ -12864,7 +12603,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L115",
+      "source_location": "L106",
       "weight": 1.0
     },
     {
@@ -12876,7 +12615,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L130",
+      "source_location": "L121",
       "weight": 1.0
     },
     {
@@ -12888,7 +12627,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L134",
+      "source_location": "L125",
       "weight": 1.0
     },
     {
@@ -12900,7 +12639,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L140",
+      "source_location": "L131",
       "weight": 1.0
     },
     {
@@ -12912,7 +12651,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L149",
+      "source_location": "L140",
       "weight": 1.0
     },
     {
@@ -12924,7 +12663,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L172",
+      "source_location": "L163",
       "weight": 1.0
     },
     {
@@ -12936,7 +12675,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L207",
+      "source_location": "L198",
       "weight": 1.0
     },
     {
@@ -12948,7 +12687,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L97",
+      "source_location": "L88",
       "weight": 1.0
     },
     {
@@ -12960,7 +12699,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L460",
+      "source_location": "L363",
       "weight": 1.0
     },
     {
@@ -12972,7 +12711,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L461",
+      "source_location": "L364",
       "weight": 1.0
     },
     {
@@ -12984,7 +12723,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L378",
+      "source_location": "L281",
       "weight": 1.0
     },
     {
@@ -12996,7 +12735,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L381",
+      "source_location": "L284",
       "weight": 1.0
     },
     {
@@ -13008,7 +12747,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L413",
+      "source_location": "L316",
       "weight": 1.0
     },
     {
@@ -13020,7 +12759,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L414",
+      "source_location": "L317",
       "weight": 1.0
     },
     {
@@ -13032,7 +12771,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L75",
+      "source_location": "L66",
       "weight": 1.0
     },
     {
@@ -13048,18 +12787,6 @@
       "weight": 1.0
     },
     {
-      "source": "extension_src_settings_history_toppairs",
-      "target": "extension_src_settings_history_pairlabel",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "extension/src/settings/history.ts",
-      "source_location": "L36",
-      "weight": 1.0
-    },
-    {
       "source": "extension_src_ui_icons_brandmark",
       "target": "extension_src_ui_icons_fixed",
       "relation": "calls",
@@ -13068,7 +12795,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/ui/icons.tsx",
-      "source_location": "L74",
+      "source_location": "L71",
       "weight": 1.0
     },
     {
@@ -13080,7 +12807,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/ui/icons.tsx",
-      "source_location": "L62",
+      "source_location": "L59",
       "weight": 1.0
     },
     {
@@ -13308,7 +13035,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/settings/history.test.ts",
-      "source_location": "L10",
+      "source_location": "L8",
       "weight": 1.0
     },
     {
@@ -17513,55 +17240,7 @@
     },
     {
       "source": "extension_src_entrypoints_popup_popup",
-      "target": "extension_src_settings_history_byday",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup",
-      "target": "extension_src_settings_history_history_limit",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup",
       "target": "extension_src_settings_history_historyentry",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup",
-      "target": "extension_src_settings_history_pairlabel",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L3",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup",
-      "target": "extension_src_settings_history_toppairs",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -17658,18 +17337,6 @@
     {
       "source": "extension_src_entrypoints_popup_popup",
       "target": "extension_src_ui_inputs_searchfield",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L6",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup",
-      "target": "extension_src_ui_inputs_segmented",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -17861,18 +17528,6 @@
     },
     {
       "source": "extension_src_settings_history_test",
-      "target": "extension_src_settings_history_byday",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/settings/history.test.ts",
-      "source_location": "L6",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_settings_history_test",
       "target": "extension_src_settings_history_history_limit",
       "relation": "imports",
       "_origin": "ast",
@@ -17886,18 +17541,6 @@
     {
       "source": "extension_src_settings_history_test",
       "target": "extension_src_settings_history_historyentry",
-      "relation": "imports",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/settings/history.test.ts",
-      "source_location": "L6",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_settings_history_test",
-      "target": "extension_src_settings_history_toppairs",
       "relation": "imports",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21111,6 +20754,7 @@
       "context": "import",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
       "source_location": "L3",
+      "type_only": true,
       "weight": 1.0
     },
     {
@@ -21422,7 +21066,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_bg_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_dk_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21434,7 +21078,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_cn_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_nl_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21446,7 +21090,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_cz_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_ee_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21458,7 +21102,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_dk_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_fi_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21470,7 +21114,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_nl_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_fr_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21482,7 +21126,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_ee_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_de_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21494,7 +21138,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_fi_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_gr_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21506,7 +21150,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_fr_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_il_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21518,7 +21162,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_de_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_in_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21530,7 +21174,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_gr_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_hu_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21542,7 +21186,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_il_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_id_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21554,7 +21198,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_in_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_it_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21566,7 +21210,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_hu_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_jp_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21578,7 +21222,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_id_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_kr_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21590,7 +21234,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_it_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_lv_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21602,7 +21246,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_jp_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_lt_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21614,7 +21258,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_kr_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_no_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21626,7 +21270,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_lv_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_pl_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21638,7 +21282,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_lt_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_pt_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21650,7 +21294,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_no_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_ro_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21662,7 +21306,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_pl_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_sk_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21674,7 +21318,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_pt_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_es_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21686,7 +21330,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_ro_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_se_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21698,7 +21342,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_sk_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_tr_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21710,7 +21354,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_es_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_ua_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21722,7 +21366,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_se_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_vn_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21734,43 +21378,43 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_tr_svg_raw",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/ui/icons.tsx",
-      "source_location": "L126",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_ua_svg_raw",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/ui/icons.tsx",
-      "source_location": "L127",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_vn_svg_raw",
-      "relation": "imports_from",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "import",
-      "source_file": "extension/src/ui/icons.tsx",
-      "source_location": "L128",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_ui_icons",
       "target": "ref_flag_icons_flags_4x3_gb_svg_raw",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "extension/src/ui/icons.tsx",
+      "source_location": "L95",
+      "weight": 1.0
+    },
+    {
+      "source": "extension_src_ui_icons",
+      "target": "ref_flag_icons_flags_4x3_arab_svg_raw",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "extension/src/ui/icons.tsx",
+      "source_location": "L96",
+      "weight": 1.0
+    },
+    {
+      "source": "extension_src_ui_icons",
+      "target": "ref_flag_icons_flags_4x3_bg_svg_raw",
+      "relation": "imports_from",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "import",
+      "source_file": "extension/src/ui/icons.tsx",
+      "source_location": "L97",
+      "weight": 1.0
+    },
+    {
+      "source": "extension_src_ui_icons",
+      "target": "ref_flag_icons_flags_4x3_cn_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -21782,7 +21426,7 @@
     },
     {
       "source": "extension_src_ui_icons",
-      "target": "ref_flag_icons_flags_4x3_arab_svg_raw",
+      "target": "ref_flag_icons_flags_4x3_cz_svg_raw",
       "relation": "imports_from",
       "_origin": "ast",
       "confidence": "EXTRACTED",
@@ -22087,42 +21731,6 @@
       "weight": 1.0
     },
     {
-      "source": "extension_src_entrypoints_popup_popup_popupprops_oncopyentry",
-      "target": "extension_src_settings_history_historyentry",
-      "relation": "references",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "parameter_type",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L47",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup_popupprops_ondelete",
-      "target": "extension_src_settings_history_historyentry",
-      "relation": "references",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "parameter_type",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L50",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup_popupprops_onrate",
-      "target": "extension_src_settings_history_historyentry",
-      "relation": "references",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "parameter_type",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L46",
-      "weight": 1.0
-    },
-    {
       "source": "extension_src_entrypoints_popup_popup_popupprops_onrestore",
       "target": "extension_src_settings_history_historyentry",
       "relation": "references",
@@ -22131,19 +21739,7 @@
       "confidence_score": 1.0,
       "context": "parameter_type",
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L44",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup_popupprops_onretryentry",
-      "target": "extension_src_settings_history_historyentry",
-      "relation": "references",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "parameter_type",
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L49",
+      "source_location": "L43",
       "weight": 1.0
     },
     {
@@ -25654,7 +25250,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L215",
+      "source_location": "L206",
       "weight": 1.0
     },
     {
@@ -25665,7 +25261,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L233",
+      "source_location": "L224",
       "weight": 1.0
     },
     {
@@ -25676,18 +25272,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L245",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup",
-      "target": "extension_src_entrypoints_popup_popup_historycard",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L312",
+      "source_location": "L235",
       "weight": 1.0
     },
     {
@@ -25698,7 +25283,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L347",
+      "source_location": "L250",
       "weight": 1.0
     },
     {
@@ -25709,7 +25294,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L348",
+      "source_location": "L251",
       "weight": 1.0
     },
     {
@@ -25720,7 +25305,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L357",
+      "source_location": "L260",
       "weight": 1.0
     },
     {
@@ -25731,7 +25316,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L433",
+      "source_location": "L336",
       "weight": 1.0
     },
     {
@@ -25742,7 +25327,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L442",
+      "source_location": "L345",
       "weight": 1.0
     },
     {
@@ -25753,18 +25338,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L456",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup",
-      "target": "extension_src_entrypoints_popup_popup_onundo",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L53",
+      "source_location": "L359",
       "weight": 1.0
     },
     {
@@ -25775,7 +25349,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L61",
+      "source_location": "L51",
+      "weight": 1.0
+    },
+    {
+      "source": "extension_src_entrypoints_popup_popup",
+      "target": "extension_src_entrypoints_popup_popup_code",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
+      "source_location": "L65",
       "weight": 1.0
     },
     {
@@ -25786,7 +25371,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L75",
+      "source_location": "L66",
       "weight": 1.0
     },
     {
@@ -25797,7 +25382,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L76",
+      "source_location": "L67",
       "weight": 1.0
     },
     {
@@ -25808,7 +25393,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L78",
+      "source_location": "L69",
       "weight": 1.0
     },
     {
@@ -25830,7 +25415,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L20",
+      "source_location": "L13",
       "weight": 1.0
     },
     {
@@ -25841,7 +25426,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L64",
+      "source_location": "L51",
       "weight": 1.0
     },
     {
@@ -25852,7 +25437,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L66",
+      "source_location": "L53",
       "weight": 1.0
     },
     {
@@ -25863,7 +25448,18 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L68",
+      "source_location": "L55",
+      "weight": 1.0
+    },
+    {
+      "source": "extension_src_entrypoints_popup_popup_stories",
+      "target": "extension_src_entrypoints_popup_popup_stories_busy",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
+      "source_location": "L69",
       "weight": 1.0
     },
     {
@@ -25879,35 +25475,13 @@
     },
     {
       "source": "extension_src_entrypoints_popup_popup_stories",
-      "target": "extension_src_entrypoints_popup_popup_stories_at",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L8",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup_stories",
-      "target": "extension_src_entrypoints_popup_popup_stories_busy",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L82",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup_stories",
       "target": "extension_src_entrypoints_popup_popup_stories_error",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L84",
+      "source_location": "L71",
       "weight": 1.0
     },
     {
@@ -25918,7 +25492,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L86",
+      "source_location": "L73",
       "weight": 1.0
     },
     {
@@ -25929,7 +25503,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L88",
+      "source_location": "L75",
       "weight": 1.0
     },
     {
@@ -25940,7 +25514,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L90",
+      "source_location": "L77",
       "weight": 1.0
     },
     {
@@ -25951,7 +25525,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L92",
+      "source_location": "L79",
       "weight": 1.0
     },
     {
@@ -25962,29 +25536,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L94",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup_stories",
-      "target": "extension_src_entrypoints_popup_popup_stories_historyundo",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L96",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup_stories",
-      "target": "extension_src_entrypoints_popup_popup_stories_historyempty",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L98",
+      "source_location": "L81",
       "weight": 1.0
     },
     {
@@ -26105,7 +25657,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/settings/history.ts",
-      "source_location": "L21",
+      "source_location": "L16",
       "weight": 1.0
     },
     {
@@ -26116,7 +25668,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/settings/history.ts",
-      "source_location": "L23",
+      "source_location": "L18",
       "weight": 1.0
     },
     {
@@ -26127,29 +25679,29 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/settings/history.ts",
-      "source_location": "L26",
+      "source_location": "L21",
       "weight": 1.0
     },
     {
       "source": "extension_src_settings_history",
-      "target": "extension_src_settings_history_pairlabel",
+      "target": "extension_src_settings_history_usedlately",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/settings/history.ts",
-      "source_location": "L30",
+      "source_location": "L25",
       "weight": 1.0
     },
     {
       "source": "extension_src_settings_history",
-      "target": "extension_src_settings_history_toppairs",
+      "target": "extension_src_settings_history_popuphistory",
       "relation": "contains",
       "_origin": "ast",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/settings/history.ts",
-      "source_location": "L34",
+      "source_location": "L36",
       "weight": 1.0
     },
     {
@@ -26161,50 +25713,6 @@
       "confidence_score": 1.0,
       "source_file": "extension/src/settings/history.ts",
       "source_location": "L4",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_settings_history",
-      "target": "extension_src_settings_history_byday",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/settings/history.ts",
-      "source_location": "L41",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_settings_history",
-      "target": "extension_src_settings_history_usedlately",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/settings/history.ts",
-      "source_location": "L59",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_settings_history",
-      "target": "extension_src_settings_history_popuphistory",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/settings/history.ts",
-      "source_location": "L70",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_settings_history_test",
-      "target": "extension_src_settings_history_test_now",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/settings/history.test.ts",
-      "source_location": "L9",
       "weight": 1.0
     },
     {
@@ -26402,7 +25910,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/ui/icons.tsx",
-      "source_location": "L131",
+      "source_location": "L128",
       "weight": 1.0
     },
     {
@@ -26413,7 +25921,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/ui/icons.tsx",
-      "source_location": "L142",
+      "source_location": "L139",
       "weight": 1.0
     },
     {
@@ -26435,7 +25943,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/ui/icons.tsx",
-      "source_location": "L51",
+      "source_location": "L48",
       "weight": 1.0
     },
     {
@@ -26446,7 +25954,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/ui/icons.tsx",
-      "source_location": "L52",
+      "source_location": "L49",
       "weight": 1.0
     },
     {
@@ -26457,7 +25965,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/ui/icons.tsx",
-      "source_location": "L58",
+      "source_location": "L55",
       "weight": 1.0
     },
     {
@@ -26468,7 +25976,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/ui/icons.tsx",
-      "source_location": "L60",
+      "source_location": "L57",
       "weight": 1.0
     },
     {
@@ -26479,7 +25987,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/ui/icons.tsx",
-      "source_location": "L69",
+      "source_location": "L66",
       "weight": 1.0
     },
     {
@@ -26534,7 +26042,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/ui/inputs.tsx",
-      "source_location": "L121",
+      "source_location": "L118",
       "weight": 1.0
     },
     {
@@ -26545,7 +26053,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/ui/inputs.tsx",
-      "source_location": "L133",
+      "source_location": "L130",
       "weight": 1.0
     },
     {
@@ -26556,7 +26064,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/ui/inputs.tsx",
-      "source_location": "L139",
+      "source_location": "L136",
       "weight": 1.0
     },
     {
@@ -26567,7 +26075,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/ui/inputs.tsx",
-      "source_location": "L143",
+      "source_location": "L140",
       "weight": 1.0
     },
     {
@@ -27654,62 +27162,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L44",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup_popupprops",
-      "target": "extension_src_entrypoints_popup_popup_popupprops_onrate",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L46",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup_popupprops",
-      "target": "extension_src_entrypoints_popup_popup_popupprops_oncopyentry",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L47",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup_popupprops",
-      "target": "extension_src_entrypoints_popup_popup_popupprops_onretryentry",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L49",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup_popupprops",
-      "target": "extension_src_entrypoints_popup_popup_popupprops_ondelete",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L50",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_entrypoints_popup_popup_popupprops",
-      "target": "extension_src_entrypoints_popup_popup_popupprops_onclearall",
-      "relation": "method",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L51",
+      "source_location": "L43",
       "weight": 1.0
     },
     {
@@ -27720,7 +27173,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/entrypoints/popup/Popup.tsx",
-      "source_location": "L58",
+      "source_location": "L48",
       "weight": 1.0
     },
     {
@@ -28011,6 +27464,18 @@
       "weight": 1.0
     },
     {
+      "source": "api_dev_dev_gateway_test",
+      "target": "extension_src_entrypoints_popup_popup_code",
+      "relation": "indirect_call",
+      "_origin": "ast",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "context": "collection",
+      "source_file": "api/dev/dev-gateway.test.ts",
+      "source_location": "L92",
+      "weight": 1.0
+    },
+    {
       "source": "extension_src_content_ui_translator_state_test",
       "target": "extension_src_content_ui_translatorwidget_stories_fix",
       "relation": "indirect_call",
@@ -28139,7 +27604,7 @@
       "confidence_score": 0.85,
       "context": "collection",
       "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L22",
+      "source_location": "L15",
       "weight": 1.0
     },
     {
@@ -28151,7 +27616,7 @@
       "confidence_score": 0.85,
       "context": "collection",
       "source_file": "extension/src/entrypoints/popup/Popup.stories.tsx",
-      "source_location": "L27",
+      "source_location": "L20",
       "weight": 1.0
     },
     {

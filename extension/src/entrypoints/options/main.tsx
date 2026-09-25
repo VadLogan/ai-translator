@@ -1,26 +1,29 @@
 import { useCallback, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { LANGUAGES } from '../../core/languages';
+import { parseSites } from '../../core/sites';
+import { disabledFields, type DisabledField } from '../../settings/disabled-fields';
 import { PROVIDERS } from '../../auth/providers';
 import { type Account, sendMessage } from '../../messaging/messages';
 import { OptionsPage } from './OptionsPage';
+import { followColorScheme } from '../../ui/color-scheme';
 import '../../ui/theme.css';
 
-// HeroUI reads its theme from a `.light` / `.dark` ancestor and ships no prefers-color-scheme
-// fallback for its variables, so follow the OS here the way the old stylesheet did.
-const colorScheme = matchMedia('(prefers-color-scheme: dark)');
-const applyColorScheme = () => {
-  document.documentElement.classList.toggle('dark', colorScheme.matches);
-  document.documentElement.classList.toggle('light', !colorScheme.matches);
-};
-colorScheme.addEventListener('change', applyColorScheme);
-applyColorScheme();
+followColorScheme();
 
 function Options() {
   const [account, setAccount] = useState<Account | null | undefined>(undefined);
   // The saved order, which the in-page menu follows. `checked` is what the boxes show right now.
   const [saved, setSaved] = useState<string[]>([]);
   const [checked, setChecked] = useState<string[]>([]);
+  // One hostname per line, as typed; parsed on save.
+  const [sites, setSites] = useState('');
+  // Turned off from the in-page icon; local to this browser, so read straight from storage.
+  const [offFields, setOffFields] = useState<DisabledField[]>([]);
+  useEffect(() => {
+    void disabledFields.get().then(setOffFields);
+    return disabledFields.watch(setOffFields);
+  }, []);
   const [status, setStatus] = useState({ message: '', isError: false });
   const [busy, setBusy] = useState(false);
 
@@ -45,6 +48,7 @@ function Options() {
       if (!response.ok) return fail(response.error.message);
       setSaved(response.data.favoriteLanguages);
       setChecked(response.data.favoriteLanguages);
+      setSites(response.data.disabledSites.join('\n'));
     })();
   }, [loadAccount]);
 
@@ -79,10 +83,13 @@ function Options() {
         ...saved.filter((code) => checked.includes(code)),
         ...checked.filter((code) => !saved.includes(code)),
       ];
-      const response = await sendMessage({ type: 'save-settings', settings: { favoriteLanguages: next } });
+      const { sites: disabledSites, invalid } = parseSites(sites);
+      if (invalid.length) return fail(`Not a site: ${invalid.join(', ')}`);
+      const response = await sendMessage({ type: 'save-settings', settings: { favoriteLanguages: next, disabledSites } });
       if (!response.ok) return fail(response.error.message);
       setSaved(response.data.favoriteLanguages);
       setChecked(response.data.favoriteLanguages);
+      setSites(response.data.disabledSites.join('\n'));
       setStatus({ message: 'Saved', isError: false });
       setTimeout(() => setStatus({ message: '', isError: false }), 2000);
     });
@@ -98,6 +105,10 @@ function Options() {
       onSignIn={signIn}
       onSignOut={signOut}
       onFavoritesChange={setChecked}
+      disabledSites={sites}
+      onDisabledSitesChange={setSites}
+      disabledFields={offFields}
+      onEnableField={(field) => void disabledFields.remove(field.site, field.key)}
       onSave={save}
     />
   );

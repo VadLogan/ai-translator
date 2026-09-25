@@ -1,6 +1,8 @@
 import { createMiddleware } from 'hono/factory';
 import {
+  HOSTNAME,
   LANGUAGE_CODE,
+  MAX_DISABLED_SITES,
   MAX_FAVORITE_LANGUAGES,
   MAX_TEXT_LENGTH,
   MAX_URL_LENGTH,
@@ -29,7 +31,7 @@ export const validate = <T>(parse: (body: unknown) => T | string) =>
 
 export function parseSettings(body: unknown): Settings | string {
   if (typeof body !== 'object' || body === null) return 'Body must be a JSON object';
-  const { favoriteLanguages } = body as Record<string, unknown>;
+  const { favoriteLanguages, disabledSites = [] } = body as Record<string, unknown>;
   if (!Array.isArray(favoriteLanguages)) return 'favoriteLanguages must be an array';
   if (favoriteLanguages.length > MAX_FAVORITE_LANGUAGES) {
     return `favoriteLanguages must have at most ${MAX_FAVORITE_LANGUAGES} entries`;
@@ -37,7 +39,12 @@ export function parseSettings(body: unknown): Settings | string {
   if (!favoriteLanguages.every((code) => typeof code === 'string' && LANGUAGE_CODE.test(code))) {
     return 'favoriteLanguages contains an invalid language code';
   }
-  return { favoriteLanguages: favoriteLanguages as string[] };
+  if (!Array.isArray(disabledSites)) return 'disabledSites must be an array';
+  if (disabledSites.length > MAX_DISABLED_SITES) return `disabledSites must have at most ${MAX_DISABLED_SITES} entries`;
+  if (!disabledSites.every((host) => typeof host === 'string' && host.length <= 253 && HOSTNAME.test(host))) {
+    return 'disabledSites contains an invalid hostname';
+  }
+  return { favoriteLanguages: favoriteLanguages as string[], disabledSites: disabledSites as string[] };
 }
 
 /** The text + url both request bodies share. Returns the reason as a string when it is invalid. */

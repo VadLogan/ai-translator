@@ -37,10 +37,14 @@ const PATHS = {
   settings: <><path d="M21 4h-7" /><path d="M10 4H3" /><path d="M21 12h-9" /><path d="M8 12H3" /><path d="M21 20h-5" /><path d="M12 20H3" /><path d="M14 2v4" /><path d="M8 10v4" /><path d="M16 18v4" /></>,
   lock: <><rect x="4" y="11" width="16" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></>,
   add: <><path d="M12 5v14" /><path d="M5 12h14" /></>,
+  ban: <><circle cx="12" cy="12" r="9" /><path d="m5.7 5.7 12.6 12.6" /></>,
+  trash: <><path d="M4 7h16" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13" /><path d="M9 7V4h6v3" /></>,
   close: <><path d="M18 6 6 18" /><path d="m6 6 12 12" /></>,
   check: <path d="M20 6 9 17l-5-5" />,
   chevronDown: <path d="m6 9 6 6 6-6" />,
   back: <path d="m15 18-6-6 6-6" />,
+  /** A sub-screen's way home. */
+  arrowBack: <><path d="M19 12H5" /><path d="m12 19-7-7 7-7" /></>,
   forward: <path d="m9 18 6-6-6-6" />,
 } satisfies Record<string, ReactNode>;
 

@@ -1,6 +1,6 @@
 {
-  "0": "diff.ts",
-  "1": "Translator.tsx",
+  "0": "ref_vitest",
+  "1": "Translator",
   "2": "inputs.stories.tsx",
   "3": "graphify skill (SKILL.md)",
   "4": "contract.ts",
@@ -29,14 +29,14 @@
   "27": "dependencies",
   "28": "icons.stories.tsx",
   "29": "ref_src_health_ts",
-  "30": "options/main.tsx",
+  "30": "Translator.tsx",
   "31": "translator-widget.ts",
   "32": "PopupProps",
   "33": "popup/main.tsx",
-  "34": "languages.ts",
+  "34": "Popup.tsx",
   "35": "Popup.stories.tsx",
   "36": "WidgetCallbacks",
   "37": "OptionsPage.stories.tsx",
-  "38": "Popup.tsx",
+  "38": "history.ts",
   "39": "preview.tsx"
 }

@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, type CSSProperties, type ReactNode } from 'react';
+import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { Button, Skeleton, Spinner } from '@heroui/react';
 import type { RewriteStyle } from '../../../../shared/contract';
 import { findLanguage, type Language } from '../../core/languages';
@@ -17,6 +17,8 @@ export interface WidgetCallbacks {
   onFixLayout(): void;
   onFixGrammar(): void;
   onOpenSettings(): void;
+  /** The hover pill's "Turn off in this field". */
+  onDisableField(): void;
 }
 
 /** Everything the widget can be showing. Translator.tsx derives it from the flow's state. */
@@ -25,7 +27,8 @@ export type WidgetView =
   /** `field`: sits in the focused field's bottom-right corner instead of above the selection. */
   /** `badge`: errors the background grammar check found; 0 = clean, 'error' = the check failed, absent = not checked. */
   /** 'layout' = typed on the wrong keyboard layout, 'gibberish' = random keystrokes; both on either icon. */
-  | { kind: 'icon'; field?: boolean; badge?: Badge; checking?: boolean }
+  /** `canDisable`: the icon belongs to a field, so hovering it offers "Turn off in this field". `hovered` opens that pill up front (Storybook). */
+  | { kind: 'icon'; field?: boolean; badge?: Badge; checking?: boolean; canDisable?: boolean; hovered?: boolean }
   | {
     kind: 'languages';
     languages: readonly Language[];
@@ -78,24 +81,32 @@ export function TranslatorWidget({ view, anchor, dark, callbacks }: TranslatorWi
     // shadow tree, and the variables have no prefers-color-scheme fallback, so the class is what
     // decides -- both for the CSS variables and for Tailwind's `dark:` variant.
     <div className={`${dark ? 'dark' : 'light'} font-tm tm-body text-tm-ink`}>
-      {view.kind === 'icon' ? <Trigger anchor={anchor} field={view.field} badge={view.badge} checking={view.checking} onPress={callbacks.onIconClick} /> : <Panel anchor={anchor} view={view} callbacks={callbacks} />}
+      {view.kind === 'icon' ? <Trigger anchor={anchor} view={view} onPress={callbacks.onIconClick} onDisable={callbacks.onDisableField} /> : <Panel anchor={anchor} view={view} callbacks={callbacks} />}
     </div>
   );
 }
 
 function Trigger({
   anchor,
-  field,
-  badge,
-  checking,
+  view: { field, badge, checking, canDisable, hovered = false },
   onPress,
+  onDisable,
 }: {
   anchor: Anchor;
-  field?: boolean;
-  badge?: Badge;
-  checking?: boolean;
+  view: Extract<WidgetView, { kind: 'icon' }>;
   onPress: () => void;
+  onDisable: () => void;
 }) {
+  // The pill stays a moment after the pointer leaves, so crossing the gap to its button keeps it open.
+  const [open, setOpen] = useState(hovered);
+  const hideTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const enter = () => {
+    clearTimeout(hideTimer.current);
+    setOpen(true);
+  };
+  const leave = () => {
+    hideTimer.current = setTimeout(() => setOpen(false), 150);
+  };
   const label = badge === 'layout'
     ? 'Wrong keyboard layout'
     : badge === 'gibberish'
@@ -110,22 +121,35 @@ function Trigger({
           ? 'Grammar check failed'
           : `Fix grammar: ${badge === 1 ? '1 error' : `${badge} errors`}`;
   return (
-    <Button
-      isIconOnly
-      variant="ghost"
-      aria-label={label}
-      className="fixed size-[26px] min-w-0 overflow-visible rounded-full p-0 shadow-tm-pop"
-      style={field ? cornerStyle(anchor) : iconStyle(anchor)}
-      onPress={onPress}
-    >
-      <BrandMark size={ICON_SIZE} shape="round" />
-      {checking && (
-        <span aria-hidden className="absolute inset-0 flex items-center justify-center rounded-full bg-tm-surface/70">
-          <Spinner size="sm" className="text-tm-accent" />
-        </span>
+    <div className="fixed size-[26px]" style={field ? cornerStyle(anchor) : iconStyle(anchor)} onPointerEnter={enter} onPointerLeave={leave}>
+      {canDisable && open && (
+        // Behind the icon and growing to the left: the corner icon sits on the field's right edge.
+        <div
+          role="group"
+          aria-label="TypeMeant in this field"
+          className="absolute -right-1 -top-1 flex h-[34px] items-center rounded-full bg-tm-surface py-1 pl-1 pr-[34px] shadow-tm-pop"
+        >
+          <IconButton aria-label="Turn off in this field" size={26} onPress={onDisable}>
+            <Icon name="ban" size={14} strokeWidth={2.4} />
+          </IconButton>
+        </div>
       )}
-      {badge !== undefined && <CountBadge count={badge} className="absolute -right-1.5 -top-1.5 ring-2 ring-tm-surface" />}
-    </Button>
+      <Button
+        isIconOnly
+        variant="ghost"
+        aria-label={label}
+        className="relative size-[26px] min-w-0 overflow-visible rounded-full p-0 shadow-tm-pop"
+        onPress={onPress}
+      >
+        <BrandMark size={ICON_SIZE} shape="round" />
+        {checking && (
+          <span aria-hidden className="absolute inset-0 flex items-center justify-center rounded-full bg-tm-surface/70">
+            <Spinner size="sm" className="text-tm-accent" />
+          </span>
+        )}
+        {badge !== undefined && <CountBadge count={badge} className="absolute -right-1.5 -top-1.5 ring-2 ring-tm-surface" />}
+      </Button>
+    </div>
   );
 }
 

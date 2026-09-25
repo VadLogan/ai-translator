@@ -94,13 +94,12 @@ describe('settings', () => {
   });
 
   it('PUTs the new list', async () => {
-    reply(200, { favoriteLanguages: ['pl'] });
-    await expect(saveSettings({ favoriteLanguages: ['pl'] }, 'token', 'http://api')).resolves.toEqual({
-      favoriteLanguages: ['pl'],
-    });
+    const settings = { favoriteLanguages: ['pl'], disabledSites: ['bank.com'] };
+    reply(200, settings);
+    await expect(saveSettings(settings, 'token', 'http://api')).resolves.toEqual(settings);
     expect(fetch).toHaveBeenCalledWith(
       'http://api/settings',
-      expect.objectContaining({ method: 'PUT', body: JSON.stringify({ favoriteLanguages: ['pl'] }) }),
+      expect.objectContaining({ method: 'PUT', body: JSON.stringify(settings) }),
     );
   });
 

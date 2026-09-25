@@ -12,8 +12,9 @@ export default defineConfig({
   manifest: {
     name: 'AI Translator',
     description: 'Select text in any input field and translate it in place.',
-    // `identity` powers launchWebAuthFlow, the OAuth window in src/auth/oauth.ts.
-    permissions: ['storage', 'identity'],
+    // `identity` powers launchWebAuthFlow, the OAuth window in src/auth/oauth.ts. `activeTab` lets
+    // the toolbar popup read the tab it opened over (for the per-site switch and history).
+    permissions: ['storage', 'identity', 'activeTab'],
     // Pins the extension id so chrome.identity's redirect URL is stable across machines and
     // matches [auth] additional_redirect_urls in supabase/config.toml. Replace with the
     // "key" field from the Chrome Web Store listing (or a locally generated one).
@@ -26,7 +27,8 @@ export default defineConfig({
       'http://127.0.0.1:54321/*',
       'https://<project-ref>.supabase.co/*',
     ],
-    action: { default_title: 'AI Translator settings' },
+    // default_popup is added by WXT from src/entrypoints/popup/.
+    action: { default_title: 'AI Translator' },
   },
   // Pinned so a dev build always points at the same reload socket; WXT otherwise
   // takes the first free port in 3000-3010, which other projects may already hold.

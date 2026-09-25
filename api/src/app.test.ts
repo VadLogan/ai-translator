@@ -25,7 +25,7 @@ vi.mock('./repositories/detections.ts', () => ({
 }));
 vi.mock('./repositories/profiles.ts', () => ({
   profilesRepository: {
-    settings: vi.fn(async () => ({ favoriteLanguages: ['en', 'pl'] })),
+    settings: vi.fn(async () => ({ favoriteLanguages: ['en', 'pl'], disabledSites: [] })),
     saveSettings: vi.fn(async (_userId: string, settings: unknown) => settings),
   },
 }));
@@ -335,19 +335,27 @@ describe('settings', () => {
     const res = await settings({}, `Bearer ${userToken(sub)}`);
 
     expect(res.status).toBe(200);
-    await expect(res.json()).resolves.toEqual({ favoriteLanguages: ['en', 'pl'] });
+    await expect(res.json()).resolves.toEqual({ favoriteLanguages: ['en', 'pl'], disabledSites: [] });
     expect(profilesRepository.settings).toHaveBeenCalledWith(sub);
   });
 
   it('saves and echoes back the new list', async () => {
-    const body = JSON.stringify({ favoriteLanguages: ['de', 'uk', 'pl'] });
+    const body = JSON.stringify({ favoriteLanguages: ['de', 'uk', 'pl'], disabledSites: ['bank.com'] });
     const res = await settings({ method: 'PUT', body });
 
     expect(res.status).toBe(200);
-    await expect(res.json()).resolves.toEqual({ favoriteLanguages: ['de', 'uk', 'pl'] });
+    await expect(res.json()).resolves.toEqual({ favoriteLanguages: ['de', 'uk', 'pl'], disabledSites: ['bank.com'] });
     expect(profilesRepository.saveSettings).toHaveBeenCalledWith(expect.any(String), {
       favoriteLanguages: ['de', 'uk', 'pl'],
+      disabledSites: ['bank.com'],
     });
+  });
+
+  it('defaults a missing disabledSites to none', async () => {
+    const res = await settings({ method: 'PUT', body: JSON.stringify({ favoriteLanguages: ['de'] }) });
+
+    expect(res.status).toBe(200);
+    await expect(res.json()).resolves.toEqual({ favoriteLanguages: ['de'], disabledSites: [] });
   });
 
   it.each([
@@ -356,6 +364,10 @@ describe('settings', () => {
     ['an invalid code', { favoriteLanguages: ['deutsch!'] }],
     ['a non-string entry', { favoriteLanguages: [42] }],
     ['too many entries', { favoriteLanguages: Array.from({ length: 21 }, () => 'de') }],
+    ['disabledSites not an array', { favoriteLanguages: ['de'], disabledSites: 'bank.com' }],
+    ['a url in disabledSites', { favoriteLanguages: ['de'], disabledSites: ['https://bank.com/login'] }],
+    ['an upper-case hostname', { favoriteLanguages: ['de'], disabledSites: ['Bank.com'] }],
+    ['too many sites', { favoriteLanguages: ['de'], disabledSites: Array.from({ length: 101 }, () => 'a.com') }],
   ])('rejects %s with 400', async (_name, body) => {
     const res = await settings({ method: 'PUT', body: JSON.stringify(body) });
 

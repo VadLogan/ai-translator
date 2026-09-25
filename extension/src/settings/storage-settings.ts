@@ -14,6 +14,10 @@ export const storageSettings = {
     if (!settings.favoriteLanguages.length) settings.favoriteLanguages = browserLanguages();
     return settings;
   },
+  /** Called with the new settings whenever any context writes them (the options page, sign-in). */
+  watch(callback: (settings: Settings) => void): () => void {
+    return settingsItem.watch(() => void this.get().then(callback));
+  },
   async update(patch: Partial<Settings>): Promise<Settings> {
     await settingsItem.setValue({ ...(await this.get()), ...patch });
     return this.get();

@@ -2,11 +2,13 @@ import { useEffect, useReducer, useRef, useSyncExternalStore } from 'react';
 import type { RewriteStyle } from '../../../../shared/contract';
 import { layoutLanguages, switchLayout } from '../../core/layout';
 import { findLanguage, type Language } from '../../core/languages';
+import { isSiteDisabled } from '../../core/sites';
 import { PROVIDERS, isProviderId } from '../../auth/providers';
 import { sendMessage } from '../../messaging/messages';
+import { disabledFields, type DisabledField } from '../../settings/disabled-fields';
 import { storageSettings } from '../../settings/storage-settings';
 import { replaceSelection } from '../replace';
-import { getEditableSelection, getFieldAnchor, getFocusedField, getPageSelection, getSelectionAnchor, isSelectionUnchanged, wholeField } from '../selection';
+import { fieldKey, fieldLabel, getEditableSelection, getFieldAnchor, getFocusedField, getPageSelection, getSelectionAnchor, isSelectionUnchanged, wholeField } from '../selection';
 import { TranslatorWidget, type WidgetView } from './TranslatorWidget';
 import { badge, countFixes, detectedLang, grammarCount, isChecking, hidden, isMenuOpen, menuLanguages, reducer, type Detection, type Screen, type State } from './translator-state';
 
@@ -36,6 +38,11 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
   const checkTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   // The one check in flight, if any: its id cancels it, its text dedupes it. Cleared once it answers.
   const pendingCheck = useRef<{ id: string; text: string } | null>(null);
+  // The user turned the extension off for this site in the options page. refresh() is sync, so it
+  // reads this ref, kept in step with the settings cache.
+  const siteDisabled = useRef(false);
+  // fieldKey()s on this site the user turned off from the icon's hover pill. Same ref pattern.
+  const offFields = useRef(new Set<string>());
   const dark = useSyncExternalStore(subscribeDark, () => darkQuery().matches);
 
   const show = (screen: Screen) => dispatch({ type: 'show', screen });
@@ -48,9 +55,11 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
   }
 
   function refresh(): void {
+    if (siteDisabled.current) return close();
     if (isInvalid() || isMenuOpen(latest.current)) return;
     // Page text last: a selection inside a field is the field's.
     const selection = getEditableSelection() ?? getPageSelection();
+    if (selection && selection.kind !== 'page' && offFields.current.has(fieldKey(selection.element))) return close();
     if (selection) {
       mount();
       dispatch({ type: 'select', selection, anchor: getSelectionAnchor(selection) });
@@ -60,7 +69,7 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
       return;
     }
     const field = getFocusedField();
-    if (!field) return close();
+    if (!field || offFields.current.has(fieldKey(field.element))) return close();
     mount();
     dispatch({ type: 'select', selection: field, anchor: getFieldAnchor(field), field: true });
   }
@@ -238,6 +247,9 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
     clearTimeout(checkTimer.current);
     checkTimer.current = setTimeout(() => {
       const { screen, selection } = latest.current;
+      // A single-line input (search box, filter, form field) shows its icon but costs no request
+      // until the icon is clicked: clicks call checkGrammar themselves.
+      if (screen.kind === 'icon' && selection?.element instanceof HTMLInputElement) return;
       if ((screen.kind === 'icon' && screen.field) || screen.kind === 'grammarFixed') void checkGrammar();
       // A selection's own text, not its whole field. An open menu asks for itself (openMenu).
       else if (screen.kind === 'icon' && selection && selection.kind !== 'page') void checkGrammar(selection);
@@ -287,6 +299,33 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
     if (!isSelectionUnchanged(selection)) return fail('The text changed. Try again.', 'close');
     replaceSelection(selection, text);
     close();
+  }
+
+  useEffect(() => {
+    const apply = ({ disabledSites }: { disabledSites: string[] }) => {
+      siteDisabled.current = isSiteDisabled(location.hostname, disabledSites);
+      if (siteDisabled.current) close();
+    };
+    storageSettings.get().then(apply, () => {});
+    return storageSettings.watch(apply);
+  }, []);
+
+  useEffect(() => {
+    const apply = (list: DisabledField[]) => {
+      offFields.current = new Set(list.filter(({ site }) => site === location.hostname).map(({ key }) => key));
+    };
+    disabledFields.get().then(apply, () => {});
+    return disabledFields.watch(apply);
+  }, []);
+
+  /** The hover pill's "Turn off in this field": no icon in this field again, until the options page says so. */
+  function disableField(): void {
+    const element = latest.current.selection?.element;
+    if (!element) return;
+    const key = fieldKey(element);
+    offFields.current.add(key); // now, not when the storage write echoes back
+    close();
+    void disabledFields.add({ site: location.hostname, key, label: fieldLabel(element) }).catch(() => {});
   }
 
   // The handlers above only touch refs and dispatch, so subscribing once is enough.
@@ -389,6 +428,7 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
           close();
           void sendMessage({ type: 'open-options' });
         },
+        onDisableField: disableField,
       }}
     />
   );
@@ -416,7 +456,7 @@ function toView(
   const { screen, selection, detection } = state;
   switch (screen.kind) {
     case 'icon':
-      return { kind: 'icon', field: screen.field, badge: badge(state), checking: isChecking(state) };
+      return { kind: 'icon', field: screen.field, badge: badge(state), checking: isChecking(state), canDisable: !!selection && selection.kind !== 'page' };
     case 'languages': {
       // The layout item is the exception, not a menu fixture: only when detect says the text was mistyped.
       const mistyped = detection === 'mistyped' || grammarCount(state) === 'layout';

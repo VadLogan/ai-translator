@@ -24,6 +24,6 @@ describe('profiles settings', () => {
 
   it('prefers the stored value over the default', async () => {
     rows.mockResolvedValueOnce([{ settings: { favoriteLanguages: ['de', 'uk'] } }]);
-    await expect(profilesRepository.settings('u1')).resolves.toEqual({ favoriteLanguages: ['de', 'uk'] });
+    await expect(profilesRepository.settings('u1')).resolves.toEqual({ favoriteLanguages: ['de', 'uk'], disabledSites: [] });
   });
 });

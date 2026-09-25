@@ -9,9 +9,11 @@ import {
   CheckboxGroup,
   Label,
   Spinner,
+  TextArea,
 } from '@heroui/react';
 import type { Language } from '../../core/languages';
 import type { Account } from '../../messaging/messages';
+import type { DisabledField } from '../../settings/disabled-fields';
 
 export interface OptionsPageProps {
   /** null = signed out, undefined = still loading. */
@@ -24,6 +26,12 @@ export interface OptionsPageProps {
   onSignIn(providerId: string): void;
   onSignOut(): void;
   onFavoritesChange(codes: string[]): void;
+  /** One hostname per line, as typed. */
+  disabledSites: string;
+  onDisabledSitesChange(text: string): void;
+  /** Fields turned off from the in-page icon, in this browser only. */
+  disabledFields: readonly DisabledField[];
+  onEnableField(field: DisabledField): void;
   onSave(): void;
 }
 
@@ -37,6 +45,10 @@ export function OptionsPage({
   onSignIn,
   onSignOut,
   onFavoritesChange,
+  disabledSites,
+  onDisabledSitesChange,
+  disabledFields,
+  onEnableField,
   onSave,
 }: OptionsPageProps) {
   return (
@@ -98,6 +110,50 @@ export function OptionsPage({
               </Checkbox>
             ))}
           </CheckboxGroup>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Disabled sites</CardTitle>
+          <CardDescription>
+            The extension stays off on these sites and their subdomains. One per line, e.g. mybank.com.
+            Login, email, phone and payment fields are always skipped.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <TextArea
+            aria-label="Disabled sites"
+            rows={4}
+            placeholder="mybank.com"
+            value={disabledSites}
+            onChange={(event) => onDisabledSitesChange(event.target.value)}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Turned-off fields</CardTitle>
+          <CardDescription>Fields you turned off from the icon's hover menu, in this browser. Changes apply at once.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {disabledFields.length === 0 ? (
+            <p className="text-sm text-muted">None yet. Hover the icon in a field and press “Turn off in this field”.</p>
+          ) : (
+            <ul className="flex flex-col gap-2">
+              {disabledFields.map((field) => (
+                <li key={`${field.site}|${field.key}`} className="flex items-center justify-between gap-3 text-sm">
+                  <span className="min-w-0 truncate">
+                    <span className="font-medium">{field.site}</span> — {field.label}
+                  </span>
+                  <Button variant="outline" size="sm" onPress={() => onEnableField(field)}>
+                    Turn back on
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
         </CardContent>
       </Card>
 

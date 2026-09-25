@@ -128,10 +128,6 @@ export default defineBackground(() => {
     return true; // keep the channel open for the async response
   });
 
-  browser.action.onClicked.addListener(() => {
-    browser.runtime.openOptionsPage();
-  });
-
   if (import.meta.env.DEV) void reloadPlaygroundWhenReady();
 });
 

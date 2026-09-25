@@ -19,6 +19,10 @@ const meta = {
     onSignIn: noop,
     onSignOut: noop,
     onFavoritesChange: noop,
+    disabledSites: 'mybank.com\nmail.example.com',
+    onDisabledSitesChange: noop,
+    disabledFields: [{ site: 'teams.microsoft.com', key: 'div|data-tid=ckeditor', label: 'Type a message' }],
+    onEnableField: noop,
     onSave: noop,
   },
 } satisfies Meta<typeof OptionsPage>;

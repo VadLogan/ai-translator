@@ -18,7 +18,7 @@ const meta = {
   args: {
     // Pretend a line of text was selected here; the widget positions itself against it.
     anchor: { x: 240, top: 160, bottom: 180 },
-    callbacks: { onIconClick: noop, onLanguagePick: noop, onFixLayout: noop, onFixGrammar: noop, onOpenSettings: noop },
+    callbacks: { onIconClick: noop, onLanguagePick: noop, onFixLayout: noop, onFixGrammar: noop, onOpenSettings: noop, onDisableField: noop },
   },
   // The story's `dark` follows the toolbar's theme switch, so both themes are one click apart.
   render: (args, { globals }) => <TranslatorWidget {...args} dark={globals['theme'] === 'dark'} />,
@@ -47,6 +47,9 @@ export const SelectionIconLayout = story({ kind: 'icon', badge: 'layout' });
 export const FieldIconGibberish = story({ kind: 'icon', field: true, badge: 'gibberish' });
 
 export const FieldIconClean = story({ kind: 'icon', field: true, badge: 0 });
+
+/** Hovered: the pill offering "Turn off in this field". */
+export const FieldIconHover = story({ kind: 'icon', field: true, canDisable: true, hovered: true });
 
 export const Menu = story({ kind: 'languages', languages: FAVORITES, detectedName: 'English', detectedLang: 'en', grammar: 3 });
 

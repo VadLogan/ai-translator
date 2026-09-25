@@ -94,19 +94,22 @@ export function Segmented<T extends string>({
   value,
   onChange,
   'aria-label': ariaLabel,
+  fill = false,
 }: {
   options: readonly { value: T; label: string }[];
   value: T;
   onChange: (value: T) => void;
   'aria-label': string;
+  /** Stretch to the container, options sharing the width equally. */
+  fill?: boolean;
 }) {
   const name = useId();
   return (
-    <div role="radiogroup" aria-label={ariaLabel} className="inline-flex gap-0.5 rounded-[20px] bg-tm-neutral p-1">
+    <div role="radiogroup" aria-label={ariaLabel} className={`${fill ? 'flex w-full' : 'inline-flex'} gap-0.5 rounded-[20px] bg-tm-neutral p-1`}>
       {options.map((option) => (
-        <label key={option.value} className="cursor-pointer">
+        <label key={option.value} className={`cursor-pointer ${fill ? 'flex-1' : ''}`}>
           <input type="radio" name={name} value={option.value} checked={option.value === value} onChange={() => onChange(option.value)} className="peer sr-only" />
-          <span className="flex h-[30px] items-center rounded-2xl px-3 text-[13px] font-medium text-tm-secondary peer-checked:bg-tm-surface peer-checked:text-tm-ink peer-checked:shadow-tm-card peer-focus-visible:shadow-tm-ring">
+          <span className="flex h-[30px] items-center justify-center whitespace-nowrap rounded-2xl px-3 text-[13px] font-medium text-tm-secondary peer-checked:bg-tm-surface peer-checked:text-tm-ink peer-checked:shadow-tm-card peer-focus-visible:shadow-tm-ring">
             {option.label}
           </span>
         </label>
@@ -134,7 +137,7 @@ const CHIP_TONE = {
 } as const;
 
 export function StatusChip({ tone = 'accent', children }: { tone?: keyof typeof CHIP_TONE; children: ReactNode }) {
-  return <span className={`rounded-2xl px-2 py-0.5 tm-group-label ${CHIP_TONE[tone]}`}>{children}</span>;
+  return <span className={`shrink-0 whitespace-nowrap rounded-2xl px-2 py-0.5 tm-group-label ${CHIP_TONE[tone]}`}>{children}</span>;
 }
 
 export function Meter({ value, max = 100, tone = 'accent', 'aria-label': ariaLabel, className = 'w-50' }: {
