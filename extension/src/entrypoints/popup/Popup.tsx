@@ -60,7 +60,7 @@ export interface PopupProps {
 
 export function Popup(props: PopupProps) {
   return (
-    <div className="flex h-[600px] w-[400px] flex-col bg-tm-subtle font-tm text-tm-ink">
+    <div className="flex max-h-[600px] w-[400px] flex-col bg-tm-subtle font-tm text-tm-ink">
       {props.screen === 'home' ? (
         <Home {...props} />
       ) : props.screen === 'history' ? (
