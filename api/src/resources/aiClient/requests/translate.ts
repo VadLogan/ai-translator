@@ -57,6 +57,7 @@ Rules:
 - Preserve the original meaning and tone.
 - Do not translate word-for-word if that makes the result unnatural.
 - Keep names, URLs, numbers, emojis, and placeholders unchanged.
+- Tokens like {{1}}, {{2}} stand for @mentions: keep each one exactly once and unchanged, placed where the sentence needs it.
 - Preserve formatting and line breaks.
 
 Validation:

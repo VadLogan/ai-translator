@@ -25,7 +25,7 @@ export async function rewriteController(c: Context<AppEnv>) {
   try {
     const result = await rewrite(body);
     log.info(`← ${ms()}ms`, result);
-    save({ result });
+  //  save({ result });
     return c.json(result);
   } catch (error) {
     log.error(`✗ ${ms()}ms`, error);

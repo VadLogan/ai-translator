@@ -10,18 +10,19 @@ export function replaceSelection(selection: WritableSelection, replacement: stri
   else replaceInContentEditable(selection, replacement);
 }
 
-function tryInsertText(doc: Document, text: string): boolean {
+function tryInsertText(doc: Document, text: string, command: 'insertText' | 'insertHTML' = 'insertText'): boolean {
   try {
-    return typeof doc.execCommand === 'function' && doc.execCommand('insertText', false, text);
+    return typeof doc.execCommand === 'function' && doc.execCommand(command, false, text);
   } catch {
     return false;
   }
 }
 
 /** True if the page's editor took the synthetic paste (it cancels the event when it does). */
-function tryPaste(element: HTMLElement, text: string): boolean {
+function tryPaste(element: HTMLElement, text: string, html?: string): boolean {
   const clipboardData = new DataTransfer();
   clipboardData.setData('text/plain', text);
+  if (html !== undefined) clipboardData.setData('text/html', html);
   return !element.dispatchEvent(new ClipboardEvent('paste', { clipboardData, bubbles: true, cancelable: true }));
 }
 
@@ -42,8 +43,18 @@ function replaceInTextControl(
   dispatchInput(element, replacement);
 }
 
+/** The replacement with its {{n}} tokens turned back into copies of the original mention chips. */
+function withAtoms(doc: Document, text: string, atoms: Element[]): HTMLElement {
+  const box = doc.createElement('div');
+  for (const part of text.split(/(\{\{\d+\}\})/)) {
+    const atom = atoms[Number(/^\{\{(\d+)\}\}$/.exec(part)?.[1]) - 1];
+    box.append(atom ? atom.cloneNode(true) : part);
+  }
+  return box;
+}
+
 function replaceInContentEditable(
-  { element, range }: Extract<WritableSelection, { kind: 'content-editable' }>,
+  { element, range, atoms }: Extract<WritableSelection, { kind: 'content-editable' }>,
   replacement: string,
 ): void {
   const doc = element.ownerDocument;
@@ -57,13 +68,17 @@ function replaceInContentEditable(
 
   // Model-based editors (CKEditor, Lexical, ProseMirror, ... e.g. Teams, Slack) revert
   // direct DOM edits, execCommand included, but they all handle paste and cancel it.
-  if (tryPaste(element, replacement)) return;
-  if (tryInsertText(doc, replacement)) return;
+  // With mentions, the paste carries HTML: editors rebuild their chips from it (ProseMirror's parseDOM).
+  const rich = atoms?.length ? withAtoms(doc, replacement, atoms) : null;
+  if (tryPaste(element, rich?.textContent ?? replacement, rich?.innerHTML)) return;
+  if (rich ? tryInsertText(doc, rich.innerHTML, 'insertHTML') : tryInsertText(doc, replacement)) return;
 
   range.deleteContents();
-  const node = doc.createTextNode(replacement);
-  range.insertNode(node);
-  range.setStartAfter(node);
+  const nodes = rich ? [...rich.childNodes] : [doc.createTextNode(replacement)];
+  const fragment = doc.createDocumentFragment();
+  fragment.append(...nodes);
+  range.insertNode(fragment);
+  range.setStartAfter(nodes[nodes.length - 1]!);
   range.collapse(true);
   selection?.removeAllRanges();
   selection?.addRange(range);

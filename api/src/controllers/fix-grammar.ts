@@ -25,7 +25,7 @@ export async function fixGrammarController(c: Context<AppEnv>) {
   try {
     const result = await fixGrammar(body, c.req.raw.signal); // the client cancels checks for text it edited
     log.info(`← ${ms()}ms`, result);
-    save({ result });
+   // save({ result });
     return c.json(result);
   } catch (error) {
     log.error(`✗ ${ms()}ms`, error);

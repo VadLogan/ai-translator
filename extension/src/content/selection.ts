@@ -10,7 +10,9 @@ export type EditableSelection =
       kind: 'content-editable';
       element: HTMLElement;
       range: Range;
+      /** Mentions show up here as {{1}}, {{2}}, …: the n-th token stands for atoms[n - 1]. */
       text: string;
+      atoms?: Element[];
     }
   /** Selected page text outside any field: it can be translated, never replaced. */
   | {
@@ -30,8 +32,9 @@ const SELECTABLE_INPUT_TYPES = new Set(['text', 'search']);
 const EXCLUDED_AUTOCOMPLETE = /^(username|email|current-password|new-password|one-time-code|tel.*|cc-.*|postal-code|url)$/;
 const EXCLUDED_NAME = /(^|[\W_])(login|user(name)?|e-?mail|otp|pin|captcha|card|cvv|cvc|iban|phone|zip|postcode)([\W_]|$)/i;
 const EXCLUDED_INPUT_MODES = new Set(['email', 'tel', 'numeric']);
-// Page-side opt-outs: ours, and the ones pages already set for Grammarly.
-const OPT_OUT = '[data-ai-translator="off"], [data-gramm="false"], [data-enable-grammarly="false"]';
+// The page-side opt-out. Grammarly's (data-gramm="false") is deliberately not honored: chat apps
+// (ChatGPT, claude.ai) set it on their composer because Grammarly's overlay fights the editor.
+const OPT_OUT = '[data-ai-translator="off"]';
 
 /** A field the page opted out of, anywhere up its tree. */
 function isOptedOut(element: Element): boolean {
@@ -98,8 +101,8 @@ export function getEditableSelection(doc: Document = document): WritableSelectio
   const range = selection.getRangeAt(0);
   const host = findContentEditableHost(range.commonAncestorContainer);
   if (!host) return null;
-  const text = range.toString();
-  return text.trim() ? { kind: 'content-editable', element: host, range: range.cloneRange(), text } : null;
+  const snapshot = serialize(range.cloneRange(), host);
+  return snapshot.text.trim() ? { kind: 'content-editable', element: host, ...snapshot } : null;
 }
 
 /** Selected text outside any field. Fields belong to getEditableSelection, so they are left out here. */
@@ -129,7 +132,42 @@ export function wholeField(element: HTMLElement | null): WritableSelection | nul
   }
   const range = element.ownerDocument.createRange();
   range.selectNodeContents(element);
-  return { kind: 'content-editable', element, range, text: range.toString() };
+  return { kind: 'content-editable', element, ...serialize(range, element) };
+}
+
+// ponytail: mention chips by markup (Jira/ProseMirror data-mention-id, Teams itemtype, CKEditor .mention),
+// plus any non-editable island; extend when a real editor's chip slips through.
+const MENTION = '[data-mention-id], [data-mention], [itemtype*="Mention"], .mention, [contenteditable="false"]';
+
+/** The outermost mention around a node, inside the host. */
+function mentionAround(node: Node, host: HTMLElement): Element | null {
+  let mention: Element | null = null;
+  for (let el = node instanceof Element ? node : node.parentElement; el && el !== host && host.contains(el); el = el.parentElement) {
+    if (el.matches(MENTION)) mention = el;
+  }
+  return mention;
+}
+
+/**
+ * The range's text with each mention swapped for a {{n}} token, so it survives the provider and
+ * replaceSelection can put the original chip back. Widens `range` (mutated) over a chip it cuts.
+ */
+function serialize(range: Range, host: HTMLElement): { range: Range; text: string; atoms?: Element[] } {
+  const start = mentionAround(range.startContainer, host);
+  const end = mentionAround(range.endContainer, host);
+  if (start) range.setStartBefore(start);
+  if (end) range.setEndAfter(end);
+  const fragment = range.cloneContents();
+  const atoms = [...fragment.querySelectorAll(MENTION)].filter((el) => !el.parentElement?.closest(MENTION));
+  if (!atoms.length) return { range, text: range.toString() };
+  atoms.forEach((atom, i) => atom.replaceWith(`{{${i + 1}}}`));
+  return { range, text: fragment.textContent ?? '', atoms };
+}
+
+/** Tokens back to the chips' own text: for what the user reads (panels, history), never for writing. */
+export function plainText(selection: EditableSelection | null, text: string): string {
+  const atoms = selection?.kind === 'content-editable' ? selection.atoms : undefined;
+  return atoms ? text.replace(/\{\{(\d+)\}\}/g, (token, n) => atoms[Number(n) - 1]?.textContent ?? token) : text;
 }
 
 /** The field's bottom-right corner, where its icon sits. */
@@ -144,7 +182,8 @@ export function isSelectionUnchanged(snapshot: EditableSelection): boolean {
   if (snapshot.kind === 'text-control') {
     return snapshot.element.value.slice(snapshot.start, snapshot.end) === snapshot.text;
   }
-  return snapshot.range.toString() === snapshot.text;
+  if (snapshot.kind === 'page') return snapshot.range.toString() === snapshot.text;
+  return serialize(snapshot.range.cloneRange(), snapshot.element).text === snapshot.text;
 }
 
 /** Where the selection sits in the viewport: a horizontal position plus its top and bottom edges. */

@@ -9,7 +9,7 @@ import { disabledFields, type DisabledField } from '../../settings/disabled-fiel
 import { historyStore, type HistoryEntry } from '../../settings/history';
 import { storageSettings } from '../../settings/storage-settings';
 import { replaceSelection } from '../replace';
-import { fieldKey, fieldLabel, getEditableSelection, getFieldAnchor, getFocusedField, getPageSelection, getSelectionAnchor, isSelectionUnchanged, wholeField } from '../selection';
+import { fieldKey, fieldLabel, getEditableSelection, getFieldAnchor, getFocusedField, getPageSelection, getSelectionAnchor, isSelectionUnchanged, plainText, wholeField, type EditableSelection } from '../selection';
 import { TranslatorWidget, type WidgetView } from './TranslatorWidget';
 import { badge, cleanCheck, countFixes, detectedLang, grammarCount, hasEnoughWords, isChecking, hidden, isMenuOpen, menuLanguages, reducer, type Detection, type Screen, type State } from './translator-state';
 
@@ -130,13 +130,15 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
     } else {
       replaceSelection(selection, response.data.text);
       close();
-      remember(entry);
+      remember(entry, selection);
     }
   }
 
   /** Into the popup's History. Best effort: an orphaned script or full storage must not break the flow. */
-  function remember(entry: DistributiveOmit<HistoryEntry, 'site' | 'at'>): void {
-    void historyStore.add({ ...entry, site: location.hostname, at: Date.now() }).catch(() => {});
+  function remember(entry: DistributiveOmit<HistoryEntry, 'site' | 'at'>, selection: EditableSelection | null = null): void {
+    const text = plainText(selection, entry.text);
+    const result = plainText(selection, entry.result);
+    void historyStore.add({ ...entry, text, result, site: location.hostname, at: Date.now() }).catch(() => {});
   }
 
   /** The API rejected us: sign in, then resume what was interrupted -- a translation or the grammar check. */
@@ -326,14 +328,14 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
     // the icon shows ✓. After close(), to overwrite the skeleton check onInput wrote. A part of the
     // field leaves the rest unchecked, so that one is asked as usual.
     if (selection.text === wholeText) dispatch({ type: 'checked', check: cleanCheck(text) });
-    remember({ kind: 'grammar', text: selection.text, result: text });
+    remember({ kind: 'grammar', text: selection.text, result: text }, selection);
   }
 
   /** The grammar panel's Copy: page text is never replaced, so a copied fix is what gets used. */
   function copyFix(text: string): void {
     const { selection } = latest.current;
-    if (selection) remember({ kind: 'grammar', text: selection.text, result: text });
-    void navigator.clipboard.writeText(text).then(close);
+    if (selection) remember({ kind: 'grammar', text: selection.text, result: text }, selection);
+    void navigator.clipboard.writeText(plainText(selection, text)).then(close);
   }
 
   useEffect(() => {
@@ -516,7 +518,7 @@ function toView(
       const { fix } = screen;
       return {
         kind: 'grammarFixed',
-        html: fix?.html,
+        html: fix ? plainText(selection, fix.html) : undefined,
         onReplace: () => fix && onReplace(fix.text),
         onCopy: () => fix && onCopyFix(fix.text),
         onRewrite,

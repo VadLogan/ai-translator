@@ -29,7 +29,7 @@ export async function detectController(c: Context<AppEnv>) {
   try {
     const result = await detectLang(body);
     log.info(`← ${ms()}ms`, result);
-    save({ result });
+   // save({ result });
     return c.json(result);
   } catch (error) {
     log.error(`✗ ${ms()}ms`, error);

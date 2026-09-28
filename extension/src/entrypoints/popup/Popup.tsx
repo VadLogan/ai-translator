@@ -94,8 +94,13 @@ function Home(props: PopupProps) {
         <span className="flex min-w-0 grow flex-col gap-px">
           <Wordmark size={15} />
           {site && (
-            <Text variant="meta" className="truncate text-[12px]">
-              {site.on ? 'On' : 'Off'} for {site.host}
+            <Text variant="meta" className="flex min-w-0 items-center gap-1.5 text-[12px]">
+              <span
+                role="img"
+                aria-label={site.on ? 'On' : 'Off'}
+                className={`size-2 shrink-0 rounded-full ${site.on ? 'bg-tm-success' : 'bg-tm-danger-ink'}`}
+              />
+              <span className="truncate">{site.host}</span>
             </Text>
           )}
         </span>

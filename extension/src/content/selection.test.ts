@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it } from 'vitest';
-import { fieldKey, getEditableSelection, getFocusedField, getPageSelection, getSelectionAnchor, isSelectionUnchanged, isTextControl } from './selection';
+import { fieldKey, getEditableSelection, getFocusedField, getPageSelection, getSelectionAnchor, isSelectionUnchanged, isTextControl, plainText } from './selection';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -102,7 +102,6 @@ describe('field exclusions', () => {
     '<input inputmode="numeric">',
     '<input spellcheck="false">',
     '<form data-ai-translator="off"><textarea></textarea></form>',
-    '<textarea data-gramm="false"></textarea>',
   ])('skips %s', (html) => {
     expect(isTextControl(field(html))).toBe(false);
   });
@@ -113,6 +112,7 @@ describe('field exclusions', () => {
     '<input name="message" autocomplete="off">',
     '<input name="userMessage">',
     '<textarea name="user_comment"></textarea>',
+    '<textarea data-gramm="false"></textarea>',
   ])('keeps %s', (html) => {
     expect(isTextControl(field(html))).toBe(true);
   });
@@ -178,5 +178,24 @@ describe('getSelectionAnchor', () => {
       top: field.top,
       bottom: field.bottom,
     });
+  });
+});
+
+describe('mentions', () => {
+  it('turns mention chips into {{n}} tokens, widening over a chip the selection cuts', () => {
+    document.body.innerHTML =
+      '<div contenteditable="true">Hi <span data-mention-id="1" contenteditable="false">@Ann Lee</span>, ok</div>';
+    const chip = document.querySelector('span')!;
+    const range = document.createRange();
+    range.setStart(document.querySelector('div')!.firstChild!, 0);
+    range.setEnd(chip.firstChild!, 4); // ends inside the chip
+    document.getSelection()!.addRange(range);
+
+    const snapshot = getEditableSelection()!;
+
+    expect(snapshot).toMatchObject({ kind: 'content-editable', text: 'Hi {{1}}' });
+    expect(snapshot.kind === 'content-editable' && snapshot.atoms?.map((atom) => atom.textContent)).toEqual(['@Ann Lee']);
+    expect(isSelectionUnchanged(snapshot)).toBe(true);
+    expect(plainText(snapshot, 'Hallo {{1}}')).toBe('Hallo @Ann Lee');
   });
 });

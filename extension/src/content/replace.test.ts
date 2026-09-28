@@ -70,4 +70,25 @@ describe('replaceSelection', () => {
     expect(pasted).toBe('Welt');
     expect(editor.textContent).toBe('Hello world'); // left to the editor, no DOM edit
   });
+
+  it('puts mention chips back: HTML in the paste, cloned chips in the DOM fallback', () => {
+    const chip = '<span data-mention-id="42" contenteditable="false">@Ann</span>';
+    document.body.innerHTML = `<div contenteditable="true">Hi ${chip}, ok</div>`;
+    const editor = document.querySelector('div')!;
+    let html = '';
+    let plain = '';
+    editor.addEventListener('paste', (event) => {
+      html = event.clipboardData!.getData('text/html');
+      plain = event.clipboardData!.getData('text/plain');
+    });
+    const range = document.createRange();
+    range.selectNodeContents(editor);
+    document.getSelection()!.addRange(range);
+
+    replaceSelection(getEditableSelection()!, 'Hallo {{1}}, gut');
+
+    expect(html).toBe(`Hallo ${chip}, gut`);
+    expect(plain).toBe('Hallo @Ann, gut');
+    expect(editor.innerHTML).toBe(`Hallo ${chip}, gut`); // nobody took the paste
+  });
 });
