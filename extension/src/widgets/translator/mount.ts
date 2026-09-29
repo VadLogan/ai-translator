@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { Translator } from './Translator';
 // Processed by the Tailwind Vite plugin and handed back as a string, so it can go straight into a
 // <style> inside the shadow root instead of leaking into the page as a stylesheet.
-import WIDGET_CSS from '../../ui/theme.css?inline';
+import WIDGET_CSS from '../../components/theme.css?inline';
 import { remToPx, withPropertyDefaults } from './shadow-css';
 
 /**

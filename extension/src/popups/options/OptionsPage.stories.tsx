@@ -6,7 +6,7 @@ import { OptionsPage } from './OptionsPage';
 const noop = () => undefined;
 
 const meta = {
-  title: 'Options/OptionsPage',
+  title: 'Popups/Options',
   component: OptionsPage,
   parameters: { layout: 'fullscreen' },
   args: {

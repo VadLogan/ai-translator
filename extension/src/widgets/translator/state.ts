@@ -1,6 +1,6 @@
 import type { FixGrammarOk } from '../../../../shared/contract';
 import type { Language } from '../../core/languages';
-import type { Anchor, EditableSelection } from '../selection';
+import type { Anchor, EditableSelection } from '../../content/selection';
 
 /** POST /detect's answer: a language, text typed on the wrong keyboard layout, or no idea. */
 export type Detection = { lang: string } | 'mistyped' | 'unknown';

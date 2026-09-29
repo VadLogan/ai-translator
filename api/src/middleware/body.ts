@@ -55,7 +55,8 @@ export function parseDetectBody(body: unknown): DetectBody | string {
   if (text.length > MAX_TEXT_LENGTH) return `text must be at most ${MAX_TEXT_LENGTH} characters`;
   // Bound the url rather than trusting the caller -- a signed-in client can still send junk. Never parsed.
   if (url !== undefined && (typeof url !== 'string' || url.length > MAX_URL_LENGTH)) return 'url is invalid';
-  return { text, ...(typeof url === 'string' ? { url } : {}) };
+  // Trimmed once here, so every provider call, guard and saved row (and its trace_id) sees the same text.
+  return { text: text.trim(), ...(typeof url === 'string' ? { url } : {}) };
 }
 
 export function parseTranslateBody(body: unknown): TranslateBody | string {

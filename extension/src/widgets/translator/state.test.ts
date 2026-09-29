@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
-import { answered, badge, cleanCheck, countFixes, grammarCount, hasEnoughWords, isChecking, isMistyped, detectedLang, hidden, isMenuOpen, menuLanguages, reducer } from './translator-state';
-import type { EditableSelection } from '../selection';
+import { answered, badge, cleanCheck, countFixes, grammarCount, hasEnoughWords, isChecking, isMistyped, detectedLang, hidden, isMenuOpen, menuLanguages, reducer } from './state';
+import type { EditableSelection } from '../../content/selection';
 import { findLanguage } from '../../core/languages';
 
 const selection = { text: 'hello' } as EditableSelection;

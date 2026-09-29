@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 // defineItem reads chrome.storage at load; only the pure helpers are under test.
 vi.mock('wxt/utils/storage', () => ({ storage: { defineItem: () => ({}) } }));
 
-import { byDay, defaultPair, HISTORY_LIMIT, orient, pairLabel, topPairs, usedLately, withEntry, type HistoryEntry, type TranslationEntry } from './history';
+import { byDay, byUse, defaultPair, HISTORY_LIMIT, intoLanguages, orient, pairLabel, topPairs, usedLately, withEntry, type HistoryEntry, type TranslationEntry } from './history';
 
 const DAY = 86_400_000;
 const NOW = new Date(2026, 8, 25, 12).getTime();
@@ -68,5 +68,26 @@ describe('usedLately', () => {
   it('lists sources on the from side, skipping undetected ones', () => {
     const list = [entry('en', 3, 'uk'), entry('en', 2), entry('en', 1, 'pl'), entry('pl', 0, 'uk')];
     expect(usedLately(list, ['pl'], 'from')).toEqual([{ code: 'uk', at: 3 }]);
+  });
+});
+
+describe('byUse', () => {
+  it('orders favorites by target uses, ties in favorites order', () => {
+    const list = [entry('fr', 3), entry('de', 2), entry('fr', 1), grammar(0)];
+    expect(byUse(['en', 'de', 'pl', 'fr'], list)).toEqual(['fr', 'de', 'en', 'pl']);
+  });
+});
+
+describe('intoLanguages', () => {
+  it('offers the 3 most used favorites, then the non-favorites used lately', () => {
+    const list = [
+      entry('fr', 3),
+      entry('uk', 2),
+      entry('uk', 1),
+    ];
+    expect(intoLanguages(['en', 'pl', 'de', 'uk'], list)).toEqual({
+      yours: ['uk', 'en', 'pl'],
+      lately: [{ code: 'fr', at: 3 }],
+    });
   });
 });

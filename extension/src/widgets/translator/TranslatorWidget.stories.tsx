@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { findLanguage } from '../../core/languages';
-import { TranslatorWidget, type WidgetView } from './TranslatorWidget';
+import { TranslatorWidget } from './TranslatorWidget';
+import type { WidgetView } from './view';
 
 const FAVORITES = ['en', 'de', 'uk'].map((code) => findLanguage(code)!);
 
@@ -12,7 +13,7 @@ const PROVIDERS = [
 const noop = () => undefined;
 
 const meta = {
-  title: 'Content/TranslatorWidget',
+  title: 'Widgets/TranslatorWidget',
   component: TranslatorWidget,
   parameters: { layout: 'fullscreen' },
   args: {

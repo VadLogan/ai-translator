@@ -12,3 +12,4 @@ When a request is only typo-ridden or loosely worded but its meaning is clear, o
 # Rules
 Binding conventions live in `.claude/rules/`. Read the relevant file before changing code it covers.
 - `rules/api-architecture.md` — the `api/src/` layers (entrypoint → wiring → middleware → controller → service → repository → db), what each may not do, and where new code goes.
+- `rules/extension-ui.md` — the `extension/src/` UI split (entrypoints → containers → hooks → pure view → presentational components), what each may import.

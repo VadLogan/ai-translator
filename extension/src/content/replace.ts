@@ -6,6 +6,9 @@ import type { WritableSelection } from './selection';
  * falls back to direct DOM edits plus a synthetic input event.
  */
 export function replaceSelection(selection: WritableSelection, replacement: string): void {
+  // The API works on trimmed text; the whitespace the selection had around it stays on the page.
+  const [, lead, , trail] = /^(\s*)([\s\S]*?)(\s*)$/.exec(selection.text)!;
+  replacement = lead + replacement.trim() + trail;
   if (selection.kind === 'text-control') replaceInTextControl(selection, replacement);
   else replaceInContentEditable(selection, replacement);
 }

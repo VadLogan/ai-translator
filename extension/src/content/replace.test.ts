@@ -24,6 +24,17 @@ describe('replaceSelection', () => {
     expect(onInput).toHaveBeenCalledOnce();
   });
 
+  it('keeps the whitespace around the selection and trims the replacement', () => {
+    document.body.innerHTML = '<textarea>Hello world !</textarea>';
+    const textarea = document.querySelector('textarea')!;
+    textarea.focus();
+    textarea.setSelectionRange(5, 12); // " world "
+
+    replaceSelection(getEditableSelection()!, '\nWelt\n');
+
+    expect(textarea.value).toBe('Hello Welt !');
+  });
+
   it('uses execCommand when the browser supports it', () => {
     document.body.innerHTML = '<input value="Hello world">';
     const input = document.querySelector('input')!;

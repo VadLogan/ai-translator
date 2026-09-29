@@ -1,19 +1,20 @@
-import { useEffect, useReducer, useRef, useSyncExternalStore } from 'react';
-import type { DetectOk, RewriteStyle } from '../../../../shared/contract';
-import { layoutLanguages, switchLayout } from '../../core/layout';
-import { findLanguage, type Language } from '../../core/languages';
-import { isSiteDisabled } from '../../core/sites';
-import { PROVIDERS, isProviderId } from '../../auth/providers';
-import { sendMessage, type Response } from '../../messaging/messages';
-import { disabledFields, type DisabledField } from '../../settings/disabled-fields';
-import { historyStore, type HistoryEntry } from '../../settings/history';
-import { storageSettings } from '../../settings/storage-settings';
-import { replaceSelection } from '../replace';
-import { fieldKey, fieldLabel, getEditableSelection, getFieldAnchor, getFocusedField, getPageSelection, getSelectionAnchor, isSelectionUnchanged, plainText, wholeField, type EditableSelection } from '../selection';
-import { TranslatorWidget, type WidgetView } from './TranslatorWidget';
-import { answered, badge, cleanCheck, countFixes, detectedLang, grammarCount, hasEnoughWords, isChecking, isVerdict, hidden, isMenuOpen, menuLanguages, reducer, type Check, type Detection, type Screen, type State, type Verdict } from './translator-state';
+import { useEffect, useReducer, useRef, useState } from 'react';
+import type { RewriteStyle } from '../../../../../shared/contract';
+import { isProviderId } from '../../../auth/providers';
+import { switchLayout } from '../../../core/layout';
+import { findLanguage, type Language } from '../../../core/languages';
+import { sendMessage } from '../../../messaging/messages';
+import { historyStore, intoLanguages, type HistoryEntry } from '../../../settings/history';
+import { storageSettings } from '../../../settings/storage-settings';
+import { replaceSelection } from '../../../content/replace';
+import { fieldKey, fieldLabel, getEditableSelection, getFieldAnchor, getFocusedField, getPageSelection, getSelectionAnchor, isSelectionUnchanged, plainText, wholeField, type EditableSelection } from '../../../content/selection';
+import { answered, cleanCheck, countFixes, detectedLang, hasEnoughWords, hidden, isMenuOpen, isVerdict, menuLanguages, reducer, type Check, type Screen, type Verdict } from '../state';
+import { toCheck, toDetection, type ViewActions, type WidgetCallbacks } from '../view';
+import { requestSlot } from './requestSlot';
+import { usePageEvents } from './usePageEvents';
+import { useSiteGate } from './useSiteGate';
 
-export interface TranslatorProps {
+export interface FlowOptions {
   /** The shadow host: events inside it are the widget's own, not "outside clicks". */
   host: HTMLElement;
   /** Puts the host in the page. Called before the first show, so nothing is injected until needed. */
@@ -26,9 +27,11 @@ export interface TranslatorProps {
 }
 
 /**
- * Two flows: a selection gets the icon → menu → translate flow; a focused field with nothing
- * selected gets a corner icon → grammar fix → replace the whole field. TranslatorWidget only renders what this decides. */
-export function Translator({ host, mount, isInvalid }: TranslatorProps) {
+ * The widget's behavior. Two flows: a selection gets the icon → menu → translate flow; a focused
+ * field with nothing selected gets a corner icon → grammar fix → replace the whole field. Returns
+ * the state and the actions the view wires to its buttons; it renders nothing itself.
+ */
+export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
   const [state, dispatch] = useReducer(reducer, hidden);
   // Event handlers and async answers read the latest state through this, not a stale closure.
   const latest = useRef(state);
@@ -37,16 +40,11 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
   const generation = useRef(0);
   // The pending background grammar check; typing restarts it.
   const checkTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
-  // The one background check (POST /check) in flight, if any: its id cancels it, its text dedupes it. Cleared once it answers.
-  const pendingCheck = useRef<Pending>(null);
-  // The one fix (POST /fix-grammar) a click asked for, same shape.
-  const pendingFix = useRef<Pending>(null);
-  // The user turned the extension off for this site in the options page. refresh() is sync, so it
-  // reads this ref, kept in step with the settings cache.
-  const siteDisabled = useRef(false);
-  // fieldKey()s on this site the user turned off from the icon's hover pill. Same ref pattern.
-  const offFields = useRef(new Set<string>());
-  const dark = useSyncExternalStore(subscribeDark, () => darkQuery().matches);
+  const cancel = (id: string) => void sendMessage({ type: 'cancel', id });
+  // The one background check (POST /check) in flight, and the one fix (POST /fix-grammar) a click asked for.
+  const [pendingCheck] = useState(() => requestSlot(cancel));
+  const [pendingFix] = useState(() => requestSlot(cancel));
+  const gate = useSiteGate(() => close());
 
   const show = (screen: Screen) => dispatch({ type: 'show', screen });
   const fail = (message: string, back: 'menu' | 'close' = 'menu') => show({ kind: 'error', message, back });
@@ -58,11 +56,11 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
   }
 
   function refresh(): void {
-    if (siteDisabled.current) return close();
+    if (gate.siteDisabled.current) return close();
     if (isInvalid() || isMenuOpen(latest.current)) return;
     // Page text last: a selection inside a field is the field's.
     const selection = getEditableSelection() ?? getPageSelection();
-    if (selection && selection.kind !== 'page' && offFields.current.has(fieldKey(selection.element))) return close();
+    if (selection && selection.kind !== 'page' && gate.offFields.current.has(fieldKey(selection.element))) return close();
     if (selection) {
       mount();
       dispatch({ type: 'select', selection, anchor: getSelectionAnchor(selection) });
@@ -72,23 +70,26 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
       return;
     }
     const field = getFocusedField();
-    if (!field || offFields.current.has(fieldKey(field.element))) return close();
+    if (!field || gate.offFields.current.has(fieldKey(field.element))) return close();
     mount();
     dispatch({ type: 'select', selection: field, anchor: getFieldAnchor(field), field: true });
   }
 
   async function openMenu(): Promise<void> {
     const id = generation.current;
-    let favorites: string[];
+    let codes: string[];
     try {
-      // The cache answers immediately; the menu must not wait on the network to open.
-      favorites = (await storageSettings.get()).favoriteLanguages;
+      // The cache and the local history answer immediately; the menu must not wait on the network to open.
+      const [{ favoriteLanguages }, history] = await Promise.all([storageSettings.get(), historyStore.get()]);
+      // The same targets as the popup's "Translate into": the 3 most used favorites, then "Used lately".
+      const { yours, lately } = intoLanguages(favoriteLanguages, history);
+      codes = [...yours, ...lately.map(({ code }) => code)];
     } catch {
       // Only fails when the extension was reloaded while the icon was showing.
       return fail('The extension was updated. Reload the page.', 'close');
     }
     if (id !== generation.current) return;
-    dispatch({ type: 'open', languages: favorites.map(findLanguage).filter((l): l is Language => l !== undefined) });
+    dispatch({ type: 'open', languages: codes.map(findLanguage).filter((l): l is Language => l !== undefined) });
     if (!latest.current.detection) void detect(id);
     // The menu's "Grammar fix" item shows the selection's error count, so it is asked up front.
     // Page text can't be replaced, so it gets no grammar fix.
@@ -232,15 +233,14 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
     if (known?.verdict) return showVerdict(target.text, known.verdict);
     if (known?.fix) return show({ kind: 'grammarFixed', fix: known.fix });
     show({ kind: 'grammarFixed', fix: null });
-    if (pendingFix.current?.text === target.text) return; // in flight: its answer fills the panel
-    abort(pendingFix);
+    if (pendingFix.text === target.text) return; // in flight: its answer fills the panel
+    pendingFix.abort();
     // The fix counts its own errors, so a background check of the same text is wasted.
-    if (pendingCheck.current?.text === target.text) abort(pendingCheck);
-    const id = crypto.randomUUID();
-    pendingFix.current = { id, text: target.text };
+    if (pendingCheck.text === target.text) pendingCheck.abort();
+    const id = pendingFix.start(target.text);
     const answer = await sendMessage({ type: 'fix-grammar', text: target.text, id });
-    if (pendingFix.current?.id !== id) return; // cancelled by an edit
-    pendingFix.current = null;
+    if (!pendingFix.isCurrent(id)) return; // cancelled by an edit
+    pendingFix.done();
     const done: Check = answer.ok ? { text: target.text, errors: countFixes(answer.data.html), fix: answer.data } : toCheck(target.text, answer);
     dispatch({ type: 'checked', check: done });
     const now = latest.current;
@@ -258,15 +258,14 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
   async function checkGrammar(field = wholeField(latest.current.selection?.element ?? null)): Promise<void> {
     const { check } = latest.current;
     if (!field?.text.trim()) return;
-    if (pendingCheck.current?.text === field.text || (check?.text === field.text && answered(check) && !check.error)) return; // asked already
-    abort(pendingCheck);
-    const id = crypto.randomUUID();
-    pendingCheck.current = { id, text: field.text };
+    if (pendingCheck.text === field.text || (check?.text === field.text && answered(check) && !check.error)) return; // asked already
+    pendingCheck.abort();
+    const id = pendingCheck.start(field.text);
     dispatch({ type: 'checked', check: { text: field.text } });
     const answer = await sendMessage({ type: 'check', text: field.text, id });
     // Cancelled, or overtaken by a newer text: answers can arrive out of order.
-    if (pendingCheck.current?.id !== id) return;
-    pendingCheck.current = null;
+    if (!pendingCheck.isCurrent(id)) return;
+    pendingCheck.done();
     const done = toCheck(field.text, answer);
     dispatch({ type: 'checked', check: done });
     const now = latest.current;
@@ -277,13 +276,6 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
     } else if (done.verdict === 'gibberish' && now.screen.kind === 'languages' && now.selection?.text === field.text) {
       showVerdict(field.text, 'gibberish'); // the menu opened before the guard answered: nothing in it may be used
     }
-  }
-
-  /** Stops a request in flight in the worker, so an edited text stops billing. */
-  function abort(pending: { current: Pending }): void {
-    if (!pending.current) return;
-    void sendMessage({ type: 'cancel', id: pending.current.id });
-    pending.current = null;
   }
 
   /** Debounced: one check per pause in typing (or per settled selection), not per keystroke. */
@@ -311,9 +303,9 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
     const { selection, screen } = latest.current;
     const field = wholeField(selection?.element ?? null);
     if (!field) return scheduleCheck();
-    const wasChecking = pendingCheck.current !== null && pendingCheck.current.text !== field.text;
-    if (wasChecking) abort(pendingCheck);
-    if (pendingFix.current && pendingFix.current.text !== field.text) abort(pendingFix);
+    const wasChecking = pendingCheck.text !== undefined && pendingCheck.text !== field.text;
+    if (wasChecking) pendingCheck.abort();
+    if (pendingFix.text !== undefined && pendingFix.text !== field.text) pendingFix.abort();
     if (screen.kind === 'grammarFixed') close();
     // Emptied, or too short to check on its own: no spinner waiting on a check that won't come. A click still asks.
     if (!hasEnoughWords(field.text)) {
@@ -361,237 +353,79 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
     void navigator.clipboard.writeText(plainText(selection, text)).then(close);
   }
 
-  useEffect(() => {
-    const apply = ({ disabledSites }: { disabledSites: string[] }) => {
-      siteDisabled.current = isSiteDisabled(location.hostname, disabledSites);
-      if (siteDisabled.current) close();
-    };
-    storageSettings.get().then(apply, () => {});
-    return storageSettings.watch(apply);
-  }, []);
-
-  useEffect(() => {
-    const apply = (list: DisabledField[]) => {
-      offFields.current = new Set(list.filter(({ site }) => site === location.hostname).map(({ key }) => key));
-    };
-    disabledFields.get().then(apply, () => {});
-    return disabledFields.watch(apply);
-  }, []);
-
-  /** The hover pill's "Turn off in this field": no icon in this field again, until the options page says so. */
+  /** The hover pill's "Turn off in this field". */
   function disableField(): void {
     const element = latest.current.selection?.element;
     if (!element) return;
-    const key = fieldKey(element);
-    offFields.current.add(key); // now, not when the storage write echoes back
+    gate.disableField(fieldKey(element), fieldLabel(element));
     close();
-    void disabledFields.add({ site: location.hostname, key, label: fieldLabel(element) }).catch(() => {});
   }
 
-  // The handlers above only touch refs and dispatch, so subscribing once is enough.
-  useEffect(() => {
-    const owns = (event: Event) => event.composedPath().includes(host);
-    const listeners: [EventTarget, string, (event: Event) => void, AddEventListenerOptions?][] = [
-      [document, 'mousedown', (event) => !owns(event) && close()],
-      // Deferred: let the browser finalize the selection first.
-      [document, 'mouseup', (event) => !owns(event) && setTimeout(refresh, 0)],
-      [
-        document,
-        'keydown',
-        (event) => {
-          const { key } = event as KeyboardEvent;
-          if (key === 'Escape') return close();
-          if (latest.current.screen.kind === 'layout' && key === 'f') {
-            event.preventDefault();
-            event.stopPropagation();
-            return fixLayout();
-          }
-          // Grammar panel shortcuts. Captured and swallowed, or the field would get the keystroke too.
-          const { screen } = latest.current;
-          // A skeleton panel has nothing to apply yet, so the keys stay the field's.
-          // Clean text offers no Replace, so its Enter stays the field's (in Teams, Enter sends).
-          const keys = screen.kind === 'grammarFixed' && screen.fix && countFixes(screen.fix.html) > 0 ? ['Enter', 'n', 'o'] : ['n', 'o'];
-          if (screen.kind === 'grammarFixed' && screen.fix && keys.includes(key)) {
-            event.preventDefault();
-            event.stopPropagation();
-            if (key === 'Enter') apply(screen.fix.text);
-            else void rewrite(key === 'n' ? 'natural' : 'formal');
-            return;
-          }
-          // Menu shortcut badges: "1".."9" pick the matching favorite language.
-          const language = /^[1-9]$/.test(key) && isMenuOpen(latest.current) ? menuLanguages(latest.current)[Number(key) - 1] : undefined;
-          if (language) void translate(language.code);
-        },
-        { capture: true },
-      ],
-      [document, 'input', (event) => !owns(event) && onInput(), { capture: true }],
-      // Model-based editors (CKEditor in Teams, ProseMirror, Lexical) cancel beforeinput and edit
-      // the DOM themselves, so `input` never fires there. Deferred: the text changes after this event.
-      // Plain fields get both; onInput is idempotent for the same text.
-      [document, 'beforeinput', (event) => !owns(event) && setTimeout(onInput, 0), { capture: true }],
-      // Focus alone (tabbing in, or clicking an empty field) shows the field's corner icon.
-      // A field focused with text already in it is checked too, so its icon is ready before typing.
-      [
-        document,
-        'focusin',
-        (event) => {
-          if (owns(event)) return;
-          setTimeout(refresh, 0);
-          scheduleCheck();
-        },
-      ],
-      // Pressing the icon moves focus into the widget; that is not leaving the field.
-      [document, 'focusout', (event) => (event as FocusEvent).relatedTarget !== host && setTimeout(refresh, 0)],
-      // Deferred like mouseup: model-based editors (Lexical, ProseMirror) move the selection after
-      // the key event, so reading it synchronously would miss it.
-      [document, 'keyup', (event) => (event as KeyboardEvent).key !== 'Escape' && setTimeout(refresh, 0)],
-      // Close only when the scroll moves the selected field: pages like Teams scroll unrelated panes
-      // (chat list, typing indicators) constantly, which would otherwise kill the menu.
-      [
-        window,
-        'scroll',
-        (event) => {
-          const { target } = event;
-          const field = latest.current.selection?.element;
-          if (field && (target === document || (target instanceof Node && target.contains(field)))) close();
-        },
-        { capture: true, passive: true },
-      ],
-      [window, 'resize', () => close()],
-    ];
-    for (const [target, type, listener, options] of listeners) target.addEventListener(type, listener, options);
-    return () => {
-      clearTimeout(checkTimer.current);
-      for (const [target, type, listener, options] of listeners) target.removeEventListener(type, listener, options);
-    };
-  }, []);
-
-  if (!state.selection) return null;
-  return (
-    <TranslatorWidget
-      view={toView(state, {
-        onPick: signIn,
-        onBack: () => (state.screen.kind === 'error' && state.screen.back === 'close' ? close() : void openMenu()),
-        onReplace: apply,
-        onCopyFix: copyFix,
-        onClose: close,
-        onRewrite: (style) => void rewrite(style),
-      })}
-      anchor={state.anchor}
-      dark={dark}
-      callbacks={{
-        onIconClick: openFromIcon,
-        onLanguagePick: (code) => void translate(code),
-        onFixLayout: fixLayout,
-        onFixGrammar: openGrammar,
-        onOpenSettings: () => {
-          close();
-          void sendMessage({ type: 'open-options' });
-        },
-        onDisableField: disableField,
-      }}
-    />
-  );
-}
-
-/** Maps the flow's state onto what the presentational widget renders. */
-function toView(
-  state: State,
-  {
-    onPick,
-    onBack,
-    onReplace,
-    onCopyFix,
-    onRewrite,
-    onClose,
-  }: {
-    onPick: (provider: string, targetLang?: string) => void;
-    onBack: () => void;
-    onReplace: (text: string) => void;
-    onCopyFix: (text: string) => void;
-    onRewrite: (style: RewriteStyle) => void;
-    onClose: () => void;
-  },
-): WidgetView {
-  const { screen, selection, detection } = state;
-  switch (screen.kind) {
-    case 'icon':
-      return { kind: 'icon', field: screen.field, badge: badge(state), checking: isChecking(state), canDisable: !!selection && selection.kind !== 'page' };
-    case 'languages': {
-      // The layout item is the exception, not a menu fixture: only when detect says the text was mistyped.
-      const mistyped = detection === 'mistyped' || grammarCount(state) === 'layout';
-      const fixed = selection && mistyped ? switchLayout(selection.text) : '';
-      return {
-        kind: 'languages',
-        languages: menuLanguages(state),
-        layoutPreview: fixed && fixed !== selection?.text ? preview(fixed) : undefined,
-        detectedName:
-          detection === null ? undefined : detection === 'mistyped' ? 'wrong keyboard layout' : detection === 'unknown' ? 'unknown' : languageName(detection.lang),
-        detectedLang: detectedLang(state),
-        grammar: grammarCount(state),
-        readOnly: selection?.kind === 'page',
-      };
+  /** Esc, the layout card's F, the grammar panel's ↵ / N / O and the menu's digits. Captured and swallowed, or the field would get the keystroke too. */
+  function onKeyDown(event: KeyboardEvent): void {
+    const { key } = event;
+    if (key === 'Escape') return close();
+    const { screen } = latest.current;
+    if (screen.kind === 'layout' && key === 'f') {
+      event.preventDefault();
+      event.stopPropagation();
+      return fixLayout();
     }
-    case 'busy':
-      return { kind: 'busy', label: screen.label };
-    case 'grammarFixed': {
-      const { fix } = screen;
-      return {
-        kind: 'grammarFixed',
-        html: fix ? plainText(selection, fix.html) : undefined,
-        onReplace: () => fix && onReplace(fix.text),
-        onCopy: () => fix && onCopyFix(fix.text),
-        onRewrite,
-      };
+    // A skeleton panel has nothing to apply yet, so the keys stay the field's.
+    // Clean text offers no Replace, so its Enter stays the field's (in Teams, Enter sends).
+    const keys = screen.kind === 'grammarFixed' && screen.fix && countFixes(screen.fix.html) > 0 ? ['Enter', 'n', 'o'] : ['n', 'o'];
+    if (screen.kind === 'grammarFixed' && screen.fix && keys.includes(key)) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (key === 'Enter') apply(screen.fix.text);
+      else void rewrite(key === 'n' ? 'natural' : 'formal');
+      return;
     }
-    case 'layout': {
-      const typed = selection?.text ?? '';
-      return { kind: 'layout', typed, fixed: switchLayout(typed), ...layoutLanguages(typed), onClose };
-    }
-    case 'notText':
-      return { kind: 'notText' };
-    case 'translated':
-      return {
-        kind: 'translated',
-        text: screen.text,
-        lang: screen.lang,
-        onCopy: () => void navigator.clipboard.writeText(screen.text).then(onClose),
-      };
-    case 'signIn':
-      return { kind: 'signIn', providers: PROVIDERS, onPick: (provider) => onPick(provider, screen.targetLang) };
-    case 'error':
-      return { kind: 'error', message: screen.message, onBack };
+    // Menu shortcut badges: "1".."9" pick the matching favorite language.
+    const language = /^[1-9]$/.test(key) && isMenuOpen(latest.current) ? menuLanguages(latest.current)[Number(key) - 1] : undefined;
+    if (language) void translate(language.code);
   }
-}
 
-/**
- * The guard's 422 `mistyped` is a detection too: it puts the layout item in the menu. A failure is
- * just "unknown", and so is "und", which must not travel on as a sourceLang.
- */
-function toDetection(response: Response<DetectOk>): Detection {
-  if (!response.ok) return response.error.code === 'mistyped' ? 'mistyped' : 'unknown';
-  return response.data.lang !== 'und' ? { lang: response.data.lang } : 'unknown';
-}
+  usePageEvents(host, {
+    close,
+    refresh,
+    onInput,
+    onKeyDown,
+    // A field focused with text already in it is checked too, so its icon is ready before typing.
+    onFocusIn: () => {
+      setTimeout(refresh, 0);
+      scheduleCheck();
+    },
+    selectedElement: () => latest.current.selection?.element,
+  });
+  useEffect(() => () => clearTimeout(checkTimer.current), []);
 
-/** A check's answer: the count, the guard's verdict (a 422), or the failure. */
-function toCheck(text: string, answer: Response<{ errors: number }>): Check {
-  if (answer.ok) return { text, errors: answer.data.errors };
-  const { code } = answer.error;
-  return isVerdict(code) ? { text, verdict: code } : { text, error: answer.error };
-}
+  const viewActions: ViewActions = {
+    onPick: signIn,
+    onBack: () => {
+      const { screen } = latest.current;
+      if (screen.kind === 'error' && screen.back === 'close') close();
+      else void openMenu();
+    },
+    onReplace: apply,
+    onCopyFix: copyFix,
+    onClose: close,
+    onRewrite: (style) => void rewrite(style),
+  };
 
-type Pending = { id: string; text: string } | null;
+  const callbacks: WidgetCallbacks = {
+    onIconClick: openFromIcon,
+    onLanguagePick: (code) => void translate(code),
+    onFixLayout: fixLayout,
+    onFixGrammar: openGrammar,
+    onOpenSettings: () => {
+      close();
+      void sendMessage({ type: 'open-options' });
+    },
+    onDisableField: disableField,
+  };
 
-const languageName = (code: string): string => findLanguage(code)?.name ?? code;
-
-const preview = (text: string): string => (text.length > 28 ? `${text.slice(0, 28)}…` : text);
-
-const darkQuery = () => matchMedia('(prefers-color-scheme: dark)');
-
-function subscribeDark(onChange: () => void): () => void {
-  const query = darkQuery();
-  query.addEventListener('change', onChange);
-  return () => query.removeEventListener('change', onChange);
+  return { state, viewActions, callbacks };
 }
 
 /** Omit that keeps a union a union: `Omit<A | B, K>` would collapse it to their common keys. */

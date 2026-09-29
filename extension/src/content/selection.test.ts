@@ -198,4 +198,30 @@ describe('mentions', () => {
     expect(isSelectionUnchanged(snapshot)).toBe(true);
     expect(plainText(snapshot, 'Hallo {{1}}')).toBe('Hallo @Ann Lee');
   });
+
+  it('keeps links as tokens, so only the prose around them is rewritten', () => {
+    document.body.innerHTML =
+      '<div contenteditable="true">see <a href="https://x.test/a">this page</a> pls</div>';
+    const range = document.createRange();
+    range.selectNodeContents(document.querySelector('div')!);
+    document.getSelection()!.addRange(range);
+
+    const snapshot = getEditableSelection()!;
+
+    expect(snapshot).toMatchObject({ kind: 'content-editable', text: 'see {{1}} pls' });
+    expect(snapshot.kind === 'content-editable' && snapshot.atoms?.[0]?.outerHTML).toBe('<a href="https://x.test/a">this page</a>');
+  });
+
+  it('keeps a quoted earlier message, link and all, as one token', () => {
+    document.body.innerHTML =
+      '<div contenteditable="true"><blockquote itemtype="http://schema.skype.com/Reply">Ann: see <a href="https://x.test">it</a></blockquote><p>i agre</p></div>';
+    const range = document.createRange();
+    range.selectNodeContents(document.querySelector('div')!);
+    document.getSelection()!.addRange(range);
+
+    const snapshot = getEditableSelection()!;
+
+    expect(snapshot).toMatchObject({ kind: 'content-editable', text: '{{1}}i agre' });
+    expect(snapshot.kind === 'content-editable' && snapshot.atoms?.map((atom) => atom.tagName)).toEqual(['BLOCKQUOTE']);
+  });
 });

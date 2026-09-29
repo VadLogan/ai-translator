@@ -91,6 +91,22 @@ export function usedLately(list: readonly HistoryEntry[], favorites: readonly st
   return out;
 }
 
+/** Favorites reordered by how often history used them on that side, most used first; ties keep the favorites' order. */
+export function byUse(favorites: readonly string[], list: readonly HistoryEntry[], side: 'from' | 'to' = 'to'): string[] {
+  const uses = new Map<string, number>();
+  for (const entry of list) {
+    const code = entry.kind === 'grammar' ? undefined : entry[side];
+    if (code) uses.set(code, (uses.get(code) ?? 0) + 1);
+  }
+  return [...favorites].sort((a, b) => (uses.get(b) ?? 0) - (uses.get(a) ?? 0));
+}
+
+/** The popup's "Translate into" list, also the in-page menu's: the 3 most used favorites, then "Used lately". */
+export const intoLanguages = (favorites: readonly string[], list: readonly HistoryEntry[]) => ({
+  yours: byUse(favorites, list).slice(0, 3),
+  lately: usedLately(list, favorites, 'to'),
+});
+
 export const historyStore = {
   get: () => item.getValue(),
   async add(entry: HistoryEntry): Promise<HistoryEntry[]> {

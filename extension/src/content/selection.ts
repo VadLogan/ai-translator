@@ -10,7 +10,7 @@ export type EditableSelection =
       kind: 'content-editable';
       element: HTMLElement;
       range: Range;
-      /** Mentions show up here as {{1}}, {{2}}, …: the n-th token stands for atoms[n - 1]. */
+      /** Mentions and links show up here as {{1}}, {{2}}, …: the n-th token stands for atoms[n - 1]. */
       text: string;
       atoms?: Element[];
     }
@@ -136,8 +136,11 @@ export function wholeField(element: HTMLElement | null): WritableSelection | nul
 }
 
 // ponytail: mention chips by markup (Jira/ProseMirror data-mention-id, Teams itemtype, CKEditor .mention),
-// plus any non-editable island; extend when a real editor's chip slips through.
-const MENTION = '[data-mention-id], [data-mention], [itemtype*="Mention"], .mention, [contenteditable="false"]';
+// plus any non-editable island, plus links, plus quoted earlier messages (Teams replies carry itemtype
+// .../Reply; any blockquote) -- all kept verbatim so a fix touches only the user's own prose;
+// extend when a real editor's chip slips through.
+const MENTION =
+  '[data-mention-id], [data-mention], [itemtype*="Mention"], .mention, [contenteditable="false"], a[href], blockquote, [itemtype*="Reply"]';
 
 /** The outermost mention around a node, inside the host. */
 function mentionAround(node: Node, host: HTMLElement): Element | null {

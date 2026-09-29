@@ -1,5 +1,5 @@
 import type { Decorator, Preview } from '@storybook/react-vite';
-import '../src/ui/theme.css';
+import '../src/components/theme.css';
 
 export const globalTypes = {
   theme: {

@@ -1,7 +1,7 @@
 import { browser } from 'wxt/browser';
 import { defineContentScript } from 'wxt/utils/define-content-script';
 import { insertIntoFocusedField, isInsertMessage } from '../content/insert';
-import { mountTranslator } from '../content/ui/translator-widget';
+import { mountTranslator } from '../widgets/translator/mount';
 
 export default defineContentScript({
   matches: ['<all_urls>'],

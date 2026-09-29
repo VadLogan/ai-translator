@@ -38,3 +38,6 @@ export function searchLanguages(query: string): Language[] {
     ({ code, name }) => code === q || name.toLowerCase().includes(q) || nativeName(code).toLowerCase().includes(q),
   );
 }
+
+/** The English name, or the code itself for a language we don't list. */
+export const languageName = (code: string): string => findLanguage(code)?.name ?? code;
