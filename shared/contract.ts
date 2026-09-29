@@ -32,11 +32,6 @@ export interface DetectBody {
 export interface DetectOk {
   /** Language code the provider detected, e.g. "en", "pl", "de". "und" when it could not tell. */
   lang: string;
-  /**
-   * The text is not a language at all but one typed on the wrong keyboard layout ("ghbdtn" for
-   * "привет"). `lang` is then "und"; the client re-types it locally with `switchLayout`.
-   */
-  mistyped?: boolean;
   usage?: TokenUsage;
   model?: string;
 }
@@ -53,10 +48,16 @@ export interface FixGrammarOk {
    * deletion is an empty span.
    */
   html: string;
-  /** Typed on the wrong keyboard layout (`ghbdtn` for `привет`): not a language, so nothing was fixed. */
-  mistyped: boolean;
-  /** Random keystrokes (`adfasdf`), no language on either layout: nothing to fix or re-type. Never with `mistyped`. */
-  gibberish: boolean;
+  usage?: TokenUsage;
+  model?: string;
+}
+
+/** The background check behind the field icon's badge: the same text + url as detection. */
+export type CheckBody = DetectBody;
+
+export interface CheckOk {
+  /** How many grammar, spelling and punctuation errors the text has; 9 means 9 or more. */
+  errors: number;
   usage?: TokenUsage;
   model?: string;
 }
@@ -84,7 +85,11 @@ export interface TokenUsage {
   totalTokens: number;
 }
 
-export type ApiErrorCode = 'invalid-input' | 'unauthenticated' | 'rate-limited' | 'not-found' | 'provider-failed';
+/**
+ * `mistyped` / `gibberish` (422): the guard in front of every provider route found the text is no
+ * language -- typed on the wrong keyboard layout (`ghbdtn` for `привет`), or random keystrokes.
+ */
+export type ApiErrorCode = 'invalid-input' | 'unauthenticated' | 'rate-limited' | 'not-found' | 'provider-failed' | 'mistyped' | 'gibberish';
 
 export interface TranslateErr {
   error: { message: string; code: ApiErrorCode };
@@ -103,6 +108,13 @@ export const DEFAULT_SETTINGS: Settings = {
   favoriteLanguages: [],
   disabledSites: [],
 };
+
+export interface Language {
+  code: string;
+  name: string;
+  /** "Translating to <this language>", written in the language itself: the busy label speaks the target language. */
+  translating: string;
+}
 
 /** A bare hostname, lower case: no scheme, port or path. */
 export const HOSTNAME = /^[a-z0-9-]+(\.[a-z0-9-]+)*$/;

@@ -98,6 +98,6 @@ export const GrammarNothingToFix = story({
 
 export const GrammarChecking = story({ kind: 'grammarFixed', onReplace: noop, onCopy: noop, onRewrite: noop });
 
-export const Layout = story({ kind: 'layout', typed: 'Ghbdsn', fixed: 'Привіт', from: 'en', to: 'uk', onDismiss: noop });
+export const Layout = story({ kind: 'layout', typed: 'Ghbdsn', fixed: 'Привіт', from: 'en', to: 'uk', onClose: noop });
 
-export const NotText = story({ kind: 'notText', onContinue: noop });
+export const NotText = story({ kind: 'notText' });

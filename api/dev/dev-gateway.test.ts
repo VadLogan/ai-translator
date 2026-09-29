@@ -10,6 +10,8 @@ vi.mock('../src/resources/aiClient/requests/translate.ts', () => ({
 }));
 vi.mock('../src/resources/aiClient/requests/detect.ts', () => ({ detectLang: vi.fn(async () => ({ lang: 'en' })) }));
 vi.mock('../src/resources/aiClient/requests/fix-grammar/fix-grammar.ts', () => ({ fixGrammar: vi.fn(async ({ text }) => ({ text, html: text })) }));
+vi.mock('../src/resources/aiClient/requests/validateGuard.ts', () => ({ validateGuard: vi.fn(async () => null) }));
+vi.mock('../src/resources/aiClient/requests/grammarQuality.ts', () => ({ grammarQuality: vi.fn(async () => ({ errors: 0 })) }));
 vi.mock('../src/resources/aiClient/requests/rewrite.ts', () => ({ rewrite: vi.fn(async ({ text, style }) => ({ text: `[${style}] ${text}` })) }));
 vi.mock('../src/repositories/rewrites.ts', () => ({ rewritesRepository: { save: vi.fn(async () => {}) } }));
 vi.mock('../src/repositories/corrections.ts', () => ({ correctionsRepository: { save: vi.fn(async () => {}) } }));

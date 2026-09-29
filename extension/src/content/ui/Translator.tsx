@@ -1,17 +1,17 @@
 import { useEffect, useReducer, useRef, useSyncExternalStore } from 'react';
-import type { RewriteStyle } from '../../../../shared/contract';
+import type { DetectOk, RewriteStyle } from '../../../../shared/contract';
 import { layoutLanguages, switchLayout } from '../../core/layout';
 import { findLanguage, type Language } from '../../core/languages';
 import { isSiteDisabled } from '../../core/sites';
 import { PROVIDERS, isProviderId } from '../../auth/providers';
-import { sendMessage } from '../../messaging/messages';
+import { sendMessage, type Response } from '../../messaging/messages';
 import { disabledFields, type DisabledField } from '../../settings/disabled-fields';
 import { historyStore, type HistoryEntry } from '../../settings/history';
 import { storageSettings } from '../../settings/storage-settings';
 import { replaceSelection } from '../replace';
 import { fieldKey, fieldLabel, getEditableSelection, getFieldAnchor, getFocusedField, getPageSelection, getSelectionAnchor, isSelectionUnchanged, plainText, wholeField, type EditableSelection } from '../selection';
 import { TranslatorWidget, type WidgetView } from './TranslatorWidget';
-import { badge, cleanCheck, countFixes, detectedLang, grammarCount, hasEnoughWords, isChecking, hidden, isMenuOpen, menuLanguages, reducer, type Detection, type Screen, type State } from './translator-state';
+import { answered, badge, cleanCheck, countFixes, detectedLang, grammarCount, hasEnoughWords, isChecking, isVerdict, hidden, isMenuOpen, menuLanguages, reducer, type Check, type Detection, type Screen, type State, type Verdict } from './translator-state';
 
 export interface TranslatorProps {
   /** The shadow host: events inside it are the widget's own, not "outside clicks". */
@@ -37,8 +37,10 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
   const generation = useRef(0);
   // The pending background grammar check; typing restarts it.
   const checkTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
-  // The one check in flight, if any: its id cancels it, its text dedupes it. Cleared once it answers.
-  const pendingCheck = useRef<{ id: string; text: string } | null>(null);
+  // The one background check (POST /check) in flight, if any: its id cancels it, its text dedupes it. Cleared once it answers.
+  const pendingCheck = useRef<Pending>(null);
+  // The one fix (POST /fix-grammar) a click asked for, same shape.
+  const pendingFix = useRef<Pending>(null);
   // The user turned the extension off for this site in the options page. refresh() is sync, so it
   // reads this ref, kept in step with the settings cache.
   const siteDisabled = useRef(false);
@@ -101,7 +103,8 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
     if (!selection) return;
     const response = await sendMessage({ type: 'detect', text: selection.text });
     if (id !== generation.current) return;
-    dispatch({ type: 'detected', detection: toDetection(response.ok ? response.data : null) });
+    if (!response.ok && response.error.code === 'gibberish') return showVerdict(selection.text, 'gibberish');
+    dispatch({ type: 'detected', detection: toDetection(response) });
   }
 
   async function translate(targetLang: string): Promise<void> {
@@ -116,8 +119,10 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
     if (id !== generation.current) return;
 
     if (!response.ok) {
-      if (response.error.code === 'unauthenticated') show({ kind: 'signIn', targetLang });
-      else fail(response.error.message);
+      const { code, message } = response.error;
+      if (code === 'unauthenticated') show({ kind: 'signIn', targetLang });
+      else if (isVerdict(code)) showVerdict(selection.text, code, message);
+      else fail(message);
       return;
     }
     const from = sourceLang ?? response.data.detectedSourceLang;
@@ -167,51 +172,49 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
   }
 
   /**
-   * The icon's click. Never asks the API itself: it opens the panel on the check the field's input
-   * already started, as a skeleton until that answers. Re-read now, not at focus: the user kept
-   * typing. From the element, not from focus: pressing the icon moves focus into the widget.
+   * The field icon's click: the grammar panel for the whole field, filled by POST /fix-grammar --
+   * the only place that asks it. Re-read now, not at focus: the user kept typing. From the element,
+   * not from focus: pressing the icon moves focus into the widget.
    */
   function fixGrammar(): void {
     const field = wholeField(latest.current.selection?.element ?? null);
     if (!field?.text.trim()) return fail('Type something first.', 'close');
-    const { check } = latest.current;
     dispatch({ type: 'select', selection: field, anchor: getFieldAnchor(field), field: true });
-    if (check?.text === field.text && check.error) return showCheckError(check.error);
-    show({ kind: 'grammarFixed', fix: check?.text === field.text ? check.fix : null });
-    // Clicked inside the debounce: start the check now rather than after the pause.
-    clearTimeout(checkTimer.current);
-    void checkGrammar();
+    clearTimeout(checkTimer.current); // the fix brings its own count
+    void loadFix(field);
   }
 
   /**
-   * The icon's click. A text the check found mistyped opens the layout card, random keystrokes the
+   * The icon's click. A text the guard found mistyped opens the layout card, random keystrokes the
    * not-text notice -- instead of the grammar panel (field) or the menu (selection).
    */
   function openFromIcon(): void {
     const { screen, selection, check } = latest.current;
     const field = screen.kind === 'icon' && !!screen.field;
     const current = field ? wholeField(selection?.element ?? null) : selection;
-    const fix = current && check?.text === current.text && !check.dismissed ? check.fix : null;
-    if (!current || !(fix?.mistyped || fix?.gibberish)) return void (field ? fixGrammar() : openMenu());
+    const verdict = current && check?.text === current.text ? check.verdict : undefined;
+    if (!current || !verdict) return void (field ? fixGrammar() : openMenu());
     if (field) dispatch({ type: 'select', selection: current, anchor: getFieldAnchor(current), field: true });
-    show({ kind: fix.mistyped ? 'layout' : 'notText', field });
+    showVerdict(current.text, verdict);
   }
 
-  /** The layout card's ✕ or the notice's "Check anyway": the regular widget takes their place. */
-  function dismissWarning(field: boolean): void {
-    dispatch({ type: 'dismissWarning' });
-    if (field) fixGrammar();
-    else void openMenu();
+  /**
+   * The guard's 422, from any route: the text is no language. A wrong layout gets the layout card
+   * (page text can't be re-typed, so it just says so), random keystrokes the notice. Remembered on
+   * the check, so the icon keeps warning until the text changes.
+   */
+  function showVerdict(text: string, verdict: Verdict, message = 'Typed on the wrong keyboard layout'): void {
+    dispatch({ type: 'checked', check: { text, verdict } });
+    if (verdict === 'gibberish') show({ kind: 'notText' });
+    else if (latest.current.selection?.kind === 'page') fail(message, 'close');
+    else show({ kind: 'layout' });
   }
 
   /** The menu's "Grammar fix" item: the grammar panel for the selection, not the whole field. */
   function openGrammar(): void {
-    const { selection, check } = latest.current;
+    const { selection } = latest.current;
     if (!selection || selection.kind === 'page') return;
-    const mine = check?.text === selection.text ? check : null;
-    if (mine?.error) return showCheckError(mine.error);
-    show({ kind: 'grammarFixed', fix: mine?.fix ?? null });
-    void checkGrammar(selection); // a no-op while it is in flight or answered
+    void loadFix(selection);
   }
 
   function showCheckError(error: { message: string; code?: string }): void {
@@ -220,41 +223,67 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
   }
 
   /**
-   * One check per text, driven by the field's input: it spins the icon, then badges the error count
-   * and fills an open skeleton panel. Edits cancel it (onInput); a failure badges the icon.
+   * Opens the grammar panel on `target`'s fix: the one already fetched for this text, or a skeleton
+   * until POST /fix-grammar answers. Its answer also replaces the badge's count with its own.
+   */
+  async function loadFix(target: EditableSelection): Promise<void> {
+    const { check } = latest.current;
+    const known = check?.text === target.text ? check : null;
+    if (known?.verdict) return showVerdict(target.text, known.verdict);
+    if (known?.fix) return show({ kind: 'grammarFixed', fix: known.fix });
+    show({ kind: 'grammarFixed', fix: null });
+    if (pendingFix.current?.text === target.text) return; // in flight: its answer fills the panel
+    abort(pendingFix);
+    // The fix counts its own errors, so a background check of the same text is wasted.
+    if (pendingCheck.current?.text === target.text) abort(pendingCheck);
+    const id = crypto.randomUUID();
+    pendingFix.current = { id, text: target.text };
+    const answer = await sendMessage({ type: 'fix-grammar', text: target.text, id });
+    if (pendingFix.current?.id !== id) return; // cancelled by an edit
+    pendingFix.current = null;
+    const done: Check = answer.ok ? { text: target.text, errors: countFixes(answer.data.html), fix: answer.data } : toCheck(target.text, answer);
+    dispatch({ type: 'checked', check: done });
+    const now = latest.current;
+    if (now.screen.kind !== 'grammarFixed' || now.screen.fix || now.selection?.text !== target.text) return; // closed or moved on
+    if (answer.ok) show({ kind: 'grammarFixed', fix: answer.data });
+    else if (done.verdict) showVerdict(target.text, done.verdict);
+    else showCheckError(answer.error);
+  }
+
+  /**
+   * The background check behind the badge (POST /check): the error count only, never the fix. One
+   * per text, driven by the field's input; it spins the icon, then badges the count. Edits cancel
+   * it (onInput); a failure badges the icon.
    */
   async function checkGrammar(field = wholeField(latest.current.selection?.element ?? null)): Promise<void> {
     const { check } = latest.current;
     if (!field?.text.trim()) return;
-    if (pendingCheck.current?.text === field.text || (check?.text === field.text && check.fix)) return; // asked already
-    cancelCheck();
+    if (pendingCheck.current?.text === field.text || (check?.text === field.text && answered(check) && !check.error)) return; // asked already
+    abort(pendingCheck);
     const id = crypto.randomUUID();
     pendingCheck.current = { id, text: field.text };
-    dispatch({ type: 'checked', check: { text: field.text, fix: null } });
-    const answer = await sendMessage({ type: 'fix-grammar', text: field.text, id });
+    dispatch({ type: 'checked', check: { text: field.text } });
+    const answer = await sendMessage({ type: 'check', text: field.text, id });
     // Cancelled, or overtaken by a newer text: answers can arrive out of order.
     if (pendingCheck.current?.id !== id) return;
     pendingCheck.current = null;
-    const done = answer.ok ? { text: field.text, fix: answer.data } : { text: field.text, fix: null, error: answer.error };
+    const done = toCheck(field.text, answer);
     dispatch({ type: 'checked', check: done });
     const now = latest.current;
     if (now.screen.kind === 'icon' && now.screen.field) {
       // Re-select: a paste or autocomplete changes the text with no keyup to refresh it.
       const current = wholeField(field.element);
       if (current) dispatch({ type: 'select', selection: current, anchor: getFieldAnchor(current), field: true });
-    } else if (now.screen.kind === 'grammarFixed' && !now.screen.fix && now.selection?.text === field.text) {
-      if (!answer.ok) showCheckError(answer.error);
-      else if (answer.data.mistyped) show({ kind: 'layout', field: true });
-      else if (answer.data.gibberish) show({ kind: 'notText', field: true });
-      else show({ kind: 'grammarFixed', fix: answer.data });
+    } else if (done.verdict === 'gibberish' && now.screen.kind === 'languages' && now.selection?.text === field.text) {
+      showVerdict(field.text, 'gibberish'); // the menu opened before the guard answered: nothing in it may be used
     }
   }
 
-  function cancelCheck(): void {
-    const pending = pendingCheck.current;
-    if (!pending) return;
-    pendingCheck.current = null;
-    void sendMessage({ type: 'cancel', id: pending.id });
+  /** Stops a request in flight in the worker, so an edited text stops billing. */
+  function abort(pending: { current: Pending }): void {
+    if (!pending.current) return;
+    void sendMessage({ type: 'cancel', id: pending.current.id });
+    pending.current = null;
   }
 
   /** Debounced: one check per pause in typing (or per settled selection), not per keystroke. */
@@ -265,8 +294,7 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
       // A single-line input (search box, filter, form field) shows its icon but costs no request
       // until the icon is clicked: clicks call checkGrammar themselves.
       if (screen.kind === 'icon' && selection?.element instanceof HTMLInputElement) return;
-      // An open panel was asked for, so it always checks; the icon only for 3+ words (the click asks for less).
-      if (screen.kind === 'grammarFixed') return void checkGrammar();
+      // 3+ words only; the click asks for less.
       if (screen.kind !== 'icon') return;
       // A selection's own text, not its whole field. An open menu asks for itself (openMenu).
       const target = screen.field ? wholeField(selection?.element ?? null) : selection?.kind !== 'page' ? selection : null;
@@ -275,33 +303,25 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
   }
 
   /**
-   * The field changed. A check for the old text is cancelled at once, not after the pause, and the
-   * icon keeps spinning into the next one. Emptied: nothing to check, the panel closes. An open
-   * panel follows the text back to a skeleton.
+   * The field changed. A check or fix for the old text is cancelled at once, not after the pause,
+   * and the icon keeps spinning into the next check. An open grammar panel closes: it showed the
+   * old text's fix, and a fix is only asked on click.
    */
   function onInput(): void {
     const { selection, screen } = latest.current;
     const field = wholeField(selection?.element ?? null);
     if (!field) return scheduleCheck();
     const wasChecking = pendingCheck.current !== null && pendingCheck.current.text !== field.text;
-    if (wasChecking) cancelCheck();
-    if (!field.text.trim()) {
-      clearTimeout(checkTimer.current);
-      dispatch({ type: 'checked', check: null });
-      if (screen.kind === 'grammarFixed') close();
-      return;
-    }
-    // Too short to check on its own: no spinner waiting on a check that won't come. A click still asks.
-    if (screen.kind !== 'grammarFixed' && !hasEnoughWords(field.text)) {
+    if (wasChecking) abort(pendingCheck);
+    if (pendingFix.current && pendingFix.current.text !== field.text) abort(pendingFix);
+    if (screen.kind === 'grammarFixed') close();
+    // Emptied, or too short to check on its own: no spinner waiting on a check that won't come. A click still asks.
+    if (!hasEnoughWords(field.text)) {
       clearTimeout(checkTimer.current);
       dispatch({ type: 'checked', check: null });
       return;
     }
-    if (screen.kind === 'grammarFixed') {
-      dispatch({ type: 'select', selection: field, anchor: getFieldAnchor(field), field: true });
-      show({ kind: 'grammarFixed', fix: null });
-    }
-    if (wasChecking || screen.kind === 'grammarFixed') dispatch({ type: 'checked', check: { text: field.text, fix: null } });
+    if (wasChecking) dispatch({ type: 'checked', check: { text: field.text } });
     scheduleCheck();
   }
 
@@ -313,8 +333,11 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
     show({ kind: 'busy', label: 'Rewriting…' });
     const response = await sendMessage({ type: 'rewrite', text: selection.text, style });
     if (id !== generation.current) return;
-    if (!response.ok) fail(response.error.message, 'close');
-    else apply(response.data.text);
+    if (!response.ok) {
+      const { code, message } = response.error;
+      if (isVerdict(code)) showVerdict(selection.text, code, message);
+      else fail(message, 'close');
+    } else apply(response.data.text);
   }
 
   function apply(text: string): void {
@@ -453,7 +476,6 @@ export function Translator({ host, mount, isInvalid }: TranslatorProps) {
         onCopyFix: copyFix,
         onClose: close,
         onRewrite: (style) => void rewrite(style),
-        onDismissWarning: dismissWarning,
       })}
       anchor={state.anchor}
       dark={dark}
@@ -482,7 +504,6 @@ function toView(
     onCopyFix,
     onRewrite,
     onClose,
-    onDismissWarning,
   }: {
     onPick: (provider: string, targetLang?: string) => void;
     onBack: () => void;
@@ -490,7 +511,6 @@ function toView(
     onCopyFix: (text: string) => void;
     onRewrite: (style: RewriteStyle) => void;
     onClose: () => void;
-    onDismissWarning: (field: boolean) => void;
   },
 ): WidgetView {
   const { screen, selection, detection } = state;
@@ -526,10 +546,10 @@ function toView(
     }
     case 'layout': {
       const typed = selection?.text ?? '';
-      return { kind: 'layout', typed, fixed: switchLayout(typed), ...layoutLanguages(typed), onDismiss: () => onDismissWarning(!!screen.field) };
+      return { kind: 'layout', typed, fixed: switchLayout(typed), ...layoutLanguages(typed), onClose };
     }
     case 'notText':
-      return { kind: 'notText', onContinue: () => onDismissWarning(!!screen.field) };
+      return { kind: 'notText' };
     case 'translated':
       return {
         kind: 'translated',
@@ -544,11 +564,23 @@ function toView(
   }
 }
 
-/** "und" is the provider saying it could not tell, so it must not travel on as a sourceLang. */
-function toDetection(answer: { lang: string; mistyped?: boolean } | null): Detection {
-  if (answer?.mistyped) return 'mistyped';
-  return answer && answer.lang !== 'und' ? { lang: answer.lang } : 'unknown';
+/**
+ * The guard's 422 `mistyped` is a detection too: it puts the layout item in the menu. A failure is
+ * just "unknown", and so is "und", which must not travel on as a sourceLang.
+ */
+function toDetection(response: Response<DetectOk>): Detection {
+  if (!response.ok) return response.error.code === 'mistyped' ? 'mistyped' : 'unknown';
+  return response.data.lang !== 'und' ? { lang: response.data.lang } : 'unknown';
 }
+
+/** A check's answer: the count, the guard's verdict (a 422), or the failure. */
+function toCheck(text: string, answer: Response<{ errors: number }>): Check {
+  if (answer.ok) return { text, errors: answer.data.errors };
+  const { code } = answer.error;
+  return isVerdict(code) ? { text, verdict: code } : { text, error: answer.error };
+}
+
+type Pending = { id: string; text: string } | null;
 
 const languageName = (code: string): string => findLanguage(code)?.name ?? code;
 

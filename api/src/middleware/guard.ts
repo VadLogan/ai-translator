@@ -1,0 +1,27 @@
+import { createMiddleware } from 'hono/factory';
+import { fail, requestId, type AppEnv } from '../utils/http.ts';
+import { scopedLogger } from '../resources/logger.ts';
+import { validateGuard, type GuardVerdict } from '../resources/aiClient/requests/validateGuard.ts';
+
+const MESSAGES = {
+  mistyped: 'Typed on the wrong keyboard layout',
+  gibberish: "This doesn't look like text",
+} as const;
+
+/**
+ * 422s a text that is no language -- a wrong keyboard layout or random keystrokes -- before the
+ * provider call it would waste. The one middleware allowed to call an AI request. Runs after
+ * validate(), which put `text` on the body. Fails open: a guard outage must not block translating.
+ */
+export const guardText = createMiddleware<AppEnv>(async (c, next) => {
+  const { text } = c.get('body') as { text: string };
+  let verdict: GuardVerdict | null = null;
+  try {
+    verdict = await validateGuard(text, c.req.raw.signal);
+  } catch (error) {
+    scopedLogger('guard', requestId().id).error('guard failed, letting the text through', error);
+  }
+  if (verdict) return fail(c, 422, verdict, MESSAGES[verdict]);
+
+  await next();
+});

@@ -1,10 +1,11 @@
 import { useState, type ReactNode } from 'react';
-import { findLanguage, LANGUAGES, nativeName, searchLanguages } from '../../core/languages';
+import { findLanguage, nativeName, searchLanguages } from '../../core/languages';
 import { byDay, HISTORY_LIMIT, pairLabel, topPairs, type HistoryEntry, type Pair, type TranslationEntry } from '../../settings/history';
 import { IconButton, Kbd, PillButton } from '../../ui/buttons';
 import { Flag, BrandMark, Icon } from '../../ui/icons';
 import { LanguageCard, SearchField, Segmented, StatusChip, Switch, TextAreaCard } from '../../ui/inputs';
 import { Text, Wordmark } from '../../ui/typography';
+import { LANGUAGES } from '../../../../shared/contants';
 
 export type PopupScreen = 'home' | 'history' | { pick: 'from' | 'into' };
 

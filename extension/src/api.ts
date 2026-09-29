@@ -1,5 +1,7 @@
 import type {
   ApiErrorCode,
+  CheckBody,
+  CheckOk,
   DetectBody,
   DetectOk,
   FixGrammarBody,
@@ -38,6 +40,10 @@ export const detect = (body: DetectBody, accessToken: string | null, baseUrl = B
 /** The whole field's text with grammar, spelling and punctuation fixed. `signal` cancels it. */
 export const fixGrammar = (body: FixGrammarBody, accessToken: string | null, signal?: AbortSignal, baseUrl = BASE_URL) =>
   call<FixGrammarOk>('/fix-grammar', { method: 'POST', body, signal }, accessToken, baseUrl);
+
+/** How many errors the text has, for the field icon's badge; the fix itself is asked on click. `signal` cancels it. */
+export const check = (body: CheckBody, accessToken: string | null, signal?: AbortSignal, baseUrl = BASE_URL) =>
+  call<CheckOk>('/check', { method: 'POST', body, signal }, accessToken, baseUrl);
 
 export const rewrite = (body: RewriteBody, accessToken: string | null, baseUrl = BASE_URL) =>
   call<RewriteOk>('/rewrite', { method: 'POST', body }, accessToken, baseUrl);

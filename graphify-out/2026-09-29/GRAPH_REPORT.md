@@ -1,17 +1,17 @@
-# Graph Report - ai-translator-ext  (2026-09-29)
+# Graph Report - ai-translator-ext  (2026-09-28)
 
 ## Corpus Check
-- 132 files · ~59,815 words
+- 127 files · ~58,609 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 9 file(s) not represented in the graph (top: (none) 5, .example 2, .css 1)
 
 ## Summary
-- 850 nodes · 1878 edges · 33 communities (30 shown, 3 thin omitted)
-- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 57 edges (avg confidence: 0.85)
+- 822 nodes · 1768 edges · 40 communities (36 shown, 4 thin omitted)
+- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 56 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `fbe28d7f`
+- Built from commit: `1521eaaa`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -24,55 +24,62 @@
 - background.ts
 - AI Translator API README
 - dev-gateway.ts
-- typography.stories.tsx
+- react
 - API architecture rules
 - scripts
 - extension/package.json
 - TranslatorWidget.stories.tsx
 - compilerOptions
+- popup/main.tsx
 - TranslatorWidget.tsx
 - buttons.tsx
 - devDependencies
 - icons.tsx
 - compilerOptions
 - imports
+- OptionsPage.tsx
 - Extension Icon 128px (translation speech bubbles)
 - scripts
 - Extension id pinning for OAuth redirect
 - vitest.config.ts
-- @storybook/react-vite
+- @tailwindcss/vite
 - dependencies
 - icons.stories.tsx
 - ref_src_health_ts
 - Popup.tsx
+- OptionsPage.stories.tsx
+- PopupProps
 - translator-widget.ts
 - WidgetCallbacks
 - Popup.stories.tsx
-- preview.tsx
+- languages.ts
+- @storybook/react-vite
+- options/main.tsx
+- messages.ts
 
 ## God Nodes (most connected - your core abstractions)
-1. `Translator()` - 53 edges
+1. `Translator()` - 50 edges
 2. `PopupProps` - 24 edges
-3. `fail()` - 20 edges
-4. `graphify skill (SKILL.md)` - 19 edges
-5. `findLanguage()` - 18 edges
-6. `scopedLogger()` - 17 edges
-7. `sendMessage()` - 16 edges
-8. `requestId()` - 13 edges
-9. `benchmark()` - 13 edges
-10. `scripts` - 13 edges
+3. `graphify skill (SKILL.md)` - 19 edges
+4. `findLanguage()` - 18 edges
+5. `fail()` - 16 edges
+6. `sendMessage()` - 15 edges
+7. `scopedLogger()` - 13 edges
+8. `scripts` - 13 edges
+9. `react` - 13 edges
+10. `API architecture rules` - 13 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Check` --references--> `FixGrammarOk`  [EXTRACTED]
   extension/src/content/ui/translator-state.ts → shared/contract.ts
-- `OptionsPageProps` --references--> `Language`  [EXTRACTED]
-  extension/src/entrypoints/options/OptionsPage.tsx → shared/contract.ts
 - `Extension id pinning for OAuth redirect` --conceptually_related_to--> `Hand-rolled PKCE OAuth`  [INFERRED]
   api/README.md → CLAUDE.md
 - `POST /detect` --references--> `Wrong keyboard layout (mistyped + switchLayout)`  [EXTRACTED]
   api/README.md → CLAUDE.md
 - `POST /fix-grammar` --shares_data_with--> `POST /detect`  [EXTRACTED]
   CLAUDE.md → api/README.md
+- `AI Translator playground page` --conceptually_related_to--> `Paste-first selection replacement`  [INFERRED]
+  extension/playground/index.html → CLAUDE.md
 
 ## Import Cycles
 - None detected.
@@ -85,7 +92,7 @@
 - **graphify graph refresh mechanisms** — _claude_skills_graphify_references_add_watch_watch, _claude_skills_graphify_references_hooks_post_commit_hook, _claude_skills_graphify_references_update_incremental_update [INFERRED 0.85]
 - **Extension toolbar icon set (16/32/48/128)** — extension_public_icon_16_icon, extension_public_icon_32_icon, extension_public_icon_48_icon, extension_public_icon_128_icon [INFERRED 0.95]
 
-## Communities (33 total, 3 thin omitted)
+## Communities (40 total, 4 thin omitted)
 
 ### Community 0 - "ref_vitest"
 Cohesion: 0.13
@@ -93,7 +100,7 @@ Nodes (12): request, toRow(), request, toRow(), request, toRow(), diff(), Segmen
 
 ### Community 1 - "Translator.tsx"
 Cohesion: 0.06
-Nodes (101): isProviderId(), caretIn(), insertIntoFocusedField(), InsertMessage, dispatchInput(), replaceInContentEditable(), replaceInTextControl(), replaceSelection() (+93 more)
+Nodes (93): isProviderId(), caretIn(), insertIntoFocusedField(), InsertMessage, dispatchInput(), replaceInContentEditable(), replaceInTextControl(), replaceSelection() (+85 more)
 
 ### Community 2 - "inputs.stories.tsx"
 Cohesion: 0.18
@@ -105,11 +112,11 @@ Nodes (44): .claude/CLAUDE.md (project instructions), Understood-as prompt rule,
 
 ### Community 4 - "contract.ts"
 Cohesion: 0.06
-Nodes (83): app, jwt(), userToken(), checkController(), detectController(), fixGrammarController(), rewriteController(), getSettings() (+75 more)
+Nodes (73): app, jwt(), userToken(), detectController(), fixGrammarController(), rewriteController(), getSettings(), putSettings() (+65 more)
 
 ### Community 5 - "background.ts"
-Cohesion: 0.14
-Nodes (29): RFC-7636, ApiError, call(), check(), detect(), fixGrammar(), getSettings(), rewrite() (+21 more)
+Cohesion: 0.13
+Nodes (30): RFC-7636, ApiError, call(), detect(), fixGrammar(), getSettings(), rewrite(), saveSettings() (+22 more)
 
 ### Community 6 - "AI Translator API README"
 Cohesion: 0.08
@@ -117,11 +124,11 @@ Nodes (27): AI Translator API README, POST /detect, deno.json + devDependencies 
 
 ### Community 7 - "dev-gateway.ts"
 Cohesion: 0.06
-Nodes (42): devToken(), gateway, token(), ASYMMETRIC, base64url(), decodeJson(), DEV_JWT_SECRET, hmacKey() (+34 more)
+Nodes (41): devToken(), gateway, token(), ASYMMETRIC, base64url(), decodeJson(), DEV_JWT_SECRET, hmacKey() (+33 more)
 
-### Community 8 - "typography.stories.tsx"
-Cohesion: 0.22
-Nodes (10): Colours, meta, Scale, TONES, Text(), TEXT_TONE, TextTone, TextVariant (+2 more)
+### Community 8 - "react"
+Cohesion: 0.20
+Nodes (11): Colours, meta, Scale, TONES, Text(), TEXT_TONE, TextTone, TextVariant (+3 more)
 
 ### Community 9 - "API architecture rules"
 Cohesion: 0.18
@@ -137,11 +144,15 @@ Nodes (16): description, typescript, vitest, name, private, type, version, flag-
 
 ### Community 12 - "TranslatorWidget.stories.tsx"
 Cohesion: 0.06
-Nodes (28): Busy, Error, FieldIcon, FieldIconChecking, FieldIconClean, FieldIconError, FieldIconErrors, FieldIconGibberish (+20 more)
+Nodes (29): Busy, Error, FieldIcon, FieldIconChecking, FieldIconClean, FieldIconError, FieldIconErrors, FieldIconGibberish (+21 more)
 
 ### Community 13 - "compilerOptions"
 Cohesion: 0.14
 Nodes (13): compilerOptions, allowImportingTsExtensions, erasableSyntaxOnly, module, moduleResolution, noEmit, noUncheckedIndexedAccess, rewriteRelativeImportExtensions (+5 more)
+
+### Community 14 - "popup/main.tsx"
+Cohesion: 0.27
+Nodes (10): isSiteDisabled(), parseSites(), Options(), activeTab(), App(), Notice, Popup(), PopupScreen (+2 more)
 
 ### Community 15 - "TranslatorWidget.tsx"
 Cohesion: 0.14
@@ -149,7 +160,7 @@ Nodes (11): Anchor, Badge, clamp(), cornerStyle(), iconStyle(), Panel(), Transla
 
 ### Community 16 - "buttons.tsx"
 Cohesion: 0.14
-Nodes (15): ICON_SIZE, ICON_TONE, IconButton(), IconButtonProps, Kbd(), KBD_TONE, PILL_SIZE, PILL_VARIANT (+7 more)
+Nodes (14): ICON_SIZE, ICON_TONE, IconButton(), IconButtonProps, Kbd(), KBD_TONE, PILL_SIZE, PILL_VARIANT (+6 more)
 
 ### Community 17 - "devDependencies"
 Cohesion: 0.17
@@ -164,8 +175,12 @@ Cohesion: 0.29
 Nodes (6): compilerOptions, jsx, noUncheckedIndexedAccess, strict, extends, ./.wxt/tsconfig.json
 
 ### Community 20 - "imports"
-Cohesion: 0.33
-Nodes (5): imports, hono, openai, postgres, @typesafe-ai/sdk
+Cohesion: 0.40
+Nodes (4): imports, hono, openai, postgres
+
+### Community 21 - "OptionsPage.tsx"
+Cohesion: 0.29
+Nodes (4): OptionsPage(), OptionsPageProps, Account, DisabledField
 
 ### Community 22 - "Extension Icon 128px (translation speech bubbles)"
 Cohesion: 0.60
@@ -175,57 +190,73 @@ Nodes (5): Extension Icon 128px (translation speech bubbles), Extension Icon 16p
 Cohesion: 0.15
 Nodes (13): scripts, build, build-storybook, compile, deploy, deploy:check, dev, dev:playground (+5 more)
 
-### Community 26 - "@storybook/react-vite"
-Cohesion: 0.33
-Nodes (4): config, @storybook/react-vite, @tailwindcss/vite, wxt
-
 ### Community 27 - "dependencies"
 Cohesion: 0.33
 Nodes (6): dependencies, flag-icons, @heroui/react, @heroui/styles, react, react-dom
 
 ### Community 28 - "icons.stories.tsx"
 Cohesion: 0.20
-Nodes (10): extension_src_core_languages_languages, BrandMark(), fixed(), Flag(), Icon(), ICON_NAMES, Brand, Flags (+2 more)
+Nodes (10): LANGUAGES, BrandMark(), fixed(), Flag(), Icon(), ICON_NAMES, Brand, Flags (+2 more)
 
-### Community 32 - "Popup.tsx"
-Cohesion: 0.05
-Nodes (43): FAVORITES, browserLanguages(), findLanguage(), nativeName(), searchLanguages(), isSiteDisabled(), parseSites(), Options() (+35 more)
+### Community 30 - "Popup.tsx"
+Cohesion: 0.20
+Nodes (5): ago(), HistoryRow(), Languages(), relative, time()
+
+### Community 31 - "OptionsPage.stories.tsx"
+Cohesion: 0.20
+Nodes (8): Failed, Loading, meta, Saved, Saving, SignedIn, SignedOut, Story
+
+### Community 32 - "PopupProps"
+Cohesion: 0.09
+Nodes (17): History(), HistoryCard(), Home(), PopupProps, byDay(), Common, defaultPair(), HISTORY_LIMIT (+9 more)
 
 ### Community 33 - "translator-widget.ts"
-Cohesion: 0.27
-Nodes (9): isInsertMessage(), remToPx(), withPropertyDefaults(), mountTranslator(), main(), ref_react_dom_client, ref_ui_theme_css_inline, ref_wxt_browser (+1 more)
+Cohesion: 0.30
+Nodes (8): isInsertMessage(), remToPx(), withPropertyDefaults(), mountTranslator(), main(), ref_ui_theme_css_inline, ref_wxt_browser, ref_wxt_utils_define_content_script
 
 ### Community 34 - "WidgetCallbacks"
 Cohesion: 0.22
 Nodes (3): fixedText(), PanelBody(), WidgetCallbacks
 
 ### Community 35 - "Popup.stories.tsx"
-Cohesion: 0.05
-Nodes (35): ProviderId, PROVIDERS, OptionsPage(), OptionsPageProps, Failed, Loading, meta, Saved (+27 more)
+Cohesion: 0.11
+Nodes (15): Busy, Empty, Error, History, HistoryEmpty, HistoryUndo, LanguagesFrom, LanguagesInto (+7 more)
 
-### Community 37 - "preview.tsx"
+### Community 36 - "languages.ts"
+Cohesion: 0.42
+Nodes (7): FAVORITES, browserLanguages(), findLanguage(), nativeName(), searchLanguages(), LanguageRow(), nameOf()
+
+### Community 37 - "@storybook/react-vite"
+Cohesion: 0.22
+Nodes (6): extension_src_ui_theme, config, globalTypes, initialGlobals, preview, @storybook/react-vite
+
+### Community 38 - "options/main.tsx"
+Cohesion: 0.32
+Nodes (4): disabledFields, item, followColorScheme(), ref_react_dom_client
+
+### Community 39 - "messages.ts"
 Cohesion: 0.33
-Nodes (4): extension_src_ui_theme, globalTypes, initialGlobals, preview
+Nodes (5): ProviderId, PROVIDERS, isMessage(), Message, Response
 
 ## Knowledge Gaps
-- **245 isolated node(s):** `hono`, `openai`, `postgres`, `@typesafe-ai/sdk`, `DEV_JWT_SECRET` (+240 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 346 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **3 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **240 isolated node(s):** `hono`, `openai`, `postgres`, `DEV_JWT_SECRET`, `ASYMMETRIC` (+235 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 340 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `buttons.tsx` to `Popup.tsx`, `Translator.tsx`, `translator-widget.ts`, `Popup.stories.tsx`, `inputs.stories.tsx`, `typography.stories.tsx`, `extension/package.json`, `TranslatorWidget.tsx`, `icons.tsx`?**
-  _High betweenness centrality (0.092) - this node is a cross-community bridge._
-- **Why does `@storybook/react-vite` connect `@storybook/react-vite` to `inputs.stories.tsx`, `Popup.stories.tsx`, `preview.tsx`, `typography.stories.tsx`, `extension/package.json`, `TranslatorWidget.stories.tsx`, `buttons.tsx`, `icons.stories.tsx`?**
-  _High betweenness centrality (0.031) - this node is a cross-community bridge._
+- **Why does `react` connect `react` to `Translator.tsx`, `translator-widget.ts`, `inputs.stories.tsx`, `options/main.tsx`, `extension/package.json`, `popup/main.tsx`, `TranslatorWidget.tsx`, `buttons.tsx`, `icons.tsx`, `Popup.tsx`?**
+  _High betweenness centrality (0.094) - this node is a cross-community bridge._
 - **Why does `hono` connect `contract.ts` to `dev-gateway.ts`?**
-  _High betweenness centrality (0.030) - this node is a cross-community bridge._
-- **Are the 9 inferred relationships involving `Translator()` (e.g. with `reducer()` and `subscribeDark()`) actually correct?**
-  _`Translator()` has 9 INFERRED edges - model-reasoned connections that need verification._
+  _High betweenness centrality (0.043) - this node is a cross-community bridge._
+- **Why does `@storybook/react-vite` connect `@storybook/react-vite` to `inputs.stories.tsx`, `Popup.stories.tsx`, `react`, `extension/package.json`, `TranslatorWidget.stories.tsx`, `buttons.tsx`, `icons.stories.tsx`, `OptionsPage.stories.tsx`?**
+  _High betweenness centrality (0.033) - this node is a cross-community bridge._
+- **Are the 10 inferred relationships involving `Translator()` (e.g. with `reducer()` and `subscribeDark()`) actually correct?**
+  _`Translator()` has 10 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `hono`, `openai`, `postgres` to the rest of the system?**
-  _245 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _240 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `ref_vitest` be split into smaller, more focused modules?**
   _Cohesion score 0.1341991341991342 - nodes in this community are weakly interconnected._
 - **Should `Translator.tsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.05546776232616941 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05952380952380952 - nodes in this community are weakly interconnected._

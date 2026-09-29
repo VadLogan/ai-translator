@@ -57,11 +57,12 @@ export type WidgetView =
   }
   /**
    * Wrong keyboard layout: `typed` as it is, `fixed` re-typed on the other layout. `from` is what it
-   * reads as, `to` the language of the fix. The card's button is `callbacks.onFixLayout`.
+   * reads as, `to` the language of the fix. The card's button is `callbacks.onFixLayout`; ✕ only
+   * closes -- the API refuses the text as typed, so there is nothing else to fall back to.
    */
-  | { kind: 'layout'; typed: string; fixed: string; from: string; to: string; onDismiss: () => void }
-  /** Random keystrokes: a notice. `onContinue` waves it off and opens the regular widget. */
-  | { kind: 'notText'; onContinue: () => void }
+  | { kind: 'layout'; typed: string; fixed: string; from: string; to: string; onClose: () => void }
+  /** Random keystrokes: a notice, nothing to press. Everything stays off until the text changes. */
+  | { kind: 'notText' }
   /** A page selection's translation, to copy. `lang` is the target language code. */
   | { kind: 'translated'; text: string; lang: string; onCopy: () => void }
   | { kind: 'signIn'; providers: readonly { id: string; name: string }[]; onPick: (id: string) => void }
@@ -311,7 +312,7 @@ function PanelBody({ view, callbacks }: { view: WidgetView; callbacks: WidgetCal
             <div className="flex items-center gap-2">
               <Icon name="keyboard" size={15} strokeWidth={1.9} />
               <Text variant="label" tone="accent" className="grow">Wrong keyboard layout</Text>
-              <IconButton aria-label="Dismiss the layout suggestion" tone="accent" size={24} onPress={view.onDismiss}>
+              <IconButton aria-label="Close" tone="accent" size={24} onPress={view.onClose}>
                 <Icon name="close" size={12} strokeWidth={2.6} />
               </IconButton>
             </div>
@@ -342,10 +343,9 @@ function PanelBody({ view, callbacks }: { view: WidgetView; callbacks: WidgetCal
             <Icon name="question" size={15} strokeWidth={1.9} className="mt-0.5 shrink-0" />
             <div className="flex flex-col gap-0.5">
               <Text variant="label" className="text-tm-warning-ink">Doesn't look like text</Text>
-              <span className="tm-meta">It isn't a language on either keyboard layout, so there is nothing to fix.</span>
+              <span className="tm-meta">It isn't a language on either keyboard layout. Change the text to translate or check it.</span>
             </div>
           </div>
-          <Item label="Check anyway" icon="forward" onPress={view.onContinue} />
         </>
       );
 

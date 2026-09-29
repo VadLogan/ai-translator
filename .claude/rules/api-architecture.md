@@ -6,7 +6,7 @@ Layered, outermost first. **Each layer may only call the one below it.**
 | --- | --- | --- | --- |
 | entrypoint | `src/index.ts`, `src/health.ts`, `src/server.ts` | which runtime we are on | anything else |
 | wiring | `src/app.ts` | CORS, the route table, `notFound` | branch on runtime, do work |
-| middleware | `src/middleware/*` | `requireUser` (401), `rateLimit` (429), `validate(parse…)` (400) | touch the DB or a provider |
+| middleware | `src/middleware/*` | `requireUser` (401), `rateLimit` (429), `validate(parse…)` (400), `guardText` (422) | touch the DB or a provider -- except `guardText`, the one middleware that calls an AI request (`validateGuard`) |
 | controller | `src/controllers/*` | the whole per-route body: which request, which repository, which messages, and its own response | build SQL, call OpenAI directly |
 | AI request | `src/resources/aiClient/requests/*` | one provider call: body in, result out | log, save, know about HTTP |
 | repository | `src/repositories/*` | app record ↔ column mapping, the SQL, the `if (!sql) return` no-op | log, decide HTTP status, call an AI request |
@@ -30,7 +30,7 @@ api/
       logger.ts         Logger interface, consoleLogger, scopedLogger(tag, id)
       aiClient/
         client.ts       the OpenAI client and MODEL, read once
-        requests/       one file per provider call (translate, detect, rewrite)
+        requests/       one file per provider call (translate, detect, rewrite, validateGuard, grammarQuality)
           <name>/       a folder only when the call has its own helpers (fix-grammar/utils/*)
     utils/http.ts       fail(), waitUntil(), requestId(), benchmark(), AppEnv
   dev/                  local-only, never deployed: dev-gateway.ts, dev-jwt.ts, dev-token.ts
@@ -58,10 +58,12 @@ tiny — it lives in `src/`, where `[functions.health]` in `supabase/config.toml
   Repositories just throw.
 - **A route is a sentence in `app.ts`**, guards first:
   ```ts
-  app.post('/translate', requireUser('Sign in to translate'), rateLimit, validate(parseTranslateBody), translateController);
+  app.post('/translate', requireUser('Sign in to translate'), rateLimit, validate(parseTranslateBody), guardText, translateController);
   ```
   `rateLimit` counts per user id, so it must come after `requireUser`, and it goes on the provider
-  routes only — never on `/settings`.
+  routes only — never on `/settings`. `guardText` goes on every provider route, after `validate`
+  (it reads `body.text`): a wrong keyboard layout or gibberish 422s (`mistyped` / `gibberish`)
+  before the provider call. It fails open -- a guard outage lets the text through.
 - **`app.ts` never branches on the runtime.** If something differs between edge, local Node and
   deployed, it belongs in an entrypoint or in `dev/dev-gateway.ts`.
 - **`userIdFrom()` in `middleware/auth.ts` decodes but does not verify** the JWT: the gateway

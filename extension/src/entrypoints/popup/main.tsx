@@ -57,7 +57,7 @@ function App() {
     let live = true;
     const timer = setTimeout(async () => {
       const response = await sendMessage({ type: 'detect', text });
-      if (live && response.ok && !response.data.mistyped && findLanguage(response.data.lang)) setDetected(response.data.lang);
+      if (live && response.ok && findLanguage(response.data.lang)) setDetected(response.data.lang);
     }, 800);
     return () => {
       live = false;

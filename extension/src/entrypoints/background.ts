@@ -1,13 +1,13 @@
 import { browser, type Browser } from 'wxt/browser';
 import { defineBackground } from 'wxt/utils/define-background';
-import { ApiError, detect, fixGrammar, getSettings, rewrite, saveSettings, translate } from '../api';
+import { ApiError, check, detect, fixGrammar, getSettings, rewrite, saveSettings, translate } from '../api';
 import { getAccessToken, signIn, signOut } from '../auth/oauth';
 import { storageSession } from '../auth/session';
 import { isMessage, type Account, type Message, type Response } from '../messaging/messages';
 import { storageSettings } from '../settings/storage-settings';
 
 export default defineBackground(() => {
-  // In-flight grammar checks by the content script's id. The fetch lives here, so only the worker can abort it.
+  // In-flight grammar checks and fixes by the content script's id. The fetch lives here, so only the worker can abort it.
   const checks = new Map<string, AbortController>();
 
   async function handle(message: Message, sender: Browser.runtime.MessageSender): Promise<Response<unknown>> {
@@ -37,14 +37,16 @@ export default defineBackground(() => {
             ok: true,
             data: await asUser((token) => detect({ text: message.text, url: sender.tab?.url ?? sender.url }, token)),
           };
-        case 'fix-grammar': {
+        case 'fix-grammar':
+        case 'check': {
           const controller = new AbortController();
           checks.set(message.id, controller);
+          const body = { text: message.text, url: sender.tab?.url ?? sender.url };
           try {
             return {
               ok: true,
-              data: await asUser((token) =>
-                fixGrammar({ text: message.text, url: sender.tab?.url ?? sender.url }, token, controller.signal),
+              data: await asUser<unknown>((token) =>
+                message.type === 'check' ? check(body, token, controller.signal) : fixGrammar(body, token, controller.signal),
               ),
             };
           } finally {

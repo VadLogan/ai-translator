@@ -4,7 +4,7 @@ import type { ApiErrorCode } from '../../../shared/contract.ts';
 /** What the middleware chain puts on the context for the controllers. */
 export type AppEnv = { Variables: { userId: string; body: unknown } };
 
-export function fail(c: Context, status: 400 | 401 | 404 | 429 | 502, code: ApiErrorCode, message: string) {
+export function fail(c: Context, status: 400 | 401 | 404 | 422 | 429 | 502, code: ApiErrorCode, message: string) {
   return c.json({ error: { message, code } }, status);
 }
 

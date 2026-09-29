@@ -1,5 +1,5 @@
 import { browser } from 'wxt/browser';
-import type { ApiErrorCode, DetectOk, FixGrammarOk, RewriteOk, RewriteStyle, Settings, TranslateOk } from '../../../shared/contract';
+import type { ApiErrorCode, CheckOk, DetectOk, FixGrammarOk, RewriteOk, RewriteStyle, Settings, TranslateOk } from '../../../shared/contract';
 import type { ProviderId } from '../auth/providers';
 
 export type Message =
@@ -7,6 +7,8 @@ export type Message =
   | { type: 'detect'; text: string }
   /** `id` names the request so `cancel` can abort it. */
   | { type: 'fix-grammar'; text: string; id: string }
+  /** The background error count behind the badge; cancellable like fix-grammar. */
+  | { type: 'check'; text: string; id: string }
   | { type: 'cancel'; id: string }
   | { type: 'rewrite'; text: string; style: RewriteStyle }
   | { type: 'open-options' }
@@ -25,6 +27,7 @@ export interface ResponseMap {
   translate: TranslateOk;
   detect: DetectOk;
   'fix-grammar': FixGrammarOk;
+  check: CheckOk;
   cancel: void;
   rewrite: RewriteOk;
   'open-options': void;
