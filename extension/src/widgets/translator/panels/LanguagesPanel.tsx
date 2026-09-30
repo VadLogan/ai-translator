@@ -4,6 +4,7 @@ import { CountBadge } from '../../../components/CountBadge';
 import { Flag } from '../../../components/icons';
 import { Divider, Item, Section, Status } from '../../../components/menu';
 import type { WidgetView } from '../view';
+import { TranslationField } from './TranslationField';
 
 type Props = {
   view: Extract<WidgetView, { kind: 'languages' }>;
@@ -15,16 +16,23 @@ type Props = {
 
 /** The selection's menu: detected language, the targets (digit keys), Grammar fix, the layout fix. */
 export function LanguagesPanel({ view, onLanguagePick, onFixGrammar, onFixLayout, onOpenSettings }: Props) {
+  const { suggested } = view;
+  // The pair's target takes "1"; the list's digits continue after it.
+  const first = suggested ? 2 : 1;
   return (
     <>
       <DetectedHeader name={view.detectedName} lang={view.detectedLang} />
+      {view.translation && <TranslationField view={view.translation} />}
+      {suggested && (
+        <Item label={suggested.name} flag={suggested.code} shortcut="1" onPress={() => onLanguagePick(suggested.code)} />
+      )}
       <Section title="Translate to">
         {view.languages.map((language, index) => (
           <Item
             key={language.code}
             label={language.name}
             flag={language.code}
-            shortcut={index < 9 ? String(index + 1) : undefined}
+            shortcut={index + first <= 9 ? String(index + first) : undefined}
             onPress={() => onLanguagePick(language.code)}
           />
         ))}

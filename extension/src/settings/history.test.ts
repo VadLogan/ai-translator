@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 // defineItem reads chrome.storage at load; only the pure helpers are under test.
 vi.mock('wxt/utils/storage', () => ({ storage: { defineItem: () => ({}) } }));
 
-import { byDay, byUse, defaultPair, HISTORY_LIMIT, intoLanguages, orient, pairLabel, topPairs, usedLately, withEntry, type HistoryEntry, type TranslationEntry } from './history';
+import { byDay, byUse, defaultPair, HISTORY_LIMIT, intoLanguages, orient, pairLabel, pinFirst, topPairs, usedLately, withEntry, type HistoryEntry, type TranslationEntry } from './history';
 
 const DAY = 86_400_000;
 const NOW = new Date(2026, 8, 25, 12).getTime();
@@ -89,5 +89,20 @@ describe('intoLanguages', () => {
       yours: ['uk', 'en', 'pl'],
       lately: [{ code: 'fr', at: 3 }],
     });
+  });
+
+  it('puts every pinned language first and fills up to 3 with the most used favorites', () => {
+    const list = [entry('fr', 3), entry('uk', 2), entry('uk', 1)];
+    expect(intoLanguages(['en', 'pl', 'de', 'uk'], list, ['de', 'fr'])).toEqual({ yours: ['de', 'fr', 'uk'], lately: [] });
+    expect(intoLanguages(['en'], list, ['de', 'pl', 'ja', 'it'])).toEqual({
+      yours: ['de', 'pl', 'ja', 'it'],
+      lately: [{ code: 'fr', at: 3 }, { code: 'uk', at: 2 }],
+    });
+  });
+});
+
+describe('pinFirst', () => {
+  it('moves pinned languages ahead of the favorites without repeating them', () => {
+    expect(pinFirst(['de', 'en'], ['en', 'pl'])).toEqual(['de', 'en', 'pl']);
   });
 });

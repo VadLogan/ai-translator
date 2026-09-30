@@ -102,4 +102,25 @@ describe('replaceSelection', () => {
     expect(plain).toBe('Hallo @Ann, gut');
     expect(editor.innerHTML).toBe(`Hallo ${chip}, gut`); // nobody took the paste
   });
+
+  it('pastes links as plain text and rebuilds them as bare <a href> (Teams itemid/itemtype dropped)', () => {
+    const url = 'https://x.test/pull/649';
+    document.body.innerHTML = `<div contenteditable="true">hi: for this: <a href="${url}" itemtype="http://schema.skype.com/HyperLink" itemid="u1">${url}</a>; ok</div>`;
+    const editor = document.querySelector('div')!;
+    let html: string | undefined;
+    let plain = '';
+    editor.addEventListener('paste', (event) => {
+      html = event.clipboardData!.getData('text/html');
+      plain = event.clipboardData!.getData('text/plain');
+    });
+    const range = document.createRange();
+    range.selectNodeContents(editor);
+    document.getSelection()!.addRange(range);
+
+    replaceSelection(getEditableSelection()!, 'Hi: for this, {{1}}, ok.');
+
+    expect(plain).toBe(`Hi: for this, ${url}, ok.`);
+    expect(html).toBe('');
+    expect(editor.innerHTML).toBe(`Hi: for this, <a href="${url}">${url}</a>, ok.`);
+  });
 });

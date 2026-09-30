@@ -302,6 +302,22 @@ describe('guardText', () => {
     await expect(res.json()).resolves.toMatchObject({ error: { code: 'gibberish' } });
   });
 
+  it('skips the guard on a translate that carries sourceLang', async () => {
+    vi.mocked(validateGuard).mockClear();
+    const res = await post('/translate', { text: 'Hello', targetLang: 'pl', sourceLang: 'en' });
+
+    expect(res.status).toBe(200);
+    expect(validateGuard).not.toHaveBeenCalled();
+  });
+
+  it('skips the guard on a fix-grammar marked guarded', async () => {
+    vi.mocked(validateGuard).mockClear();
+    const res = await post('/fix-grammar', { text: 'Hello', guarded: true });
+
+    expect(res.status).toBe(200);
+    expect(validateGuard).not.toHaveBeenCalled();
+  });
+
   it('lets the text through when the guard itself fails', async () => {
     vi.mocked(validateGuard).mockRejectedValueOnce(new Error('guard down'));
     vi.spyOn(console, 'error').mockImplementationOnce(() => {});

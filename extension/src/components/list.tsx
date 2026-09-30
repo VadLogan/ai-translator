@@ -26,8 +26,9 @@ export function Group({ label, children }: { label: string; children: ReactNode 
   );
 }
 
-export function Row({ selected, compact, icon, onPress, children }: { selected: boolean; compact?: boolean; icon: ReactNode; onPress: () => void; children: ReactNode }) {
-  return (
+/** `action` is a control at the row's right edge, a sibling of the row's button (buttons can't nest). */
+export function Row({ selected, compact, icon, onPress, action, children }: { selected: boolean; compact?: boolean; icon: ReactNode; onPress: () => void; action?: ReactNode; children: ReactNode }) {
+  const row = (
     <button
       type="button"
       onClick={onPress}
@@ -36,6 +37,14 @@ export function Row({ selected, compact, icon, onPress, children }: { selected: 
     >
       {icon}
       {children}
+      {action && <span className="w-8 shrink-0" />}
     </button>
+  );
+  if (!action) return row;
+  return (
+    <div className="group relative">
+      {row}
+      <span className="absolute inset-y-0 right-2.5 flex items-center">{action}</span>
+    </div>
   );
 }

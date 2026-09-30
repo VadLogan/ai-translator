@@ -4,7 +4,6 @@ import { GrammarPanel } from './panels/GrammarPanel';
 import { LanguagesPanel } from './panels/LanguagesPanel';
 import { LayoutPanel } from './panels/LayoutPanel';
 import { BusyPanel, ErrorPanel, NotTextPanel, SignInPanel } from './panels/notices';
-import { TranslatedPanel } from './panels/TranslatedPanel';
 import { panelPosition, viewportSize } from './position';
 import { Trigger } from './Trigger';
 import type { WidgetCallbacks, WidgetView } from './view';
@@ -48,7 +47,7 @@ function Panel({ anchor, view, callbacks }: { anchor: Anchor; view: WidgetView; 
       role="dialog"
       aria-label={view.kind === 'grammarFixed' ? 'Grammar fixed' : view.kind === 'layout' ? 'Wrong keyboard layout' : view.kind === 'notText' ? "Doesn't look like text" : 'Translate selection'}
       className={`fixed max-h-[420px] overflow-auto rounded-2xl bg-tm-surface p-1.5 shadow-tm-pop ${
-        view.kind === 'grammarFixed' || view.kind === 'translated' ? 'w-[340px]' : view.kind === 'layout' || view.kind === 'notText' ? 'w-[279px]' : 'min-w-[200px] max-w-[280px]'
+        view.kind === 'grammarFixed' || (view.kind === 'languages' && view.translation) ? 'w-[340px]' : view.kind === 'layout' || view.kind === 'notText' ? 'w-[279px]' : 'min-w-[200px] max-w-[280px]'
       }`}
     >
       <PanelBody view={view} callbacks={callbacks} />
@@ -68,8 +67,6 @@ function PanelBody({ view, callbacks }: { view: WidgetView; callbacks: WidgetCal
       return <LayoutPanel view={view} onFixLayout={callbacks.onFixLayout} />;
     case 'notText':
       return <NotTextPanel />;
-    case 'translated':
-      return <TranslatedPanel view={view} />;
     case 'signIn':
       return <SignInPanel view={view} onOpenSettings={callbacks.onOpenSettings} />;
     case 'error':

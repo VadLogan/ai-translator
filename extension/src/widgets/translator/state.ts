@@ -1,6 +1,7 @@
 import type { FixGrammarOk } from '../../../../shared/contract';
 import type { Language } from '../../core/languages';
 import type { Anchor, EditableSelection } from '../../content/selection';
+import type { Pair } from '../../settings/history';
 
 /** POST /detect's answer: a language, text typed on the wrong keyboard layout, or no idea. */
 export type Detection = { lang: string } | 'mistyped' | 'unknown';
@@ -16,8 +17,6 @@ export type Screen =
   | { kind: 'layout' }
   /** The guard found random keystrokes: a notice. Nothing else is offered until the text changes. */
   | { kind: 'notText' }
-  /** A page selection's translation: shown to copy, since page text can't be replaced. */
-  | { kind: 'translated'; text: string; lang: string }
   /** `targetLang`: the translation to resume after signing in; absent = re-run the grammar check. */
   | { kind: 'signIn'; targetLang?: string }
   /** `back` is where the Back item leads: the menu, or nowhere when retrying can't help. */
@@ -30,6 +29,13 @@ export interface State {
   screen: Screen;
   /** The favorites shown in the menu, so digit-key shortcuts can pick among them. */
   languages: readonly Language[];
+  /** The user's language pairs from history, most used first: the menu suggests the one matching the detection. */
+  pairs: readonly Pair[];
+  /**
+   * Page text only: the menu's translation field, under the detected line. Asked by itself for the
+   * pair's target once detection answers, or by a pick. `text` and `error` both absent = in flight.
+   */
+  translation: { lang: string; text?: string; error?: string } | null;
   /** Null until detection answers; it is only asked once the menu opens. */
   detection: Detection | null;
   /** The latest grammar check and the text it ran on; `errors`, `verdict` and `error` all absent = in flight. */
@@ -57,12 +63,13 @@ export const answered = (check: Check): boolean => check.errors !== undefined ||
 export type Action =
   | { type: 'select'; selection: EditableSelection; anchor: Anchor; field?: boolean }
   | { type: 'close' }
-  | { type: 'open'; languages: readonly Language[] }
+  | { type: 'open'; languages: readonly Language[]; pairs: readonly Pair[] }
   | { type: 'detected'; detection: Detection }
+  | { type: 'translation'; translation: State['translation'] }
   | { type: 'show'; screen: Screen }
   | { type: 'checked'; check: State['check'] };
 
-export const hidden: State = { selection: null, anchor: { x: 0, top: 0, bottom: 0 }, screen: { kind: 'icon' }, languages: [], detection: null, check: null };
+export const hidden: State = { selection: null, anchor: { x: 0, top: 0, bottom: 0 }, screen: { kind: 'icon' }, languages: [], pairs: [], translation: null, detection: null, check: null };
 
 export function reducer(state: State, action: Action): State {
   switch (action.type) {
@@ -73,9 +80,11 @@ export function reducer(state: State, action: Action): State {
     case 'close':
       return state.selection ? { ...hidden, check: state.check } : state;
     case 'open':
-      return { ...state, screen: { kind: 'languages' }, languages: action.languages };
+      return { ...state, screen: { kind: 'languages' }, languages: action.languages, pairs: action.pairs };
     case 'detected':
       return { ...state, detection: action.detection };
+    case 'translation':
+      return { ...state, translation: action.translation };
     case 'show':
       return state.selection ? { ...state, screen: action.screen } : state;
     case 'checked':
@@ -89,10 +98,26 @@ export const isMenuOpen = (state: State): boolean => state.selection !== null &&
 export const detectedLang = (state: State): string | undefined =>
   typeof state.detection === 'object' && state.detection ? state.detection.lang : undefined;
 
-/** The favorites offered as targets: the detected source language is left out, translating into it is a no-op. */
-export const menuLanguages = (state: State): readonly Language[] => {
+/**
+ * The target of the user's usual pair for the detected language, offered above the list: the most
+ * used pair starting from it, else one ending in it, flipped (PL→UA suggests PL for Ukrainian text).
+ */
+export function pairTarget(state: State): string | undefined {
   const source = detectedLang(state);
-  return state.languages.filter((language) => language.code !== source);
+  if (!source) return undefined;
+  return state.pairs.find((pair) => pair.from === source)?.to ?? state.pairs.find((pair) => pair.to === source)?.from;
+}
+
+/** The favorites offered as targets: the detected source (a no-op) and the language shown above them are left out. */
+export const menuLanguages = (state: State): readonly Language[] => {
+  const skip = [detectedLang(state), state.translation?.lang ?? pairTarget(state)];
+  return state.languages.filter((language) => !skip.includes(language.code));
+};
+
+/** What the digit keys pick, in order: the pair's target (a field's; page text shows it translated instead), then the list. */
+export const menuShortcuts = (state: State): string[] => {
+  const target = state.selection?.kind === 'page' ? undefined : pairTarget(state);
+  return [...(target ? [target] : []), ...menuLanguages(state).map((language) => language.code)];
 };
 
 /** Each edit in `FixGrammarOk.html` is one `span.fix`; the text around them is escaped, so this can't miscount. */

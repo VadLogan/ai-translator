@@ -23,7 +23,9 @@ export function usePageEvents(host: HTMLElement, handlers: PageHandlers): void {
       [document, 'mousedown', (event) => !owns(event) && close()],
       // Deferred: let the browser finalize the selection first.
       [document, 'mouseup', (event) => !owns(event) && setTimeout(refresh, 0)],
-      [document, 'keydown', (event) => onKeyDown(event as KeyboardEvent), { capture: true }],
+      // On window, whose capture runs before the page's document-level ones (Radix, most popups), so
+      // a key the widget takes never reaches them.
+      [window, 'keydown', (event) => onKeyDown(event as KeyboardEvent), { capture: true }],
       [document, 'input', (event) => !owns(event) && onInput(), { capture: true }],
       // Model-based editors (CKEditor in Teams, ProseMirror, Lexical) cancel beforeinput and edit
       // the DOM themselves, so `input` never fires there. Deferred: the text changes after this event.

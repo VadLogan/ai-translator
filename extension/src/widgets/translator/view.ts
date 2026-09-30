@@ -1,11 +1,11 @@
 import type { DetectOk, RewriteStyle } from '../../../../shared/contract';
 import { PROVIDERS } from '../../auth/providers';
 import { layoutLanguages, switchLayout } from '../../core/layout';
-import { languageName, type Language } from '../../core/languages';
+import { findLanguage, languageName, type Language } from '../../core/languages';
 import type { Response } from '../../messaging/messages';
 import { plainText } from '../../content/selection';
 import type { Badge } from '../../components/CountBadge';
-import { badge, detectedLang, grammarCount, isChecking, isVerdict, menuLanguages, type Check, type Detection, type State } from './state';
+import { badge, detectedLang, grammarCount, isChecking, isVerdict, menuLanguages, pairTarget, type Check, type Detection, type State } from './state';
 
 export interface WidgetCallbacks {
   onIconClick(): void;
@@ -28,6 +28,13 @@ export type WidgetView =
   | {
     kind: 'languages';
     languages: readonly Language[];
+    /** A field's usual pair target for the detected language, shown above the list as shortcut 1. */
+    suggested?: Language;
+    /**
+     * Page text: the translation under the detected line. `lines`: skeleton lines sized to the
+     * selection while it loads; `text` once it answers, `error` if it failed.
+     */
+    translation?: { lang: string; text?: string; error?: string; lines: number; onCopy: () => void };
     /** The selection re-typed on the other keyboard layout, offered as a menu item. */
     layoutPreview?: string;
     /** Left out while POST /detect is still in flight, detection failed, or the text was mistyped. */
@@ -59,8 +66,6 @@ export type WidgetView =
   | { kind: 'layout'; typed: string; fixed: string; from: string; to: string; onClose: () => void }
   /** Random keystrokes: a notice, nothing to press. Everything stays off until the text changes. */
   | { kind: 'notText' }
-  /** A page selection's translation, to copy. `lang` is the target language code. */
-  | { kind: 'translated'; text: string; lang: string; onCopy: () => void }
   | { kind: 'signIn'; providers: readonly { id: string; name: string }[]; onPick: (id: string) => void }
   | { kind: 'error'; message: string; onBack: () => void };
 
@@ -87,6 +92,12 @@ export function toView(state: State, { onPick, onBack, onReplace, onCopyFix, onR
       return {
         kind: 'languages',
         languages: menuLanguages(state),
+        suggested: selection?.kind === 'page' ? undefined : findLanguage(pairTarget(state) ?? ''),
+        translation: state.translation ? {
+          ...state.translation,
+          lines: Math.min(5, Math.ceil((selection?.text.length ?? 0) / 40)) || 1,
+          onCopy: () => void navigator.clipboard.writeText(state.translation?.text ?? '').then(onClose),
+        } : undefined,
         layoutPreview: fixed && fixed !== selection?.text ? preview(fixed) : undefined,
         detectedName:
           detection === null ? undefined : detection === 'mistyped' ? 'wrong keyboard layout' : detection === 'unknown' ? 'unknown' : languageName(detection.lang),
@@ -113,13 +124,6 @@ export function toView(state: State, { onPick, onBack, onReplace, onCopyFix, onR
     }
     case 'notText':
       return { kind: 'notText' };
-    case 'translated':
-      return {
-        kind: 'translated',
-        text: screen.text,
-        lang: screen.lang,
-        onCopy: () => void navigator.clipboard.writeText(screen.text).then(onClose),
-      };
     case 'signIn':
       return { kind: 'signIn', providers: PROVIDERS, onPick: (provider) => onPick(provider, screen.targetLang) };
     case 'error':

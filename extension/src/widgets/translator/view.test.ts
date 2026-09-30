@@ -10,15 +10,31 @@ const selected = (text: string, kind = 'input'): State =>
   reducer(hidden, { type: 'select', selection: { text, kind } as unknown as EditableSelection, anchor });
 
 it('names the detected language and leaves it out of the targets', () => {
-  let state = reducer(selected('hello'), { type: 'open', languages: ['en', 'de'].map((code) => findLanguage(code)!) });
+  let state = reducer(selected('hello'), { type: 'open', languages: ['en', 'de'].map((code) => findLanguage(code)!), pairs: [] });
   state = reducer(state, { type: 'detected', detection: { lang: 'en' } });
   const view = toView(state, actions);
   expect(view).toMatchObject({ kind: 'languages', detectedName: 'English', detectedLang: 'en', readOnly: false });
   expect(view.kind === 'languages' && view.languages.map(({ code }) => code)).toEqual(['de']);
 });
 
+it('suggests the usual pair target above the list', () => {
+  let state = reducer(selected('cześć wszystkim'), { type: 'open', languages: ['uk', 'en'].map((code) => findLanguage(code)!), pairs: [{ from: 'pl', to: 'uk' }] });
+  state = reducer(state, { type: 'detected', detection: { lang: 'pl' } });
+  const view = toView(state, actions);
+  expect(view.kind === 'languages' && view.suggested?.code).toBe('uk');
+  expect(view.kind === 'languages' && view.languages.map(({ code }) => code)).toEqual(['en']);
+});
+
+it("shows page text's translation field: skeleton lines sized to the selection, then the text", () => {
+  let state = reducer(selected('x'.repeat(100), 'page'), { type: 'open', languages: [], pairs: [{ from: 'pl', to: 'uk' }] });
+  state = reducer(reducer(state, { type: 'detected', detection: { lang: 'pl' } }), { type: 'translation', translation: { lang: 'uk' } });
+  expect(toView(state, actions)).toMatchObject({ suggested: undefined, translation: { lang: 'uk', lines: 3 } });
+  state = reducer(state, { type: 'translation', translation: { lang: 'uk', text: 'привіт' } });
+  expect(toView(state, actions)).toMatchObject({ translation: { text: 'привіт' } });
+});
+
 it('offers the re-typed text only when detection says mistyped', () => {
-  let state = reducer(selected('ghbdtn'), { type: 'open', languages: [] });
+  let state = reducer(selected('ghbdtn'), { type: 'open', languages: [], pairs: [] });
   expect(toView(state, actions)).toMatchObject({ layoutPreview: undefined });
   state = reducer(state, { type: 'detected', detection: 'mistyped' });
   expect(toView(state, actions)).toMatchObject({ detectedName: 'wrong keyboard layout', layoutPreview: 'привет' });
@@ -27,7 +43,7 @@ it('offers the re-typed text only when detection says mistyped', () => {
 it('marks page text read-only and gives its icon no hover pill', () => {
   const state = selected('hello', 'page');
   expect(toView(state, actions)).toMatchObject({ kind: 'icon', canDisable: false });
-  expect(toView(reducer(state, { type: 'open', languages: [] }), actions)).toMatchObject({ readOnly: true });
+  expect(toView(reducer(state, { type: 'open', languages: [], pairs: [] }), actions)).toMatchObject({ readOnly: true });
 });
 
 it('resumes the interrupted translation after sign-in', () => {

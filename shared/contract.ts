@@ -37,7 +37,13 @@ export interface DetectOk {
 }
 
 /** Grammar fix: the same text + url as detection. */
-export type FixGrammarBody = DetectBody;
+export interface FixGrammarBody extends DetectBody {
+  /**
+   * The client's `POST /check` of this exact text already passed the guard: skip the second guard
+   * call (0.3-0.9 s), as a translate with `sourceLang` does.
+   */
+  guarded?: boolean;
+}
 
 export interface FixGrammarOk {
   /** The corrected text, in the same language. Unchanged when there was nothing to fix. */

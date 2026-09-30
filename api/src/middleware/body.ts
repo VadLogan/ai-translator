@@ -8,6 +8,7 @@ import {
   MAX_URL_LENGTH,
   REWRITE_STYLES,
   type DetectBody,
+  type FixGrammarBody,
   type RewriteBody,
   type RewriteStyle,
   type Settings,
@@ -72,6 +73,14 @@ export function parseTranslateBody(body: unknown): TranslateBody | string {
     targetLang,
     ...(typeof sourceLang === 'string' ? { sourceLang } : {}),
   };
+}
+
+export function parseFixGrammarBody(body: unknown): FixGrammarBody | string {
+  const parsed = parseDetectBody(body);
+  if (typeof parsed === 'string') return parsed;
+  const { guarded } = body as Record<string, unknown>;
+  if (guarded !== undefined && typeof guarded !== 'boolean') return 'guarded must be a boolean';
+  return { ...parsed, ...(guarded ? { guarded } : {}) };
 }
 
 export function parseRewriteBody(body: unknown): RewriteBody | string {

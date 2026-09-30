@@ -8,7 +8,7 @@ const meta = {
   component: Languages,
   parameters: { layout: 'centered' },
   decorators: [(Story) => <PopupFrame><Story /></PopupFrame>],
-  args: { side: 'into', current: 'en', yours: ['en', 'pl', 'uk'], lately: LATELY, onBack: noop, onChoose: noop },
+  args: { side: 'into', current: 'en', yours: ['en', 'pl', 'uk'], lately: LATELY, pinned: ['pl'], onTogglePin: noop, onBack: noop, onChoose: noop },
 } satisfies Meta<typeof Languages>;
 
 export default meta;

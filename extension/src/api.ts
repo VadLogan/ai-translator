@@ -30,8 +30,8 @@ export class ApiError extends Error {
 }
 
 /** Calls the backend API, which owns translation; the extension never holds provider keys. */
-export const translate = (body: TranslateBody, accessToken: string | null, baseUrl = BASE_URL) =>
-  call<TranslateOk>('/translate', { method: 'POST', body }, accessToken, baseUrl);
+export const translate = (body: TranslateBody, accessToken: string | null, signal?: AbortSignal, baseUrl = BASE_URL) =>
+  call<TranslateOk>('/translate', { method: 'POST', body, signal }, accessToken, baseUrl);
 
 /** What language is the selection in? Asked when the menu opens, before a target is picked. */
 export const detect = (body: DetectBody, accessToken: string | null, baseUrl = BASE_URL) =>

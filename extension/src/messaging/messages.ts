@@ -3,10 +3,12 @@ import type { ApiErrorCode, CheckOk, DetectOk, FixGrammarOk, RewriteOk, RewriteS
 import type { ProviderId } from '../auth/providers';
 
 export type Message =
-  | { type: 'translate'; text: string; targetLang: string; sourceLang?: string }
+  /** `id`: set by the menu's translation field, so picking another language can `cancel` it. */
+  | { type: 'translate'; text: string; targetLang: string; sourceLang?: string; id?: string }
   | { type: 'detect'; text: string }
   /** `id` names the request so `cancel` can abort it. */
-  | { type: 'fix-grammar'; text: string; id: string }
+  /** `guarded`: a /check of this exact text already passed the guard, so the API skips it. */
+  | { type: 'fix-grammar'; text: string; id: string; guarded?: boolean }
   /** The background error count behind the badge; cancellable like fix-grammar. */
   | { type: 'check'; text: string; id: string }
   | { type: 'cancel'; id: string }

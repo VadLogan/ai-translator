@@ -6,6 +6,8 @@ import { Translator } from './Translator';
 import WIDGET_CSS from '../../components/theme.css?inline';
 import { remToPx, withPropertyDefaults } from './shadow-css';
 
+const POPUP = 'dialog, [popover], [role="dialog"], [role="alertdialog"], [aria-modal="true"]';
+
 /**
  * Renders the translator into a closed shadow root, isolated from page CSS. All behavior lives in
  * the Translator component; this only builds the host. Returns the teardown.
@@ -27,8 +29,16 @@ export function mountTranslator({ isInvalid }: { isInvalid: () => boolean }): ()
     host.addEventListener(type, (event) => event.stopPropagation());
   }
 
-  const mount = () => {
-    if (!host.isConnected) document.documentElement.append(host);
+  const mount = (near: Element) => {
+    // A popup dismisses on clicks outside it, and a modal <dialog> makes the rest of the page inert
+    // under its top layer, so inside one the host goes into the popup; elsewhere onto <html>.
+    const parent = near.closest(POPUP) ?? document.documentElement;
+    if (host.parentNode !== parent) parent.append(host);
+    // A transformed ancestor (a dialog centred with translate) is the containing block of fixed
+    // elements; shift the host back so the widget's viewport coordinates still hold.
+    host.style.translate = '';
+    const { left, top } = host.getBoundingClientRect();
+    host.style.translate = `${-left}px ${-top}px`;
   };
   const root = createRoot(container);
   root.render(createElement(Translator, { host, mount, isInvalid }));

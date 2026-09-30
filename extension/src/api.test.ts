@@ -9,7 +9,7 @@ const reply = (status: number, body: unknown) =>
 describe('translate', () => {
   it('posts the request and returns the translation', async () => {
     reply(200, { text: 'Hallo' });
-    await expect(translate({ text: 'Hello', targetLang: 'de' }, 'token', 'http://api')).resolves.toEqual({ text: 'Hallo' });
+    await expect(translate({ text: 'Hello', targetLang: 'de' }, 'token', undefined, 'http://api')).resolves.toEqual({ text: 'Hallo' });
     expect(fetch).toHaveBeenCalledWith(
       'http://api/translate',
       expect.objectContaining({ method: 'POST', headers: expect.objectContaining({ authorization: 'Bearer token' }) }),

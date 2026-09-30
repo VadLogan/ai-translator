@@ -46,12 +46,25 @@ function replaceInTextControl(
   dispatchInput(element, replacement);
 }
 
-/** The replacement with its {{n}} tokens turned back into copies of the original mention chips. */
+/** A plain `<a href>`, not a clone: editors key their own link models on extra attributes (Teams'
+ *  `itemtype`/`itemid`), and a duplicated one makes the paste restyle the whole range as the link. */
+function isLink(atom: Element): atom is HTMLAnchorElement {
+  return atom instanceof HTMLAnchorElement && atom.hasAttribute('href');
+}
+
+function bareLink(doc: Document, link: HTMLAnchorElement): HTMLAnchorElement {
+  const a = doc.createElement('a');
+  a.href = link.href;
+  a.textContent = link.textContent;
+  return a;
+}
+
+/** The replacement with its {{n}} tokens turned back into the original mention chips and links. */
 function withAtoms(doc: Document, text: string, atoms: Element[]): HTMLElement {
   const box = doc.createElement('div');
   for (const part of text.split(/(\{\{\d+\}\})/)) {
     const atom = atoms[Number(/^\{\{(\d+)\}\}$/.exec(part)?.[1]) - 1];
-    box.append(atom ? atom.cloneNode(true) : part);
+    box.append(!atom ? part : isLink(atom) ? bareLink(doc, atom) : atom.cloneNode(true));
   }
   return box;
 }
@@ -73,7 +86,9 @@ function replaceInContentEditable(
   // direct DOM edits, execCommand included, but they all handle paste and cancel it.
   // With mentions, the paste carries HTML: editors rebuild their chips from it (ProseMirror's parseDOM).
   const rich = atoms?.length ? withAtoms(doc, replacement, atoms) : null;
-  if (tryPaste(element, rich?.textContent ?? replacement, rich?.innerHTML)) return;
+  // Links alone go as plain text (URL inline, the editor autolinks it); HTML only when a chip needs rebuilding.
+  const chips = atoms?.some((atom) => !isLink(atom));
+  if (tryPaste(element, rich?.textContent ?? replacement, chips ? rich?.innerHTML : undefined)) return;
   if (rich ? tryInsertText(doc, rich.innerHTML, 'insertHTML') : tryInsertText(doc, replacement)) return;
 
   range.deleteContents();

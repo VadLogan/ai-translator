@@ -14,7 +14,7 @@ widgets/translator/     the in-page widget
   TranslatorWidget.tsx Trigger.tsx panels/   presentational, stories beside them
 popups/toolbar/         the toolbar popup
   ToolbarPopup.tsx      container: composes hooks, picks the screen
-  hooks/                useTranslation, useHistory, useActiveSite
+  hooks/                useTranslation, useHistory, useActiveSite, usePinned
   screens/              Home, History, Languages, entries (HistoryRow, HistoryCard); stories beside each
 popups/options/         OptionsApp (container) + OptionsPage (presentational)
 content/                DOM domain logic shared by the widget and the popup's Insert: selection, replace, insert

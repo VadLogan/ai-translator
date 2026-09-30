@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { browser } from 'wxt/browser';
 import { PROVIDERS } from '../../auth/providers';
 import { sendMessage } from '../../messaging/messages';
-import { intoLanguages, topPairs, usedLately, type HistoryEntry } from '../../settings/history';
+import { intoLanguages, pinFirst, topPairs, usedLately, type HistoryEntry } from '../../settings/history';
 import { useActiveSite } from './hooks/useActiveSite';
 import { useHistory } from './hooks/useHistory';
+import { usePinned } from './hooks/usePinned';
 import { useTranslation } from './hooks/useTranslation';
 import { PopupFrame } from './Popup';
 import { History } from './screens/History';
@@ -17,6 +18,7 @@ type Screen = 'home' | 'history' | { pick: 'from' | 'into' };
 export function ToolbarPopup() {
   const [screen, setScreen] = useState<Screen>('home');
   const history = useHistory();
+  const pins = usePinned();
   // The site switch reports into the translator's notice line, the popup's one message slot.
   const site = useActiveSite((message) => translation.fail(message));
   const translation = useTranslation({ favorites: site.favorites, history: history.history, remember: history.add, host: site.tab.host });
@@ -65,9 +67,11 @@ export function ToolbarPopup() {
         <Languages
           side={side}
           current={side === 'into' ? translation.into : translation.from}
-          // The into side shows only the 3 most used favorites; the rest stay one search away.
-          yours={side === 'into' ? intoLanguages(favorites, history.history).yours : favorites.slice(0, 9)}
-          lately={usedLately(history.history, favorites, side === 'from' ? 'from' : 'to')}
+          // The into side shows the pins plus the most used favorites (3 in all); the rest stay one search away.
+          yours={side === 'into' ? intoLanguages(favorites, history.history, pins.pinned).yours : pinFirst(pins.pinned, favorites).slice(0, Math.max(9, pins.pinned.length))}
+          lately={usedLately(history.history, pinFirst(pins.pinned, favorites), side === 'from' ? 'from' : 'to')}
+          pinned={pins.pinned}
+          onTogglePin={pins.toggle}
           onBack={home}
           onChoose={(lang) => {
             translation.choose(side, lang);

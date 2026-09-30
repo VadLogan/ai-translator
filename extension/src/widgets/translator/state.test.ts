@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { answered, badge, cleanCheck, countFixes, grammarCount, hasEnoughWords, isChecking, isMistyped, detectedLang, hidden, isMenuOpen, menuLanguages, reducer } from './state';
+import { answered, badge, cleanCheck, countFixes, grammarCount, hasEnoughWords, isChecking, isMistyped, detectedLang, hidden, isMenuOpen, menuLanguages, menuShortcuts, pairTarget, reducer } from './state';
 import type { EditableSelection } from '../../content/selection';
 import { findLanguage } from '../../core/languages';
 
@@ -11,7 +11,7 @@ it('walks icon → menu → detected → close', () => {
   expect(state.screen).toEqual({ kind: 'icon', field: undefined });
   expect(isMenuOpen(state)).toBe(false);
 
-  state = reducer(state, { type: 'open', languages: [findLanguage('de')!] });
+  state = reducer(state, { type: 'open', languages: [findLanguage('de')!], pairs: [] });
   expect(isMenuOpen(state)).toBe(true);
 
   state = reducer(state, { type: 'detected', detection: { lang: 'en' } });
@@ -79,10 +79,37 @@ it('spins while the check is in flight, then badges', () => {
 it('leaves the detected language out of the targets', () => {
   const de = findLanguage('de')!;
   const en = findLanguage('en')!;
-  let state = reducer(reducer(hidden, { type: 'select', selection, anchor }), { type: 'open', languages: [en, de] });
+  let state = reducer(reducer(hidden, { type: 'select', selection, anchor }), { type: 'open', languages: [en, de], pairs: [] });
   expect(menuLanguages(state)).toEqual([en, de]);
   state = reducer(state, { type: 'detected', detection: { lang: 'en' } });
   expect(menuLanguages(state)).toEqual([de]);
+});
+
+it("suggests the usual pair's target for the detected language and leaves it out of the list", () => {
+  const [pl, uk, en] = ['pl', 'uk', 'en'].map((code) => findLanguage(code)!);
+  const pairs = [{ from: 'pl', to: 'uk' }, { from: 'uk', to: 'en' }];
+  let state = reducer(reducer(hidden, { type: 'select', selection, anchor }), { type: 'open', languages: [uk!, en!, pl!], pairs });
+  expect(pairTarget(state)).toBeUndefined();
+  state = reducer(state, { type: 'detected', detection: { lang: 'pl' } });
+  expect(pairTarget(state)).toBe('uk');
+  expect(menuLanguages(state)).toEqual([en]);
+  expect(menuShortcuts(state)).toEqual(['uk', 'en']);
+  // A pair starting from the detected language wins over one ending in it.
+  expect(pairTarget({ ...state, detection: { lang: 'uk' } })).toBe('en');
+  // Only one ending in it: flipped.
+  expect(pairTarget({ ...state, pairs: [pairs[0]!], detection: { lang: 'uk' } })).toBe('pl');
+  expect(pairTarget({ ...state, detection: 'unknown' })).toBeUndefined();
+});
+
+it("page text shows the pair's target translated, not as a shortcut; a pick swaps which language is left out", () => {
+  const [pl, uk, en] = ['pl', 'uk', 'en'].map((code) => findLanguage(code)!);
+  const page = { ...selection, kind: 'page' } as EditableSelection;
+  let state = reducer(reducer(hidden, { type: 'select', selection: page, anchor }), { type: 'open', languages: [uk!, en!, pl!], pairs: [{ from: 'pl', to: 'uk' }] });
+  state = reducer(state, { type: 'detected', detection: { lang: 'pl' } });
+  expect(menuShortcuts(state)).toEqual(['en']);
+  state = reducer(state, { type: 'translation', translation: { lang: 'en' } });
+  expect(menuLanguages(state)).toEqual([uk]);
+  expect(reducer(state, { type: 'close' }).translation).toBeNull();
 });
 
 it('counts the grammar fixes of the selected text only', () => {

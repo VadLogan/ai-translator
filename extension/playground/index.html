@@ -30,5 +30,27 @@
     <input id="otp" autocomplete="one-time-code" value="123456" />
     <label for="opted-out">Opted out (data-ai-translator="off")</label>
     <textarea id="opted-out" data-ai-translator="off">This page asked us to stay out.</textarea>
+    <h2>Popups (the widget must not close them)</h2>
+    <button id="open-popup">Open popup</button>
+    <button id="open-dialog">Open modal &lt;dialog&gt;</button>
+    <!-- Closes on any click outside it, seen in the capture phase like Headless UI; centred with a transform. -->
+    <div id="popup" role="dialog" hidden style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 360px; padding: 16px; background: #fff; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 8px 24px #0003">
+      <label for="popup-text">Textarea in a popup</label>
+      <textarea id="popup-text">Their going to the park tomorow with there dog.</textarea>
+    </div>
+    <dialog id="dialog">
+      <label for="dialog-text">Textarea in a modal dialog</label>
+      <textarea id="dialog-text">She dont know nothing about it.</textarea>
+      <form method="dialog"><button>Close</button></form>
+    </dialog>
+    <h2>Specific fields / elements</h2>
+    <!-- One <h5> per site, then its field's markup trimmed to what reproduces the bug. -->
+    <script>
+      const popup = document.getElementById('popup');
+      document.getElementById('open-popup').onclick = (event) => { event.stopPropagation(); popup.hidden = false; };
+      document.addEventListener('mousedown', (event) => { if (!popup.contains(event.target)) popup.hidden = true; }, true);
+      document.addEventListener('keydown', (event) => { if (event.key === 'Escape') popup.hidden = true; }, true);
+      document.getElementById('open-dialog').onclick = () => document.getElementById('dialog').showModal();
+    </script>
   </body>
 </html>

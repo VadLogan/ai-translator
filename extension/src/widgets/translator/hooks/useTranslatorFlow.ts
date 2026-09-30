@@ -4,11 +4,12 @@ import { isProviderId } from '../../../auth/providers';
 import { switchLayout } from '../../../core/layout';
 import { findLanguage, type Language } from '../../../core/languages';
 import { sendMessage } from '../../../messaging/messages';
-import { historyStore, intoLanguages, type HistoryEntry } from '../../../settings/history';
+import { historyStore, intoLanguages, topPairs, type HistoryEntry } from '../../../settings/history';
+import { pinnedLanguages } from '../../../settings/pinned';
 import { storageSettings } from '../../../settings/storage-settings';
 import { replaceSelection } from '../../../content/replace';
 import { fieldKey, fieldLabel, getEditableSelection, getFieldAnchor, getFocusedField, getPageSelection, getSelectionAnchor, isSelectionUnchanged, plainText, wholeField, type EditableSelection } from '../../../content/selection';
-import { answered, cleanCheck, countFixes, detectedLang, hasEnoughWords, hidden, isMenuOpen, isVerdict, menuLanguages, reducer, type Check, type Screen, type Verdict } from '../state';
+import { answered, cleanCheck, countFixes, detectedLang, hasEnoughWords, hidden, isMenuOpen, isVerdict, menuShortcuts, pairTarget, reducer, type Check, type Screen, type Verdict } from '../state';
 import { toCheck, toDetection, type ViewActions, type WidgetCallbacks } from '../view';
 import { requestSlot } from './requestSlot';
 import { usePageEvents } from './usePageEvents';
@@ -17,8 +18,8 @@ import { useSiteGate } from './useSiteGate';
 export interface FlowOptions {
   /** The shadow host: events inside it are the widget's own, not "outside clicks". */
   host: HTMLElement;
-  /** Puts the host in the page. Called before the first show, so nothing is injected until needed. */
-  mount: () => void;
+  /** Puts the host in the page (inside `near`'s popup, if any). Called before each show, so nothing is injected until needed. */
+  mount: (near: Element) => void;
   /**
    * After an extension reload or update this script is orphaned: every chrome.* call throws
    * "Extension context invalidated". Reading WXT's ctx.isInvalid lets it notice and tear us down.
@@ -44,6 +45,8 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
   // The one background check (POST /check) in flight, and the one fix (POST /fix-grammar) a click asked for.
   const [pendingCheck] = useState(() => requestSlot(cancel));
   const [pendingFix] = useState(() => requestSlot(cancel));
+  // Page text's translation field: one language in flight; picking another aborts it.
+  const [pendingTranslation] = useState(() => requestSlot(cancel));
   const gate = useSiteGate(() => close());
 
   const show = (screen: Screen) => dispatch({ type: 'show', screen });
@@ -52,7 +55,15 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
   function close(): void {
     clearTimeout(checkTimer.current);
     generation.current++;
+    pendingTranslation.abort();
     dispatch({ type: 'close' });
+    dropOrphanCheck();
+  }
+
+  /** A 'checking' placeholder with no request behind it (an edit cancelled it, then no check followed) would spin forever. */
+  function dropOrphanCheck(): void {
+    const { check } = latest.current;
+    if (check && !answered(check) && pendingCheck.text === undefined) dispatch({ type: 'checked', check: null });
   }
 
   function refresh(): void {
@@ -62,7 +73,7 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     const selection = getEditableSelection() ?? getPageSelection();
     if (selection && selection.kind !== 'page' && gate.offFields.current.has(fieldKey(selection.element))) return close();
     if (selection) {
-      mount();
+      mount(selection.element);
       dispatch({ type: 'select', selection, anchor: getSelectionAnchor(selection) });
       // Checked up front, so the icon can warn about a wrong layout before it is clicked. Page text
       // can't be replaced, so it isn't checked.
@@ -71,25 +82,27 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     }
     const field = getFocusedField();
     if (!field || gate.offFields.current.has(fieldKey(field.element))) return close();
-    mount();
+    mount(field.element);
     dispatch({ type: 'select', selection: field, anchor: getFieldAnchor(field), field: true });
   }
 
   async function openMenu(): Promise<void> {
     const id = generation.current;
     let codes: string[];
+    let pairs: ReturnType<typeof topPairs>;
     try {
       // The cache and the local history answer immediately; the menu must not wait on the network to open.
-      const [{ favoriteLanguages }, history] = await Promise.all([storageSettings.get(), historyStore.get()]);
-      // The same targets as the popup's "Translate into": the 3 most used favorites, then "Used lately".
-      const { yours, lately } = intoLanguages(favoriteLanguages, history);
+      const [{ favoriteLanguages }, history, pinned] = await Promise.all([storageSettings.get(), historyStore.get(), pinnedLanguages.get()]);
+      // The same targets as the popup's "Translate into": the pins, the most used favorites, then "Used lately".
+      const { yours, lately } = intoLanguages(favoriteLanguages, history, pinned);
       codes = [...yours, ...lately.map(({ code }) => code)];
+      pairs = topPairs(history, Infinity);
     } catch {
       // Only fails when the extension was reloaded while the icon was showing.
       return fail('The extension was updated. Reload the page.', 'close');
     }
     if (id !== generation.current) return;
-    dispatch({ type: 'open', languages: codes.map(findLanguage).filter((l): l is Language => l !== undefined) });
+    dispatch({ type: 'open', languages: codes.map(findLanguage).filter((l): l is Language => l !== undefined), pairs });
     if (!latest.current.detection) void detect(id);
     // The menu's "Grammar fix" item shows the selection's error count, so it is asked up front.
     // Page text can't be replaced, so it gets no grammar fix.
@@ -98,21 +111,30 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     if (selection && selection.kind !== 'page' && hasEnoughWords(selection.text)) void checkGrammar(selection);
   }
 
-  /** Fills in the menu's detected line. Failures stay silent -- translating does not depend on it. */
+  /**
+   * Fills in the menu's detected line. Failures stay silent -- translating does not depend on it.
+   * Page text in a language the user has a pair for is translated at once into the pair's target,
+   * into the field under that line; the menu stays. A field's own text waits for a pick.
+   */
   async function detect(id: number): Promise<void> {
     const { selection } = latest.current;
     if (!selection) return;
     const response = await sendMessage({ type: 'detect', text: selection.text });
     if (id !== generation.current) return;
     if (!response.ok && response.error.code === 'gibberish') return showVerdict(selection.text, 'gibberish');
-    dispatch({ type: 'detected', detection: toDetection(response) });
+    const detection = toDetection(response);
+    dispatch({ type: 'detected', detection });
+    if (selection.kind !== 'page' || typeof detection !== 'object' || latest.current.translation) return; // a pick got there first
+    // latest.current renders the detection only later, so the pair is looked up on it by hand.
+    const target = pairTarget({ ...latest.current, detection });
+    if (target) void translateInField(target, detection.lang);
   }
 
-  async function translate(targetLang: string): Promise<void> {
+  async function translate(targetLang: string, sourceLang = detectedLang(latest.current)): Promise<void> {
     const { selection } = latest.current;
     if (!selection) return;
+    if (selection.kind === 'page') return translateInField(targetLang, sourceLang);
     const id = ++generation.current;
-    const sourceLang = detectedLang(latest.current);
     show({ kind: 'busy', label: `${findLanguage(targetLang)?.translating ?? `Translating to ${targetLang}`}…` });
 
     // sourceLang is what the user translated with, so the API can mark the detection verified.
@@ -128,16 +150,39 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     }
     const from = sourceLang ?? response.data.detectedSourceLang;
     const entry = { text: selection.text, result: response.data.text, to: targetLang, ...(from ? { from } : {}) };
-    if (selection.kind === 'page') {
-      show({ kind: 'translated', text: response.data.text, lang: targetLang });
-      remember(entry);
-    } else if (!isSelectionUnchanged(selection)) {
+    if (!isSelectionUnchanged(selection)) {
       fail('The text changed while translating. Select it again.');
     } else {
       replaceSelection(selection, response.data.text);
       close();
       remember(entry, selection);
     }
+  }
+
+  /**
+   * Page text is never replaced: its translation fills the field under the menu's detected line,
+   * skeleton first. A pick while one is in flight aborts it and swaps the field's language.
+   */
+  async function translateInField(targetLang: string, sourceLang = detectedLang(latest.current)): Promise<void> {
+    const { selection, screen } = latest.current;
+    if (!selection) return;
+    pendingTranslation.abort();
+    const id = pendingTranslation.start(selection.text);
+    if (screen.kind !== 'languages') show({ kind: 'languages' }); // back from sign-in or an error
+    dispatch({ type: 'translation', translation: { lang: targetLang } });
+    const response = await sendMessage({ type: 'translate', text: selection.text, targetLang, id, ...(sourceLang ? { sourceLang } : {}) });
+    if (!pendingTranslation.isCurrent(id)) return; // aborted: closed, or another language picked
+    pendingTranslation.done();
+    if (!response.ok) {
+      const { code, message } = response.error;
+      if (code === 'unauthenticated') show({ kind: 'signIn', targetLang });
+      else if (isVerdict(code)) showVerdict(selection.text, code, message);
+      else dispatch({ type: 'translation', translation: { lang: targetLang, error: message } });
+      return;
+    }
+    dispatch({ type: 'translation', translation: { lang: targetLang, text: response.data.text } });
+    const from = sourceLang ?? response.data.detectedSourceLang;
+    remember({ text: selection.text, result: response.data.text, to: targetLang, ...(from ? { from } : {}) });
   }
 
   /** Into the popup's History. Best effort: an orphaned script or full storage must not break the flow. */
@@ -226,25 +271,33 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
   /**
    * Opens the grammar panel on `target`'s fix: the one already fetched for this text, or a skeleton
    * until POST /fix-grammar answers. Its answer also replaces the badge's count with its own.
+   * `prefetch`: asked in the background once a check found errors, so the click opens it at once.
    */
-  async function loadFix(target: EditableSelection): Promise<void> {
+  async function loadFix(target: EditableSelection, prefetch = false): Promise<void> {
     const { check } = latest.current;
     const known = check?.text === target.text ? check : null;
-    if (known?.verdict) return showVerdict(target.text, known.verdict);
-    if (known?.fix) return show({ kind: 'grammarFixed', fix: known.fix });
-    show({ kind: 'grammarFixed', fix: null });
+    if (!prefetch) {
+      if (known?.verdict) return showVerdict(target.text, known.verdict);
+      if (known?.fix) return show({ kind: 'grammarFixed', fix: known.fix });
+      show({ kind: 'grammarFixed', fix: null });
+    }
     if (pendingFix.text === target.text) return; // in flight: its answer fills the panel
     pendingFix.abort();
     // The fix counts its own errors, so a background check of the same text is wasted.
     if (pendingCheck.text === target.text) pendingCheck.abort();
+    // A /check of this exact text answered, so it passed the guard: the API skips a second one.
+    const guarded = known?.errors !== undefined;
     const id = pendingFix.start(target.text);
-    const answer = await sendMessage({ type: 'fix-grammar', text: target.text, id });
+    const answer = await sendMessage({ type: 'fix-grammar', text: target.text, id, ...(guarded ? { guarded } : {}) });
     if (!pendingFix.isCurrent(id)) return; // cancelled by an edit
     pendingFix.done();
+    const now = latest.current;
+    const waiting = now.screen.kind === 'grammarFixed' && !now.screen.fix && now.selection?.text === target.text;
+    // A failed prefetch nobody clicked keeps the check's count: a click asks again.
+    if (prefetch && !waiting && !answer.ok) return;
     const done: Check = answer.ok ? { text: target.text, errors: countFixes(answer.data.html), fix: answer.data } : toCheck(target.text, answer);
     dispatch({ type: 'checked', check: done });
-    const now = latest.current;
-    if (now.screen.kind !== 'grammarFixed' || now.screen.fix || now.selection?.text !== target.text) return; // closed or moved on
+    if (!waiting) return; // closed or moved on
     if (answer.ok) show({ kind: 'grammarFixed', fix: answer.data });
     else if (done.verdict) showVerdict(target.text, done.verdict);
     else showCheckError(answer.error);
@@ -268,6 +321,9 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     pendingCheck.done();
     const done = toCheck(field.text, answer);
     dispatch({ type: 'checked', check: done });
+    // Errors found: fetch the fix now, so the click shows it instead of a skeleton. Costs a fix per
+    // typing pause with errors, whether or not the panel is opened.
+    if (done.errors && latest.current.selection) void loadFix(field, true);
     const now = latest.current;
     if (now.screen.kind === 'icon' && now.screen.field) {
       // Re-select: a paste or autocomplete changes the text with no keyup to refresh it.
@@ -284,13 +340,13 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     checkTimer.current = setTimeout(() => {
       const { screen, selection } = latest.current;
       // A single-line input (search box, filter, form field) shows its icon but costs no request
-      // until the icon is clicked: clicks call checkGrammar themselves.
-      if (screen.kind === 'icon' && selection?.element instanceof HTMLInputElement) return;
+      // until the icon is clicked: clicks call checkGrammar themselves. An open menu asks for itself (openMenu).
+      const skip = screen.kind !== 'icon' || selection?.element instanceof HTMLInputElement;
+      // A selection's own text, not its whole field.
+      const target = skip ? null : screen.field ? wholeField(selection?.element ?? null) : selection?.kind !== 'page' ? selection : null;
       // 3+ words only; the click asks for less.
-      if (screen.kind !== 'icon') return;
-      // A selection's own text, not its whole field. An open menu asks for itself (openMenu).
-      const target = screen.field ? wholeField(selection?.element ?? null) : selection?.kind !== 'page' ? selection : null;
-      if (target && hasEnoughWords(target.text)) void checkGrammar(target);
+      if (target && hasEnoughWords(target.text)) return void checkGrammar(target);
+      dropOrphanCheck();
     }, delay);
   }
 
@@ -364,7 +420,14 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
   /** Esc, the layout card's F, the grammar panel's ↵ / N / O and the menu's digits. Captured and swallowed, or the field would get the keystroke too. */
   function onKeyDown(event: KeyboardEvent): void {
     const { key } = event;
-    if (key === 'Escape') return close();
+    if (key === 'Escape') {
+      // An open panel takes the Escape, so a popup or dialog around the field stays; the next Escape is the page's.
+      if (isMenuOpen(latest.current)) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+      }
+      return close();
+    }
     const { screen } = latest.current;
     if (screen.kind === 'layout' && key === 'f') {
       event.preventDefault();
@@ -381,9 +444,9 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
       else void rewrite(key === 'n' ? 'natural' : 'formal');
       return;
     }
-    // Menu shortcut badges: "1".."9" pick the matching favorite language.
-    const language = /^[1-9]$/.test(key) && isMenuOpen(latest.current) ? menuLanguages(latest.current)[Number(key) - 1] : undefined;
-    if (language) void translate(language.code);
+    // Menu shortcut badges: "1".."9" pick the pair's target, then the favorites.
+    const code = /^[1-9]$/.test(key) && isMenuOpen(latest.current) ? menuShortcuts(latest.current)[Number(key) - 1] : undefined;
+    if (code) void translate(code);
   }
 
   usePageEvents(host, {

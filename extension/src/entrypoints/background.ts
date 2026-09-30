@@ -7,30 +7,38 @@ import { isMessage, type Account, type Message, type Response } from '../messagi
 import { storageSettings } from '../settings/storage-settings';
 
 export default defineBackground(() => {
-  // In-flight grammar checks and fixes by the content script's id. The fetch lives here, so only the worker can abort it.
+  // In-flight grammar checks, fixes and field translations by the content script's id. The fetch lives here, so only the worker can abort it.
   const checks = new Map<string, AbortController>();
 
   async function handle(message: Message, sender: Browser.runtime.MessageSender): Promise<Response<unknown>> {
     try {
       switch (message.type) {
-        case 'translate':
+        case 'translate': {
           // Fetched here, not in the content script: host_permissions exempt the worker from page CORS.
           // The url comes from the sender, not the message: the browser fills it in, so a
           // compromised page can't forge where the extension was used.
-          return {
-            ok: true,
-            data: await asUser((token) =>
-              translate(
-                {
-                  text: message.text,
-                  targetLang: message.targetLang,
-                  ...(message.sourceLang ? { sourceLang: message.sourceLang } : {}),
-                  url: sender.tab?.url ?? sender.url,
-                },
-                token,
+          const controller = new AbortController();
+          if (message.id) checks.set(message.id, controller);
+          try {
+            return {
+              ok: true,
+              data: await asUser((token) =>
+                translate(
+                  {
+                    text: message.text,
+                    targetLang: message.targetLang,
+                    ...(message.sourceLang ? { sourceLang: message.sourceLang } : {}),
+                    url: sender.tab?.url ?? sender.url,
+                  },
+                  token,
+                  controller.signal,
+                ),
               ),
-            ),
-          };
+            };
+          } finally {
+            if (message.id) checks.delete(message.id);
+          }
+        }
         case 'detect':
           // Same reasons as translate, url included.
           return {
@@ -46,7 +54,9 @@ export default defineBackground(() => {
             return {
               ok: true,
               data: await asUser<unknown>((token) =>
-                message.type === 'check' ? check(body, token, controller.signal) : fixGrammar(body, token, controller.signal),
+                message.type === 'check'
+                  ? check(body, token, controller.signal)
+                  : fixGrammar({ ...body, ...(message.guarded ? { guarded: true } : {}) }, token, controller.signal),
               ),
             };
           } finally {

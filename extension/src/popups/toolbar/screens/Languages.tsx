@@ -14,12 +14,15 @@ export interface LanguagesProps {
   /** "Yours", numbered for the digit keys. */
   yours: readonly string[];
   lately: readonly { code: string; at: number }[];
+  /** Pinned languages: always first in "Yours". */
+  pinned: readonly string[];
+  onTogglePin(code: string): void;
   onBack(): void;
   /** null = "Detect automatically" (source only). */
   onChoose(code: string | null): void;
 }
 
-export function Languages({ side, current, yours, lately, onBack, onChoose }: LanguagesProps) {
+export function Languages({ side, current, yours, lately, pinned, onTogglePin, onBack, onChoose }: LanguagesProps) {
   const [query, setQuery] = useState('');
   const [browse, setBrowse] = useState(false);
   const listing = query.trim() || browse;
@@ -50,7 +53,7 @@ export function Languages({ side, current, yours, lately, onBack, onChoose }: La
         {listing ? (
           <Group label={query.trim() ? 'Results' : 'All languages'}>
             {searchLanguages(query).map(({ code: lang }) => (
-              <LanguageRow key={lang} lang={lang} selected={lang === current} onPress={() => onChoose(lang)} />
+              <LanguageRow key={lang} lang={lang} selected={lang === current} pinned={pinned.includes(lang)} onTogglePin={() => onTogglePin(lang)} onPress={() => onChoose(lang)} />
             ))}
           </Group>
         ) : (
@@ -65,7 +68,7 @@ export function Languages({ side, current, yours, lately, onBack, onChoose }: La
             {yours.length > 0 && (
               <Group label="Yours">
                 {yours.map((lang, index) => (
-                  <LanguageRow key={lang} lang={lang} selected={lang === current} hint={String(index + 1)} onPress={() => onChoose(lang)} />
+                  <LanguageRow key={lang} lang={lang} selected={lang === current} hint={String(index + 1)} pinned={pinned.includes(lang)} onTogglePin={() => onTogglePin(lang)} onPress={() => onChoose(lang)} />
                 ))}
               </Group>
             )}
@@ -93,9 +96,21 @@ export function Languages({ side, current, yours, lately, onBack, onChoose }: La
   );
 }
 
-function LanguageRow({ lang, selected, hint, onPress }: { lang: string; selected: boolean; hint?: string; onPress: () => void }) {
+function LanguageRow({ lang, selected, hint, pinned, onTogglePin, onPress }: { lang: string; selected: boolean; hint?: string; pinned: boolean; onTogglePin: () => void; onPress: () => void }) {
+  const pin = (
+    <button
+      type="button"
+      aria-label={pinned ? `Unpin ${languageName(lang)}` : `Pin ${languageName(lang)}`}
+      aria-pressed={pinned}
+      title={pinned ? 'Unpin' : 'Pin to the top'}
+      onClick={onTogglePin}
+      className={`flex size-8 cursor-pointer items-center justify-center rounded-full outline-none hover:bg-tm-neutral focus-visible:opacity-100 focus-visible:shadow-tm-ring ${pinned ? 'text-tm-accent' : 'text-tm-muted opacity-0 group-hover:opacity-100'}`}
+    >
+      <Icon name="pin" size={15} className={pinned ? '[&_path]:fill-current' : undefined} />
+    </button>
+  );
   return (
-    <Row selected={selected} onPress={onPress} icon={<Flag lang={lang} width={22} />}>
+    <Row selected={selected} onPress={onPress} icon={<Flag lang={lang} width={22} />} action={pin}>
       <span className="flex grow flex-col">
         <span lang={lang} className="tm-label">{nativeName(lang)}</span>
         <Text variant="meta" className="text-[12px]">{languageName(lang)} · {lang}</Text>

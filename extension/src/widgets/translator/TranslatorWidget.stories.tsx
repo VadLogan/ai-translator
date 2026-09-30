@@ -54,6 +54,9 @@ export const FieldIconHover = story({ kind: 'icon', field: true, canDisable: tru
 
 export const Menu = story({ kind: 'languages', languages: FAVORITES, detectedName: 'English', detectedLang: 'en', grammar: 3 });
 
+/** Polish detected, and the user usually translates PL → UK: Ukrainian comes first, out of the list. */
+export const MenuPairSuggested = story({ kind: 'languages', languages: FAVORITES.filter(({ code }) => code !== 'uk'), suggested: findLanguage('uk'), detectedName: 'Polish', detectedLang: 'pl', grammar: 0 });
+
 export const MenuGrammarClean = story({ kind: 'languages', languages: FAVORITES, detectedName: 'English', detectedLang: 'en', grammar: 0 });
 
 export const MenuDetecting = story({ kind: 'languages', languages: FAVORITES, grammar: 'checking' });
@@ -69,7 +72,17 @@ export const MenuWithoutFavorites = story({ kind: 'languages', languages: [], de
 
 export const MenuPageText = story({ kind: 'languages', languages: FAVORITES, detectedName: 'English', detectedLang: 'en', readOnly: true });
 
-export const Translated = story({ kind: 'translated', text: 'Привіт, як справи? Сподіваюся, у тебе все добре.', lang: 'uk', onCopy: noop });
+/** Page text in Polish, pair PL → UK: the translation is asked by itself and shows under the detected line. */
+export const Translated = story({
+  kind: 'languages', languages: FAVORITES.filter(({ code }) => code !== 'uk'), detectedName: 'Polish', detectedLang: 'pl', readOnly: true,
+  translation: { lang: 'uk', text: 'Привіт, як справи? Сподіваюся, у тебе все добре.', lines: 2, onCopy: noop },
+});
+
+/** The same, while the translation is still in flight: skeleton lines sized to the selection. */
+export const Translating = story({
+  kind: 'languages', languages: FAVORITES.filter(({ code }) => code !== 'uk'), detectedName: 'Polish', detectedLang: 'pl', readOnly: true,
+  translation: { lang: 'uk', lines: 2, onCopy: noop },
+});
 
 export const Busy = story({ kind: 'busy', label: 'Перекладаю українською…' });
 

@@ -561,7 +561,7 @@
       "file_type": "code",
       "norm_label": "distributiveomit",
       "source_file": "extension/src/widgets/translator/hooks/useTranslatorFlow.ts",
-      "source_location": "L495"
+      "source_location": "L488"
     },
     {
       "id": "extension_src_widgets_translator_state_action",
@@ -14085,7 +14085,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/widgets/translator/hooks/usePageEvents.ts",
-      "source_location": "L28",
+      "source_location": "L26",
       "weight": 1.0
     },
     {
@@ -14097,7 +14097,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/widgets/translator/hooks/usePageEvents.ts",
-      "source_location": "L29",
+      "source_location": "L27",
       "weight": 1.0
     },
     {
@@ -14109,7 +14109,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/widgets/translator/hooks/usePageEvents.ts",
-      "source_location": "L35",
+      "source_location": "L33",
       "weight": 1.0
     },
     {
@@ -14121,7 +14121,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/widgets/translator/hooks/usePageEvents.ts",
-      "source_location": "L48",
+      "source_location": "L46",
       "weight": 1.0
     },
     {
@@ -14349,7 +14349,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/widgets/translator/hooks/useTranslatorFlow.ts",
-      "source_location": "L448",
+      "source_location": "L441",
       "weight": 1.0
     },
     {
@@ -14361,7 +14361,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/widgets/translator/hooks/useTranslatorFlow.ts",
-      "source_location": "L452",
+      "source_location": "L445",
       "weight": 1.0
     },
     {
@@ -15038,18 +15038,6 @@
     },
     {
       "source": "extension_src_widgets_translator_hooks_usetranslatorflow_usetranslatorflow_onkeydown",
-      "target": "extension_src_widgets_translator_state_ismenuopen",
-      "relation": "calls",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "context": "call",
-      "source_file": "extension/src/widgets/translator/hooks/useTranslatorFlow.ts",
-      "source_location": "L425",
-      "weight": 1.0
-    },
-    {
-      "source": "extension_src_widgets_translator_hooks_usetranslatorflow_usetranslatorflow_onkeydown",
       "target": "extension_src_widgets_translator_hooks_usetranslatorflow_usetranslatorflow_close",
       "relation": "calls",
       "_origin": "ast",
@@ -15057,7 +15045,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/widgets/translator/hooks/useTranslatorFlow.ts",
-      "source_location": "L429",
+      "source_location": "L423",
       "weight": 1.0
     },
     {
@@ -15069,7 +15057,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/widgets/translator/hooks/useTranslatorFlow.ts",
-      "source_location": "L435",
+      "source_location": "L428",
       "weight": 1.0
     },
     {
@@ -15081,7 +15069,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/widgets/translator/hooks/useTranslatorFlow.ts",
-      "source_location": "L439",
+      "source_location": "L432",
       "weight": 1.0
     },
     {
@@ -15093,7 +15081,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/widgets/translator/hooks/useTranslatorFlow.ts",
-      "source_location": "L443",
+      "source_location": "L436",
       "weight": 1.0
     },
     {
@@ -15105,7 +15093,19 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/widgets/translator/hooks/useTranslatorFlow.ts",
-      "source_location": "L444",
+      "source_location": "L437",
+      "weight": 1.0
+    },
+    {
+      "source": "extension_src_widgets_translator_hooks_usetranslatorflow_usetranslatorflow_onkeydown",
+      "target": "extension_src_widgets_translator_state_ismenuopen",
+      "relation": "calls",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "context": "call",
+      "source_file": "extension/src/widgets/translator/hooks/useTranslatorFlow.ts",
+      "source_location": "L441",
       "weight": 1.0
     },
     {
@@ -15117,7 +15117,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/widgets/translator/hooks/useTranslatorFlow.ts",
-      "source_location": "L448",
+      "source_location": "L441",
       "weight": 1.0
     },
     {
@@ -15129,7 +15129,7 @@
       "confidence_score": 1.0,
       "context": "call",
       "source_file": "extension/src/widgets/translator/hooks/useTranslatorFlow.ts",
-      "source_location": "L449",
+      "source_location": "L442",
       "weight": 1.0
     },
     {
@@ -34409,7 +34409,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "extension/src/widgets/translator/hooks/useTranslatorFlow.ts",
-      "source_location": "L495",
+      "source_location": "L488",
       "weight": 1.0
     },
     {
@@ -37083,7 +37083,7 @@
       "confidence_score": 0.85,
       "context": "collection",
       "source_file": "extension/src/widgets/translator/hooks/useTranslatorFlow.ts",
-      "source_location": "L454",
+      "source_location": "L447",
       "weight": 1.0
     },
     {
@@ -37095,7 +37095,7 @@
       "confidence_score": 0.85,
       "context": "collection",
       "source_file": "extension/src/widgets/translator/hooks/useTranslatorFlow.ts",
-      "source_location": "L455",
+      "source_location": "L448",
       "weight": 1.0
     },
     {
@@ -37107,7 +37107,7 @@
       "confidence_score": 0.85,
       "context": "collection",
       "source_file": "extension/src/widgets/translator/hooks/useTranslatorFlow.ts",
-      "source_location": "L456",
+      "source_location": "L449",
       "weight": 1.0
     },
     {
@@ -37119,7 +37119,7 @@
       "confidence_score": 0.85,
       "context": "collection",
       "source_file": "extension/src/widgets/translator/hooks/useTranslatorFlow.ts",
-      "source_location": "L467",
+      "source_location": "L460",
       "weight": 1.0
     },
     {
@@ -37131,7 +37131,7 @@
       "confidence_score": 0.85,
       "context": "collection",
       "source_file": "extension/src/widgets/translator/hooks/useTranslatorFlow.ts",
-      "source_location": "L473",
+      "source_location": "L466",
       "weight": 1.0
     },
     {
@@ -37143,7 +37143,7 @@
       "confidence_score": 0.85,
       "context": "collection",
       "source_file": "extension/src/widgets/translator/hooks/useTranslatorFlow.ts",
-      "source_location": "L474",
+      "source_location": "L467",
       "weight": 1.0
     },
     {
@@ -37155,7 +37155,7 @@
       "confidence_score": 0.85,
       "context": "collection",
       "source_file": "extension/src/widgets/translator/hooks/useTranslatorFlow.ts",
-      "source_location": "L480",
+      "source_location": "L473",
       "weight": 1.0
     },
     {
@@ -37167,7 +37167,7 @@
       "confidence_score": 0.85,
       "context": "collection",
       "source_file": "extension/src/widgets/translator/hooks/useTranslatorFlow.ts",
-      "source_location": "L482",
+      "source_location": "L475",
       "weight": 1.0
     },
     {
@@ -37179,7 +37179,7 @@
       "confidence_score": 0.85,
       "context": "collection",
       "source_file": "extension/src/widgets/translator/hooks/useTranslatorFlow.ts",
-      "source_location": "L483",
+      "source_location": "L476",
       "weight": 1.0
     },
     {
@@ -37191,7 +37191,7 @@
       "confidence_score": 0.85,
       "context": "collection",
       "source_file": "extension/src/widgets/translator/hooks/useTranslatorFlow.ts",
-      "source_location": "L488",
+      "source_location": "L481",
       "weight": 1.0
     },
     {

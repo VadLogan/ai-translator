@@ -101,10 +101,16 @@ export function byUse(favorites: readonly string[], list: readonly HistoryEntry[
   return [...favorites].sort((a, b) => (uses.get(b) ?? 0) - (uses.get(a) ?? 0));
 }
 
-/** The popup's "Translate into" list, also the in-page menu's: the 3 most used favorites, then "Used lately". */
-export const intoLanguages = (favorites: readonly string[], list: readonly HistoryEntry[]) => ({
-  yours: byUse(favorites, list).slice(0, 3),
-  lately: usedLately(list, favorites, 'to'),
+/** Pinned languages first, then the other favorites; each once. */
+export const pinFirst = (pinned: readonly string[], favorites: readonly string[]): string[] => [...new Set([...pinned, ...favorites])];
+
+/**
+ * The popup's "Translate into" list, also the in-page menu's: every pinned language, then the most
+ * used other favorites up to 3 in all, then "Used lately".
+ */
+export const intoLanguages = (favorites: readonly string[], list: readonly HistoryEntry[], pinned: readonly string[] = []) => ({
+  yours: [...pinned, ...byUse(favorites.filter((code) => !pinned.includes(code)), list)].slice(0, Math.max(3, pinned.length)),
+  lately: usedLately(list, pinFirst(pinned, favorites), 'to'),
 });
 
 export const historyStore = {

@@ -14,7 +14,11 @@ const MESSAGES = {
  * validate(), which put `text` on the body. Fails open: a guard outage must not block translating.
  */
 export const guardText = createMiddleware<AppEnv>(async (c, next) => {
-  const { text } = c.get('body') as { text: string };
+  const { text, sourceLang, guarded } = c.get('body') as { text: string; sourceLang?: string; guarded?: boolean };
+  // A translate with sourceLang follows a /detect, a fix marked guarded a /check, that already
+  // guarded this text: skip the second guard call (0.3-0.9 s). A client could skip it on purpose,
+  // but that only spends its own rate limit.
+  if (sourceLang || guarded) return next();
   let verdict: GuardVerdict | null = null;
   try {
     verdict = await validateGuard(text, c.req.raw.signal);

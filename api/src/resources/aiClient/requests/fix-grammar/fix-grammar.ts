@@ -16,6 +16,8 @@ export async function fixGrammar({ text }: FixGrammarBody, signal?: AbortSignal)
     model: MODEL,
     instructions: AGENT_INSTRUCTION,
     input: text,
+    // Proofreading needs no chain of thought; the default effort spent ~70 hidden tokens (~1 s) per fix.
+    reasoning: { effort: 'none' },
     text: {
       format: {
         type: 'json_schema',

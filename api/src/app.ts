@@ -5,7 +5,7 @@ import { fail, type AppEnv } from './utils/http.ts';
 import { requireUser } from './middleware/auth.ts';
 import { rateLimit } from './middleware/rate-limit.ts';
 import { guardText } from './middleware/guard.ts';
-import { parseDetectBody, parseRewriteBody, parseSettings, parseTranslateBody, validate } from './middleware/body.ts';
+import { parseDetectBody, parseFixGrammarBody, parseRewriteBody, parseSettings, parseTranslateBody, validate } from './middleware/body.ts';
 import { getSettings, putSettings } from './controllers/settings.ts';
 import { detectController } from './controllers/detect.ts';
 import { translateController } from './controllers/translate.ts';
@@ -43,7 +43,7 @@ app.post('/detect', requireUser('Sign in to detect the language'), rateLimit, va
 app.post('/translate', requireUser('Sign in to translate'), rateLimit, validate(parseTranslateBody), guardText, translateController);
 
 // Same body as /detect: text + url.
-app.post('/fix-grammar', requireUser('Sign in to fix grammar'), rateLimit, validate(parseDetectBody), guardText, fixGrammarController);
+app.post('/fix-grammar', requireUser('Sign in to fix grammar'), rateLimit, validate(parseFixGrammarBody), guardText, fixGrammarController);
 
 // The field icon's badge: the error count only. The fix itself is asked on click (/fix-grammar).
 app.post('/check', requireUser('Sign in to check grammar'), rateLimit, validate(parseDetectBody), guardText, checkController);
