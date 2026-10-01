@@ -118,6 +118,17 @@ export const GrammarNative = story({
   ignored: [0],
 });
 
+/** An earlier fix shown while the latest one loads: the text stays, a spinner beside the title. */
+export const GrammarUpdating = story({
+  kind: 'grammar',
+  lang: 'en',
+  html: `${fix("I'm sending", 'I send')} you the updated ${fix('estimate', 'estimte')} for the finish works.`,
+  edits: [sending, estimate],
+  index: 0,
+  loading: true,
+  ...grammar,
+});
+
 /** The last edit left: no stepper, no Replace all. */
 export const GrammarLastEdit = story({ kind: 'grammar', lang: 'en', html: `the updated ${fix('estimate', 'estimte')}.`, edits: [estimate], index: 0, ...grammar });
 

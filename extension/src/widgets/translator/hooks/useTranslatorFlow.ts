@@ -295,7 +295,7 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
   async function loadFix(target: WritableSelection, prefetch = false, field = true): Promise<void> {
     const { check } = latest.current;
     const known = check?.text === target.text ? check : null;
-    const panel = (fix: FixGrammarOk | null): Screen => ({ kind: 'grammar', fix, index: 0, field, base: field ? 0 : offsetIn(target) });
+    const panel = (fix: FixGrammarOk | null, loading?: boolean): Screen => ({ kind: 'grammar', fix, index: 0, field, base: field ? 0 : offsetIn(target), loading });
     if (field && isChunked(target)) {
       // Paragraph by paragraph: the panel opens on what is already known, or a skeleton that publish fills.
       if (known?.verdict) return showVerdict(target.text, known.verdict);
@@ -305,7 +305,9 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
       if (known && settled(known, status)) return show(panel(known.fix ?? cleanFix(target.text)));
       finished.current = true; // a click is as good as a pause: check the caret's sentence now too
       checkField(target);
-      return show(panel(null)); // after checkField: its publish runs before the render, on the icon screen
+      // After checkField: its publish runs before the render, on the icon screen. What is known so
+      // far stays readable, with a spinner, instead of a skeleton.
+      return show(visibleEdits(latest.current, status.fix).length ? panel(status.fix, true) : panel(null));
     }
     if (!prefetch) {
       if (known?.verdict) return showVerdict(target.text, known.verdict);
@@ -390,8 +392,9 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
       const errors = counts.reduce((sum, c) => sum + (typeof c === 'object' ? c.errors : 0), 0);
       const fix = typeof answer === 'object' ? answer : checked && !verdict && !errors ? cleanFix(chunk.text) : undefined;
       const carried = fix || verdict ? undefined : carriedFix(element, chunk.text);
-      // The ended sentences before the one being typed, as one text: fixed while it is typed on.
-      const ended = typed > 0 ? sentences.slice(0, typed) : [];
+      // Typing on at the paragraph's end: its ended sentences, as one text, are fixed meanwhile. Not
+      // for an edit in the middle: the paragraph's earlier fix already carries over to the rest.
+      const ended = typed > 0 && typed === sentences.length - 1 ? sentences.slice(0, typed) : [];
       const last = ended.at(-1);
       const done = last ? text.slice(chunk.start, last.start + last.text.length) : '';
       const doneErrors = counts.slice(0, typed).reduce((sum: number | undefined, c) => (sum === undefined || c === undefined ? undefined : sum + (typeof c === 'object' ? c.errors : 0)), 0);
@@ -485,11 +488,14 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
       // Re-select: a paste or autocomplete changes the text with no keyup to refresh it. Only then:
       // a 'select' resets the screen, and this may run before a just-shown panel has rendered.
       if (now.selection.text !== field.text) dispatch({ type: 'select', selection: field, anchor: getFieldAnchor(field), field: true });
-    } else if (screen.kind === 'grammar' && screen.field && !screen.fix && !screen.hover && now.selection?.text === field.text) {
-      // A click's skeleton, waiting on the last paragraphs.
+    } else if (screen.kind === 'grammar' && screen.field && (!screen.fix || screen.loading) && !screen.hover && now.selection?.text === field.text) {
+      // A click's skeleton or earlier fix, waiting on the last paragraphs: each answer shows the latest.
+      const left = visibleEdits(latest.current, status.fix).length;
+      const index = Math.max(0, Math.min(screen.index, left - 1));
       if (verdict) showVerdict(field.text, verdict);
       else if (error) showCheckError(error);
-      else if (status.fixedAll) show({ kind: 'grammar', fix: status.fix, index: 0, field: true, base: 0 });
+      else if (status.fixedAll) show({ ...screen, fix: status.fix, index, loading: false });
+      else if (left) show({ ...screen, fix: status.fix, index, loading: true });
     }
   }
 
@@ -573,6 +579,19 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     if (isChunked(field)) publish(field.element);
     else if (wasChecking) dispatch({ type: 'checked', check: { text: field.text } });
     scheduleCheck();
+  }
+
+  /**
+   * The field's DOM changed with no input event: the page wrote it (a chat clearing its composer on
+   * send). Re-read it, so the badge never describes text that is gone, then treat it as an edit.
+   */
+  function onMutation(): void {
+    const { screen, selection } = latest.current;
+    if (writingEdit.current || screen.kind !== 'icon' || !screen.field || !selection) return;
+    const field = wholeField(selection.element);
+    if (!field || field.text === selection.text) return;
+    dispatch({ type: 'select', selection: field, anchor: getFieldAnchor(field), field: true });
+    onInput();
   }
 
   function apply(text: string, selection = latest.current.selection): void {
@@ -720,6 +739,7 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     close,
     refresh,
     onInput,
+    onMutation,
     onKeyDown,
     onScroll,
     onPointer: underlines.onPointer,

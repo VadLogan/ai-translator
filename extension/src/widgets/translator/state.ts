@@ -16,9 +16,11 @@ export type Screen =
    * skeleton). `index` is the shown edit among the visible ones. `hover`: opened from an underline, so
    * it closes when the pointer leaves. `field`: the fix is the whole field's (the corner icon, an
    * underline), not a selection's (the menu's "Grammar fix"). `base`: where the fixed text starts in
-   * its field -- 0 for the whole field, the selection's offset otherwise.
+   * its field -- 0 for the whole field, the selection's offset otherwise. `loading`: `fix` is what is
+   * known so far (fixed paragraphs, carried-over edits) while the rest of the field's fixes are in
+   * flight; publish swaps in the latest as they answer.
    */
-  | { kind: 'grammar'; fix: FixGrammarOk | null; index: number; base: number; field: boolean; hover?: boolean }
+  | { kind: 'grammar'; fix: FixGrammarOk | null; index: number; base: number; field: boolean; hover?: boolean; loading?: boolean }
   /** The guard found a wrong keyboard layout: the local re-type is all that is offered. */
   | { kind: 'layout' }
   /** The guard found random keystrokes: a notice. Nothing else is offered until the text changes. */

@@ -115,5 +115,7 @@ it('tells the sentence being typed, a trailing space included', () => {
   expect(isBeingTyped(text, typing, text.length)).toBe(true); // caret after the space
   expect(isBeingTyped(text, done, text.length)).toBe(false); // ended
   expect(isBeingTyped(text, typing, null)).toBe(false); // typing finished
-  expect(isBeingTyped(text, typing, 3)).toBe(false); // caret in an earlier sentence
+  expect(isBeingTyped(text, typing, 3)).toBe(false); // caret in an earlier sentence: that one is
+  expect(isBeingTyped(text, done, 3)).toBe(true); // editing the middle of an ended sentence
+  expect(isBeingTyped(text, done, done.start + done.text.length)).toBe(false); // right after its full stop: just finished
 });

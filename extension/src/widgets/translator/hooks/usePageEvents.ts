@@ -4,6 +4,8 @@ export interface PageHandlers {
   close(): void;
   refresh(): void;
   onInput(): void;
+  /** The selected field's DOM changed, at most once a frame. */
+  onMutation(): void;
   onKeyDown(event: KeyboardEvent): void;
   /** Focus moved into a page field. */
   onFocusIn(): void;
@@ -21,7 +23,7 @@ export interface PageHandlers {
  */
 export function usePageEvents(host: HTMLElement, handlers: PageHandlers): void {
   useEffect(() => {
-    const { close, refresh, onInput, onKeyDown, onFocusIn, onScroll, onPointer, selectedElement } = handlers;
+    const { close, refresh, onInput, onMutation, onKeyDown, onFocusIn, onScroll, onPointer, selectedElement } = handlers;
     const owns = (event: Event) => event.composedPath().includes(host);
     let frame = 0;
     const listeners: [EventTarget, string, (event: Event) => void, AddEventListenerOptions?][] = [
@@ -73,7 +75,21 @@ export function usePageEvents(host: HTMLElement, handlers: PageHandlers): void {
       [window, 'resize', () => onScroll()],
     ];
     for (const [target, type, listener, options] of listeners) target.addEventListener(type, listener, options);
+    // A page clearing or rewriting a contenteditable from code fires no input event. ponytail: a
+    // textarea's .value set from code mutates nothing, so it still goes unseen; poll if that matters.
+    let mutated = 0;
+    const observer = new MutationObserver((records) => {
+      const field = selectedElement();
+      if (mutated || !field || !records.some((r) => field.contains(r.target))) return;
+      mutated = requestAnimationFrame(() => {
+        mutated = 0;
+        onMutation();
+      });
+    });
+    observer.observe(document, { childList: true, characterData: true, subtree: true });
     return () => {
+      observer.disconnect();
+      cancelAnimationFrame(mutated);
       cancelAnimationFrame(frame);
       for (const [target, type, listener, options] of listeners) target.removeEventListener(type, listener, options);
     };

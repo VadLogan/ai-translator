@@ -51,11 +51,13 @@ export type WidgetView =
    * The grammar panel, one edit at a time. `html`: `FixGrammarOk.html`, escaped text with each edit
    * wrapped in `<span class="fix" data-original>`; absent while the fix is loading (a skeleton).
    * `edits` are the ones still showing, in `html`'s span order minus the ignored ones; `index` is the
-   * shown one. `ignored` are the span positions to draw as their original text.
+   * shown one. `ignored` are the span positions to draw as their original text. `loading`: `html` is
+   * an earlier fix, still shown while the latest one loads.
    */
   | {
     kind: 'grammar';
     html?: string;
+    loading?: boolean;
     /** The text's language code, for the preview's `lang`. */
     lang?: string;
     edits: readonly { kind: FixKind; original: string; replacement: string; reason: string }[];
@@ -124,6 +126,7 @@ export function toView(state: State, { onPick, onBack, onClose, onReplaceEdit, o
       return {
         kind: 'grammar',
         html: fix ? plainText(selection, fix.html) : undefined,
+        loading: !!fix && screen.loading,
         edits: edits.map(({ kind, original, replacement, reason }) => ({ kind, original: plainText(selection, original), replacement: plainText(selection, replacement), reason })),
         index,
         ignored: fix ? fix.edits.flatMap((edit, i) => (edits.includes(edit) ? [] : [i])) : [],

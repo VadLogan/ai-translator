@@ -24,7 +24,10 @@ export function GrammarPanel({ view }: { view: Extract<WidgetView, { kind: 'gram
             <Icon name="check" size={11} strokeWidth={3.4} />
           </span>
         )}
-        <Text variant="label" className="grow">{loading ? 'Checking grammar…' : count ? 'Grammar fixed' : 'Nothing to fix'}</Text>
+        <Text variant="label">{loading ? 'Checking grammar…' : count ? 'Grammar fixed' : 'Nothing to fix'}</Text>
+        {/* An earlier fix stays readable while the latest one loads. */}
+        {view.loading && <Spinner size="sm" aria-label="Updating" className="scale-75 text-tm-accent" />}
+        <span className="grow" />
         {count > 0 && <Text variant="meta" className="pr-1.5">{count === 1 ? '1 change' : `${count} changes`}</Text>}
       </div>
       {loading ? (

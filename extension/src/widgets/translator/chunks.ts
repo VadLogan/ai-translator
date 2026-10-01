@@ -69,12 +69,16 @@ export const cleanFix = (text: string): FixGrammarOk => ({ text, html: escapeHtm
 export const isFinished = (text: string): boolean => /[.!?…。！？]["'”’»)\]]*\s*$/.test(text);
 
 /**
- * `sentence` (of the field's `text`) is the one being typed: the caret is in it or after it with
- * only whitespace between ("…my brother |"), and it hasn't ended. Null caret: nobody is typing.
+ * `sentence` (of the field's `text`) is the one being typed: the caret is inside it (editing the
+ * middle of a sentence, ended or not: "…and bou|ght some apples."), or after it with only
+ * whitespace between and it hasn't ended ("…my brother |"). A caret right after its full stop is
+ * a sentence just finished, not one being typed. Null caret: nobody is typing.
  */
 export function isBeingTyped(text: string, sentence: Chunk, caret: number | null): boolean {
-  if (caret === null || caret < sentence.start || isFinished(sentence.text)) return false;
-  return !text.slice(sentence.start + sentence.text.length, caret).trim();
+  if (caret === null || caret < sentence.start) return false;
+  const end = sentence.start + sentence.text.length;
+  if (caret < end) return true;
+  return !isFinished(sentence.text) && !text.slice(end, caret).trim();
 }
 
 /**
