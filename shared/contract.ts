@@ -36,6 +36,28 @@ export interface DetectOk {
   model?: string;
 }
 
+/** Voice input: the recorded audio (multipart field `audio`) + the page url. */
+export interface TranscribeBody {
+  audio: File;
+  url?: string;
+}
+
+export interface TranscribeOk {
+  /** What was said; '' when nothing was heard. */
+  text: string;
+  /** Its language, detected server-side so the client can skip a /detect. "und" when unknown. */
+  lang: string;
+  model?: string;
+}
+
+/** A short-lived client secret for a live (Realtime) transcription session: the extension streams audio to OpenAI with it. */
+export interface VoiceSessionOk {
+  secret: string;
+  /** When the secret stops opening new sessions, in seconds since epoch. */
+  expiresAt: number;
+  model: string;
+}
+
 /** Grammar fix: the same text + url as detection. */
 export interface FixGrammarBody extends DetectBody {
   /**
@@ -149,3 +171,5 @@ export const MAX_TEXT_LENGTH = 5000;
 export const MAX_FAVORITE_LANGUAGES = 20;
 export const MAX_DISABLED_SITES = 100;
 export const MAX_URL_LENGTH = 2048;
+/** One dictation: 60 s of webm/opus is ~0.5 MB. */
+export const MAX_AUDIO_BYTES = 5 * 1024 * 1024;

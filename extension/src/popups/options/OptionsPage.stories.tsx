@@ -24,6 +24,9 @@ const meta = {
     disabledFields: [{ site: 'teams.microsoft.com', key: 'div|data-tid=ckeditor', label: 'Type a message' }],
     onEnableField: noop,
     onSave: noop,
+    mic: 'prompt',
+    micRequested: false,
+    onAllowMic: noop,
   },
 } satisfies Meta<typeof OptionsPage>;
 
@@ -46,3 +49,5 @@ export const Saved: Story = {
 export const Failed: Story = {
   args: { status: { message: 'Sign in to save your settings.', isError: true } },
 };
+
+export const MicRequested: Story = { args: { account: { email: 'you@example.com' }, micRequested: true } };

@@ -9,6 +9,8 @@ import type {
   RewriteBody,
   RewriteOk,
   Settings,
+  TranscribeOk,
+  VoiceSessionOk,
   TranslateBody,
   TranslateErr,
   TranslateOk,
@@ -48,6 +50,14 @@ export const check = (body: CheckBody, accessToken: string | null, signal?: Abor
 export const rewrite = (body: RewriteBody, accessToken: string | null, baseUrl = BASE_URL) =>
   call<RewriteOk>('/rewrite', { method: 'POST', body }, accessToken, baseUrl);
 
+/** Voice input: multipart `audio` (+ `url`) in, what was said and its language out. */
+export const transcribe = (form: FormData, accessToken: string | null, baseUrl = BASE_URL) =>
+  call<TranscribeOk>('/transcribe', { method: 'POST', body: form }, accessToken, baseUrl);
+
+/** A short-lived secret for a live (Realtime) transcription session; the recorder streams the mic with it. */
+export const voiceSession = (accessToken: string | null, baseUrl = BASE_URL) =>
+  call<VoiceSessionOk>('/voice-session', { method: 'POST' }, accessToken, baseUrl);
+
 /** Settings live server-side so they follow the user across devices. */
 export const getSettings = (accessToken: string | null, baseUrl = BASE_URL) =>
   call<Settings>('/settings', {}, accessToken, baseUrl);
@@ -66,11 +76,12 @@ async function call<T>(
     response = await fetch(`${baseUrl}${path}`, {
       method,
       headers: {
-        'content-type': 'application/json',
+        // FormData sets its own multipart content-type, boundary included.
+        ...(body instanceof FormData ? {} : { 'content-type': 'application/json' }),
         // host_permissions exempt the worker from CORS, so this header triggers no preflight.
         ...(accessToken ? { authorization: `Bearer ${accessToken}` } : {}),
       },
-      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+      ...(body === undefined ? {} : { body: body instanceof FormData ? body : JSON.stringify(body) }),
       signal,
     });
   } catch (error) {

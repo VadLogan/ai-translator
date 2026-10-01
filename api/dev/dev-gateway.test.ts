@@ -13,6 +13,9 @@ vi.mock('../src/resources/aiClient/requests/fix-grammar/fix-grammar.ts', () => (
 vi.mock('../src/resources/aiClient/requests/validateGuard.ts', () => ({ validateGuard: vi.fn(async () => null), GUARD_MESSAGES: { mistyped: 'mistyped', gibberish: 'gibberish' } }));
 vi.mock('../src/resources/aiClient/requests/grammarQuality.ts', () => ({ grammarQuality: vi.fn(async () => ({ errors: 0 })) }));
 vi.mock('../src/resources/aiClient/requests/rewrite.ts', () => ({ rewrite: vi.fn(async ({ text, style }) => ({ text: `[${style}] ${text}` })) }));
+vi.mock('../src/resources/aiClient/requests/transcribe.ts', () => ({ transcribe: vi.fn(async () => ({ text: '', model: 'm' })) }));
+vi.mock('../src/resources/aiClient/requests/voiceSession.ts', () => ({ voiceSession: vi.fn(async () => ({ secret: 'ek_test', expiresAt: 1, model: 'm' })) }));
+vi.mock('../src/repositories/transcriptions.ts', () => ({ transcriptionsRepository: { save: vi.fn(async () => {}) } }));
 vi.mock('../src/repositories/rewrites.ts', () => ({ rewritesRepository: { save: vi.fn(async () => {}) } }));
 vi.mock('../src/repositories/corrections.ts', () => ({ correctionsRepository: { save: vi.fn(async () => {}) } }));
 vi.mock('../src/resources/db.ts', () => ({ checkDb: vi.fn(async () => 'disabled') }));

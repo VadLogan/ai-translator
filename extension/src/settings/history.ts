@@ -9,6 +9,8 @@ interface Common {
   at: number;
   /** Starred by the user. Local only: there is no feedback endpoint yet. */
   starred?: boolean;
+  /** The text was dictated (voice input), not typed or selected. */
+  voice?: true;
 }
 
 /**
@@ -46,6 +48,15 @@ export function topPairs(list: readonly HistoryEntry[], count = 2): Pair[] {
     uses.set(key, seen);
   }
   return [...uses.values()].sort((a, b) => b.count - a.count).slice(0, count).map(({ pair }) => pair);
+}
+
+/**
+ * The target of the user's usual pair for `source`: the most used pair starting from it, else one
+ * ending in it, flipped (PL→UA suggests PL for Ukrainian text). `pairs` most used first (`topPairs`).
+ */
+export function pairFor(pairs: readonly Pair[], source: string | undefined): string | undefined {
+  if (!source) return undefined;
+  return pairs.find((pair) => pair.from === source)?.to ?? pairs.find((pair) => pair.to === source)?.from;
 }
 
 /** The popup's starting pair: the most used one, else the first two favorites. */

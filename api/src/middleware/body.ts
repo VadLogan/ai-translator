@@ -2,6 +2,7 @@ import { createMiddleware } from 'hono/factory';
 import {
   HOSTNAME,
   LANGUAGE_CODE,
+  MAX_AUDIO_BYTES,
   MAX_DISABLED_SITES,
   MAX_FAVORITE_LANGUAGES,
   MAX_TEXT_LENGTH,
@@ -12,18 +13,20 @@ import {
   type RewriteBody,
   type RewriteStyle,
   type Settings,
+  type TranscribeBody,
   type TranslateBody,
 } from '../../../shared/contract.ts';
 import { fail, type AppEnv } from '../utils/http.ts';
 
 /**
- * Validates the JSON body with `parse` and puts the result on the context, or 400s with the
+ * Validates the JSON (or multipart, for audio) body with `parse` and puts the result on the context, or 400s with the
  * reason. Controllers read it back with one `c.get('body') as …` -- the route table pairs the
  * parser with its controller on the same line.
  */
 export const validate = <T>(parse: (body: unknown) => T | string) =>
   createMiddleware<AppEnv>(async (c, next) => {
-    const parsed = parse(await c.req.json().catch(() => null));
+    const multipart = c.req.header('content-type')?.startsWith('multipart/form-data');
+    const parsed = parse(await (multipart ? c.req.formData() : c.req.json()).catch(() => null));
     if (typeof parsed === 'string') return fail(c, 400, 'invalid-input', parsed);
 
     c.set('body', parsed);
@@ -89,4 +92,16 @@ export function parseRewriteBody(body: unknown): RewriteBody | string {
   const { style } = body as Record<string, unknown>;
   if (!REWRITE_STYLES.includes(style as RewriteStyle)) return `style must be one of ${REWRITE_STYLES.join(', ')}`;
   return { ...parsed, style: style as RewriteStyle };
+}
+
+/** A dictation upload: multipart with an `audio` file part and an optional `url`. */
+export function parseTranscribeBody(body: unknown): TranscribeBody | string {
+  if (!(body instanceof FormData)) return 'Body must be multipart/form-data';
+  const audio = body.get('audio');
+  const url = body.get('url');
+  if (!(audio instanceof File) || !audio.size) return 'audio is required';
+  if (!audio.type.startsWith('audio/')) return 'audio must be an audio file';
+  if (audio.size > MAX_AUDIO_BYTES) return `audio must be at most ${MAX_AUDIO_BYTES} bytes`;
+  if (url !== null && (typeof url !== 'string' || url.length > MAX_URL_LENGTH)) return 'url is invalid';
+  return { audio, ...(typeof url === 'string' ? { url } : {}) };
 }

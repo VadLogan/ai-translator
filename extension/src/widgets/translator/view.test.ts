@@ -4,7 +4,7 @@ import { findLanguage } from '../../core/languages';
 import { hidden, reducer, type State } from './state';
 import { toCheck, toDetection, toView } from './view';
 
-const actions = { onPick: vi.fn(), onBack: vi.fn(), onClose: vi.fn(), onReplaceEdit: vi.fn(), onIgnoreEdit: vi.fn(), onReplaceAll: vi.fn(), onStep: vi.fn() };
+const actions = { onPick: vi.fn(), onBack: vi.fn(), onClose: vi.fn(), onReplaceEdit: vi.fn(), onIgnoreEdit: vi.fn(), onReplaceAll: vi.fn(), onStep: vi.fn(), onStopDictation: vi.fn(), onInsertDictation: vi.fn() };
 const anchor = { x: 1, top: 2, bottom: 3 };
 const selected = (text: string, kind = 'input'): State =>
   reducer(hidden, { type: 'select', selection: { text, kind } as unknown as EditableSelection, anchor });
@@ -80,4 +80,29 @@ it('maps the grammar panel onto the shown edit, skipping ignored ones', () => {
   state = reducer(state, { type: 'ignore', edit: until });
   view = toView(state, actions);
   expect(view).toMatchObject({ kind: 'grammar', index: 0, ignored: [0], edits: [{ original: 'teh' }] });
+});
+
+it('maps voice input: listening, then transcribing; ✕ closes', () => {
+  const state = reducer(selected('hi'), { type: 'show', screen: { kind: 'recording' } });
+  const view = toView(state, actions);
+  expect(view).toMatchObject({ kind: 'recording', transcribing: false, level: 0, seconds: 0, onStop: actions.onStopDictation, onCancel: actions.onClose });
+  expect(toView(reducer(state, { type: 'show', screen: { kind: 'recording', level: 0.5, ms: 7400, text: 'I have' } }), actions)).toMatchObject({ level: 0.5, seconds: 7.4, text: 'I have' });
+  expect(toView(reducer(state, { type: 'show', screen: { kind: 'recording', transcribing: true } }), actions)).toMatchObject({ transcribing: true });
+});
+
+it("gives a dictation's grammar panel its transcript and Insert of the fixed text", () => {
+  let state = reducer(selected('I has a dog', 'page'), { type: 'dictated', dictation: { transcript: 'I has a dog', text: 'I have a dog', at: 0 } });
+  state = reducer(state, { type: 'show', screen: { kind: 'grammar', fix: { text: 'I have a dog', html: 'I have a dog', edits: [] }, index: 0, base: 0, field: false, dictated: true } });
+  const view = toView(state, actions);
+  expect(view).toMatchObject({ kind: 'grammar', dictation: { transcript: 'I has a dog', text: 'I have a dog' } });
+  if (view.kind === 'grammar') view.dictation?.onInsert();
+  expect(actions.onInsertDictation).toHaveBeenCalledWith('I have a dog');
+});
+
+it("offers Insert on a dictation's translation only once it has answered", () => {
+  let state = reducer(selected('Hallo', 'page'), { type: 'dictated', dictation: { transcript: 'Hallo', text: 'Hallo', at: 0 } });
+  state = reducer(reducer(state, { type: 'open', languages: [], pairs: [] }), { type: 'translation', translation: { lang: 'en' } });
+  expect(toView(state, actions)).toMatchObject({ kind: 'languages', dictation: { transcript: 'Hallo', text: undefined } });
+  state = reducer(state, { type: 'translation', translation: { lang: 'en', text: 'Hello' } });
+  expect(toView(state, actions)).toMatchObject({ dictation: { text: 'Hello' } });
 });

@@ -246,6 +246,24 @@ describe('rangeAt', () => {
     expect(rangeAt(host, 0, 999)).toBeNull();
   });
 
+  it('places an empty range at the very end: the caret of a dictation into an empty or space-ended composer', () => {
+    // Teams' empty CKEditor composer: no text at all, just a paragraph with its filler <br>.
+    document.body.innerHTML = '<div contenteditable="true"><p><br></p></div>';
+    let host = document.querySelector('div')!;
+    let range = rangeAt(host, 0, 0)!;
+    expect(range.collapsed).toBe(true);
+    expect(range.startContainer).toBe(host.querySelector('p')); // inside the paragraph, not after it
+
+    document.body.innerHTML = '<div contenteditable="true"><p>It is a test </p></div>';
+    host = document.querySelector('div')!;
+    const length = wholeField(host)!.text.length;
+    range = rangeAt(host, length, length)!;
+    expect(range.collapsed).toBe(true);
+    expect(range.startContainer.textContent).toBe('It is a test ');
+    expect(range.startOffset).toBe('It is a test '.length);
+    expect(partOf(wholeField(host)!, length, length)?.text).toBe('');
+  });
+
   it('cuts a part of the field that replaceSelection can write', () => {
     document.body.innerHTML = '<div contenteditable="true">see <i>teh</i> file</div>';
     const field = wholeField(document.querySelector('div'))!;

@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 // defineItem reads chrome.storage at load; only the pure helpers are under test.
 vi.mock('wxt/utils/storage', () => ({ storage: { defineItem: () => ({}) } }));
 
-import { byDay, byUse, defaultPair, HISTORY_LIMIT, intoLanguages, orient, pairLabel, pinFirst, topPairs, usedLately, withEntry, type HistoryEntry, type TranslationEntry } from './history';
+import { byDay, byUse, defaultPair, HISTORY_LIMIT, intoLanguages, orient, pairFor, pairLabel, pinFirst, topPairs, usedLately, withEntry, type HistoryEntry, type TranslationEntry } from './history';
 
 const DAY = 86_400_000;
 const NOW = new Date(2026, 8, 25, 12).getTime();
@@ -39,6 +39,16 @@ describe('defaultPair', () => {
     expect(defaultPair([entry('en', 1, 'uk'), entry('de', 2, 'pl'), entry('de', 3, 'pl')], ['fr', 'it'])).toEqual({ from: 'pl', to: 'de' });
     expect(defaultPair([entry('en', 1), grammar(2)], ['fr', 'it', 'es'])).toEqual({ from: 'fr', to: 'it' });
     expect(defaultPair([], ['fr'])).toBeNull();
+  });
+});
+
+describe('pairFor', () => {
+  const pairs = [{ from: 'uk', to: 'en' }, { from: 'pl', to: 'uk' }];
+  it('takes the most used pair starting from the language', () => expect(pairFor(pairs, 'uk')).toBe('en'));
+  it('else flips one ending in it', () => expect(pairFor(pairs, 'en')).toBe('uk'));
+  it('finds nothing for a language in no pair, or no language', () => {
+    expect(pairFor(pairs, 'de')).toBeUndefined();
+    expect(pairFor(pairs, undefined)).toBeUndefined();
   });
 });
 

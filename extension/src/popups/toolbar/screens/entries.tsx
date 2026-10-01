@@ -15,11 +15,13 @@ export interface EntryActions {
   onDelete(entry: HistoryEntry): void;
 }
 
-/** What made the entry, at a glance: a translation or a grammar fix / rewrite. */
+/** What made the entry, at a glance: a translation or a grammar fix / rewrite, then a mic when it was dictated. */
 function KindIcon({ entry }: { entry: HistoryEntry }) {
+  const kind = entry.kind === 'grammar' ? 'Grammar fix' : 'Translation';
   return (
-    <span role="img" aria-label={entry.kind === 'grammar' ? 'Grammar fix' : 'Translation'} className="flex shrink-0 text-tm-muted">
+    <span role="img" aria-label={entry.voice ? `${kind} by voice` : kind} className="flex shrink-0 items-center gap-0.5 text-tm-muted">
       <Icon name={entry.kind === 'grammar' ? 'fixGrammar' : 'translate'} size={16} strokeWidth={1.9} />
+      {entry.voice && <Icon name="mic" size={13} strokeWidth={2} className="text-tm-accent" />}
     </span>
   );
 }

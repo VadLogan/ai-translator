@@ -1,8 +1,8 @@
 {
   "name": "ai-translator-ext",
-  "description": "Translate selected text in any input field on the fly",
+  "description": "Translate, fix grammar and dictate in any text field. Pick a language from the icon, fix typos and layout, or speak and insert.",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "scripts": {
     "dev": "wxt",

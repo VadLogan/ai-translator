@@ -11,6 +11,9 @@ import { rewrite } from './resources/aiClient/requests/rewrite.ts';
 import { rewritesRepository } from './repositories/rewrites.ts';
 import { validateGuard } from './resources/aiClient/requests/validateGuard.ts';
 import { grammarQuality } from './resources/aiClient/requests/grammarQuality.ts';
+import { transcribe } from './resources/aiClient/requests/transcribe.ts';
+import { transcriptionsRepository } from './repositories/transcriptions.ts';
+import { voiceSession } from './resources/aiClient/requests/voiceSession.ts';
 
 // The real providers call OpenAI; tests only cover the HTTP layer.
 vi.mock('./resources/aiClient/requests/translate.ts', () => ({
@@ -21,6 +24,9 @@ vi.mock('./resources/aiClient/requests/fix-grammar/fix-grammar.ts', () => ({ fix
 vi.mock('./resources/aiClient/requests/validateGuard.ts', () => ({ validateGuard: vi.fn(async () => null), GUARD_MESSAGES: { mistyped: 'mistyped', gibberish: 'gibberish' } }));
 vi.mock('./resources/aiClient/requests/grammarQuality.ts', () => ({ grammarQuality: vi.fn(async () => ({ errors: 2, verdict: null })) }));
 vi.mock('./resources/aiClient/requests/rewrite.ts', () => ({ rewrite: vi.fn(async ({ text, style }) => ({ text: `[${style}] ${text}` })) }));
+vi.mock('./resources/aiClient/requests/transcribe.ts', () => ({ transcribe: vi.fn(async () => ({ text: 'hello there', model: 'm' })) }));
+vi.mock('./resources/aiClient/requests/voiceSession.ts', () => ({ voiceSession: vi.fn(async () => ({ secret: 'ek_test', expiresAt: 1, model: 'm' })) }));
+vi.mock('./repositories/transcriptions.ts', () => ({ transcriptionsRepository: { save: vi.fn(async () => {}) } }));
 vi.mock('./repositories/rewrites.ts', () => ({ rewritesRepository: { save: vi.fn(async () => {}) } }));
 vi.mock('./repositories/corrections.ts', () => ({ correctionsRepository: { save: vi.fn(async () => {}) } }));
 vi.mock('./repositories/translations.ts',() => ({ translationsRepository: { save: vi.fn(async () => {}) } }));
@@ -500,5 +506,69 @@ describe('settings', () => {
 
     expect(res.status).toBe(401);
     await expect(res.json()).resolves.toMatchObject({ error: { code: 'unauthenticated' } });
+  });
+});
+
+describe('POST /transcribe', () => {
+  const upload = (audio: File | null, authorization: string | null = `Bearer ${userToken()}`) => {
+    const form = new FormData();
+    if (audio) form.set('audio', audio);
+    return app.request('/api/transcribe', { method: 'POST', headers: authorization ? { authorization } : {}, body: form });
+  };
+  const webm = (bytes = 3) => new File([new Uint8Array(bytes)], 'a.webm', { type: 'audio/webm' });
+
+  it('returns the text and its language, and saves nothing (switched off for now)', async () => {
+    const res = await upload(webm());
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ text: 'hello there', lang: 'en', model: 'm' });
+    expect(detectLang).toHaveBeenCalledWith({ text: 'hello there' });
+    expect(transcriptionsRepository.save).not.toHaveBeenCalled();
+  });
+
+  it('skips detection when nothing was heard', async () => {
+    vi.mocked(transcribe).mockResolvedValueOnce({ text: '', model: 'm' });
+    expect(await (await upload(webm())).json()).toMatchObject({ text: '', lang: 'und' });
+    expect(detectLang).not.toHaveBeenCalled();
+  });
+
+  it('401s without a token', async () => {
+    expect((await upload(webm(), null)).status).toBe(401);
+  });
+
+  it('502s when the provider fails', async () => {
+    vi.mocked(transcribe).mockRejectedValueOnce(new Error('boom'));
+    expect((await upload(webm())).status).toBe(502);
+    expect(transcriptionsRepository.save).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['no audio', null],
+    ['not audio', new File(['x'], 'a.txt', { type: 'text/plain' })],
+    ['empty audio', webm(0)],
+    ['too big', webm(5 * 1024 * 1024 + 1)],
+  ])('400s on %s', async (_, audio) => {
+    expect((await upload(audio)).status).toBe(400);
+    expect(transcribe).not.toHaveBeenCalled();
+  });
+});
+
+describe('POST /voice-session', () => {
+  const mint = (authorization: string | null = `Bearer ${userToken()}`) =>
+    app.request('/api/voice-session', { method: 'POST', headers: authorization ? { authorization } : {} });
+
+  it('returns a client secret for a live transcription session', async () => {
+    const res = await mint();
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ secret: 'ek_test', expiresAt: 1, model: 'm' });
+  });
+
+  it('401s without a token', async () => {
+    expect((await mint(null)).status).toBe(401);
+    expect(voiceSession).not.toHaveBeenCalled();
+  });
+
+  it('502s when the provider fails', async () => {
+    vi.mocked(voiceSession).mockRejectedValueOnce(new Error('boom'));
+    expect((await mint()).status).toBe(502);
   });
 });

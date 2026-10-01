@@ -5,8 +5,9 @@ import { disabledFields, type DisabledField } from '../../settings/disabled-fiel
 import { PROVIDERS } from '../../auth/providers';
 import { type Account, sendMessage } from '../../messaging/messages';
 import { OptionsPage } from './OptionsPage';
+import { useMicPermission } from './useMicPermission';
 
-/** The options page's container: account, favorites, turned-off sites and fields, all through the worker. */
+/** The options page's container: account, favorites, turned-off sites and fields, all through the worker; the mic grant. */
 export function OptionsApp() {
   const [account, setAccount] = useState<Account | null | undefined>(undefined);
   // The saved order, which the in-page menu follows. `checked` is what the boxes show right now.
@@ -20,6 +21,7 @@ export function OptionsApp() {
     void disabledFields.get().then(setOffFields);
     return disabledFields.watch(setOffFields);
   }, []);
+  const mic = useMicPermission();
   const [status, setStatus] = useState({ message: '', isError: false });
   const [busy, setBusy] = useState(false);
 
@@ -106,6 +108,9 @@ export function OptionsApp() {
       disabledFields={offFields}
       onEnableField={(field) => void disabledFields.remove(field.site, field.key)}
       onSave={save}
+      mic={mic.state}
+      micRequested={mic.requested}
+      onAllowMic={() => void mic.allow()}
     />
   );
 }

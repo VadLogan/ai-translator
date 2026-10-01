@@ -1,16 +1,37 @@
 import type { ReactNode } from 'react';
 import { Skeleton, Spinner } from '@heroui/react';
-import { IconButton, Kbd, PillButton } from '../../../components/buttons';
-import { Icon } from '../../../components/icons';
-import { Divider } from '../../../components/menu';
-import { Text } from '../../../components/typography';
-import type { WidgetView } from '../view';
+import type { FixKind } from '../../../shared/contract';
+import { IconButton, Kbd, PillButton } from './buttons';
+import { Icon } from './icons';
+import { Divider } from './menu';
+import { Text } from './typography';
+
+/**
+ * The grammar panel, one edit at a time. `html`: `FixGrammarOk.html`, escaped text with each edit
+ * wrapped in `<span class="fix" data-original>`; absent while the fix is loading (a skeleton).
+ * `edits` are the ones still showing, in `html`'s span order minus the ignored ones; `index` is the
+ * shown one. `ignored` are the span positions to draw as their original text. `loading`: `html` is
+ * an earlier fix, still shown while the latest one loads.
+ */
+export interface GrammarView {
+  html?: string;
+  loading?: boolean;
+  /** The text's language code, for the preview's `lang`. */
+  lang?: string;
+  edits: readonly { kind: FixKind; original: string; replacement: string; reason: string }[];
+  index: number;
+  ignored: readonly number[];
+  onReplace: () => void;
+  onIgnore: () => void;
+  onReplaceAll: () => void;
+  onStep: (index: number) => void;
+}
 
 /**
  * The grammar fix, one edit at a time: the fixed text with the shown edit picked out, then that
  * edit (kind, `original → replacement`, why) with Replace / Ignore / Replace all and ‹ › between them.
  */
-export function GrammarPanel({ view }: { view: Extract<WidgetView, { kind: 'grammar' }> }) {
+export function GrammarPanel({ view }: { view: GrammarView }) {
   const loading = view.html === undefined;
   const count = view.edits.length;
   const edit = view.edits[view.index];

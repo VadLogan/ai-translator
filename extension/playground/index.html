@@ -55,6 +55,8 @@ Thank you in advance for you help.</textarea>
     </dialog>
     <h2>Specific fields / elements</h2>
     <!-- One <h5> per site, then its field's markup trimmed to what reproduces the bug. -->
+    <h5>Teams web: empty composer (voice input's Insert found no caret position: "Couldn't write into the field")</h5>
+    <div id="teams-empty" contenteditable="true" role="textbox" aria-label="Type a message"><p><br></p></div>
     <script>
       const popup = document.getElementById('popup');
       document.getElementById('open-popup').onclick = (event) => { event.stopPropagation(); popup.hidden = false; };

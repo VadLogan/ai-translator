@@ -4,6 +4,8 @@ import { PROVIDERS } from '../../auth/providers';
 import { sendMessage } from '../../messaging/messages';
 import { intoLanguages, pinFirst, topPairs, usedLately, type HistoryEntry } from '../../settings/history';
 import { useActiveSite } from './hooks/useActiveSite';
+import { useDictation } from './hooks/useDictation';
+import { useGrammarFix } from './hooks/useGrammarFix';
 import { useHistory } from './hooks/useHistory';
 import { usePinned } from './hooks/usePinned';
 import { useTranslation } from './hooks/useTranslation';
@@ -23,6 +25,16 @@ export function ToolbarPopup() {
   const site = useActiveSite((message) => translation.fail(message));
   const translation = useTranslation({ favorites: site.favorites, history: history.history, remember: history.add });
   const { favorites } = site;
+  const grammar = useGrammarFix({ text: translation.text, setText: translation.setText, remember: history.add, onError: translation.fail });
+  // Dictated English gets the grammar fix; a language with no usual pair, the "into" picker.
+  const dictation = useDictation({
+    onError: translation.fail,
+    onText: (text, lang) => {
+      const next = translation.dictated(text, lang);
+      if (next === 'grammar') grammar.start(text, true);
+      else if (next === 'pick') setScreen({ pick: 'into' });
+    },
+  });
 
   const home = () => (history.dropUndo(), setScreen('home'));
   const restore = (entry: HistoryEntry) => {
@@ -99,6 +111,14 @@ export function ToolbarPopup() {
         text={translation.text}
         onTextChange={translation.setText}
         onTranslate={translation.translate}
+        dictation={dictation.state}
+        dictationLevel={dictation.level}
+        dictationSeconds={dictation.seconds}
+        dictationText={dictation.text}
+        onDictate={dictation.start}
+        onStopDictation={dictation.stop}
+        onCancelDictation={dictation.cancel}
+        grammar={grammar.view}
         busy={translation.busy}
         result={translation.result}
         version={translation.version}

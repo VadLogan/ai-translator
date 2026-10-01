@@ -1,4 +1,6 @@
 import { IconButton, Kbd, PillButton } from '../../../components/buttons';
+import { GrammarPanel, type GrammarView } from '../../../components/GrammarPanel';
+import { Recording } from '../../../components/Recording';
 import { BrandMark, Flag, Icon } from '../../../components/icons';
 import { LanguageCard, StatusChip, Switch, TextAreaCard } from '../../../components/inputs';
 import { Text, Wordmark } from '../../../components/typography';
@@ -25,6 +27,17 @@ export interface HomeProps {
   text: string;
   onTextChange(text: string): void;
   onTranslate(): void;
+  /** Voice input: the mic on the text card, then the listening / transcribing card. */
+  dictation: 'idle' | 'listening' | 'transcribing';
+  /** While listening: the mic's loudness (0..1), the time so far and the words heard so far. */
+  dictationLevel: number;
+  dictationSeconds: number;
+  dictationText?: string;
+  onDictate(): void;
+  onStopDictation(): void;
+  onCancelDictation(): void;
+  /** The grammar fix of the text (dictated English), the same panel as the in-page widget's. */
+  grammar: GrammarView | null;
   busy: boolean;
   /** The translation and its alternatives ("Try another"), in the language it was made into. */
   result: { lang: string; versions: readonly string[] } | null;
@@ -105,21 +118,38 @@ export function Home(props: HomeProps) {
           <LanguageCard flag={<Flag lang={into} />} caption="Into" name={languageName(into)} onPress={() => props.onPick('into')} />
         </div>
 
-        <TextAreaCard
-          label="Text to translate"
-          rows={3}
-          lang={from}
-          autoFocus
-          placeholder="Type or paste text"
-          value={props.text}
-          onChange={(event) => props.onTextChange(event.currentTarget.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
-              event.preventDefault();
-              props.onTranslate();
-            }
-          }}
-        />
+        <div className="relative flex flex-col">
+          <TextAreaCard
+            label="Text to translate"
+            rows={3}
+            lang={from}
+            autoFocus
+            placeholder="Type, paste or dictate text"
+            value={props.text}
+            onChange={(event) => props.onTextChange(event.currentTarget.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
+                event.preventDefault();
+                props.onTranslate();
+              }
+            }}
+          />
+          <IconButton aria-label="Voice input" tone="ghost" size={28} className="absolute right-1.5 top-1.5" isDisabled={props.dictation !== 'idle'} onPress={props.onDictate}>
+            <Icon name="mic" size={15} strokeWidth={1.9} />
+          </IconButton>
+        </div>
+
+        {props.dictation !== 'idle' && (
+          <div className="rounded-3xl bg-tm-surface p-1.5 shadow-tm-card" role="dialog" aria-label="Voice input">
+            <Recording transcribing={props.dictation === 'transcribing'} level={props.dictationLevel} seconds={props.dictationSeconds} text={props.dictationText} onStop={props.onStopDictation} onCancel={props.onCancelDictation} />
+          </div>
+        )}
+
+        {props.grammar && (
+          <div className="rounded-3xl bg-tm-surface p-1.5 shadow-tm-card" role="dialog" aria-label="Grammar fixed">
+            <GrammarPanel view={props.grammar} />
+          </div>
+        )}
 
         <PillButton variant="primary" className="w-full shrink-0" isDisabled={busy || !props.text.trim()} onPress={props.onTranslate}>
           {busy ? `${findLanguage(into)?.translating ?? 'Translating'}…` : `Translate to ${languageName(into)}`}

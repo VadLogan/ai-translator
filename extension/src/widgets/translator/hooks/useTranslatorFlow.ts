@@ -1,10 +1,12 @@
 import { useEffect, useReducer, useRef, useState } from 'react';
+import { browser } from 'wxt/browser';
 import type { CheckOk, FixEdit, FixGrammarOk } from '../../../../../shared/contract';
 import { isProviderId } from '../../../auth/providers';
 import { switchLayout } from '../../../core/layout';
 import { findLanguage, type Language } from '../../../core/languages';
 import { sendMessage } from '../../../messaging/messages';
-import { historyStore, intoLanguages, topPairs, type HistoryEntry } from '../../../settings/history';
+import { isVoiceLevel } from '../../../messaging/recorder';
+import { historyStore, intoLanguages, pairFor, topPairs, type HistoryEntry } from '../../../settings/history';
 import { pinnedLanguages } from '../../../settings/pinned';
 import { storageSettings } from '../../../settings/storage-settings';
 import { replaceSelection } from '../../../content/replace';
@@ -69,6 +71,7 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
   const fail = (message: string, back: 'menu' | 'close' = 'menu') => show({ kind: 'error', message, back });
 
   function close(): void {
+    if (latest.current.screen.kind === 'recording') void sendMessage({ type: 'voice-cancel' }); // releases the mic
     stopTimers();
     checks.drop();
     fixes.drop();
@@ -207,7 +210,9 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
   function remember(entry: DistributiveOmit<HistoryEntry, 'site' | 'at'>, selection: EditableSelection | null = null): void {
     const text = plainText(selection, entry.text);
     const result = plainText(selection, entry.result);
-    void historyStore.add({ ...entry, text, result, site: location.hostname, at: Date.now() }).catch(() => {});
+    // While a dictation is open, what it produces (its translation, its inserted fix) is marked as spoken.
+    const voice = latest.current.dictation ? { voice: true as const } : {};
+    void historyStore.add({ ...entry, text, result, site: location.hostname, at: Date.now(), ...voice }).catch(() => {});
   }
 
   /** The API rejected us: sign in, then resume what was interrupted -- a translation or the grammar check. */
@@ -634,7 +639,14 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
    * Closes after the last one.
    */
   function replaceEdit(edit: FixEdit): void {
-    const { screen, selection, check } = latest.current;
+    const { screen, selection, check, dictation: said } = latest.current;
+    if (screen.kind === 'grammar' && screen.dictated && screen.fix && said) {
+      // A dictation's edit changes the panel's copy; the field waits for Insert.
+      const fix = withoutFixEdit(screen.fix, edit);
+      dispatch({ type: 'dictated', dictation: { ...said, text: applyEdits(said.text, [edit]) } });
+      const left = visibleEdits(latest.current, fix).length;
+      return show({ ...screen, fix, index: Math.max(0, Math.min(screen.index, left - 1)) });
+    }
     if (screen.kind !== 'grammar' || !screen.fix || !selection || selection.kind === 'page') return;
     const field = wholeField(selection.element);
     const part = field && partOf(field, screen.base + edit.start, screen.base + edit.end);
@@ -675,6 +687,8 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
   function replaceAll(): void {
     const state = latest.current;
     const { screen, selection } = state;
+    // A dictation's Replace all takes every edit and inserts the result: nothing is left to review.
+    if (screen.kind === 'grammar' && screen.dictated && screen.fix && state.dictation) return insertDictation(applyEdits(state.dictation.text, visibleEdits(state, screen.fix)));
     if (screen.kind !== 'grammar' || !screen.fix || !selection || selection.kind === 'page') return;
     if (!screen.field) return apply(applyEdits(selection.text, visibleEdits(state, screen.fix)));
     const field = wholeField(selection.element);
@@ -697,6 +711,103 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     underlines.relayout();
   }
 
+  // Where the dictation goes: the field's caret offset when the mic was pressed.
+  const dictation = useRef<{ element: HTMLElement; at: number }>(undefined);
+
+  /** The hover pill's mic: records (in the worker's offscreen recorder) until Stop. */
+  async function dictate(): Promise<void> {
+    const field = wholeField(latest.current.selection?.element ?? null);
+    if (!field) return;
+    // Read before the press moves focus into the widget: a textarea keeps its selectionEnd, a contenteditable the document selection.
+    const caret = field.kind === 'text-control' ? (field.element as HTMLInputElement | HTMLTextAreaElement).selectionEnd : caretIn(field);
+    dictation.current = { element: field.element, at: caret ?? field.text.length };
+    stopTimers();
+    dispatch({ type: 'select', selection: field, anchor: getFieldAnchor(field), field: true });
+    show({ kind: 'recording' });
+    // The pressed mic unmounts with the pill: focus back to the field, or it falls to <body> and
+    // editors that react to blur (Teams) rebuild the composer under us.
+    field.element.focus({ preventScroll: true });
+    const id = generation.current;
+    const response = await sendMessage({ type: 'voice-start' });
+    if (id !== generation.current) return void sendMessage({ type: 'voice-cancel' }); // closed while the mic was starting
+    if (!response.ok) fail(response.error.message, 'close');
+  }
+
+  /**
+   * Stop: the recording is transcribed and stays in the widget -- the field is untouched until
+   * Insert. English gets the grammar panel on what was said; a language the user has a pair for is
+   * translated into its target at once; any other gets the menu's languages to pick from. The
+   * selection becomes a page-kind stand-in holding the transcript, so the page-text menu and its
+   * translation field work on it unchanged.
+   */
+  async function stopDictation(): Promise<void> {
+    const { screen } = latest.current;
+    if (screen.kind !== 'recording' || screen.transcribing) return;
+    const id = generation.current;
+    show({ kind: 'recording', transcribing: true });
+    dictation.current?.element.focus({ preventScroll: true }); // Stop unmounts: keep focus in the field, not on <body>
+    const response = await sendMessage({ type: 'voice-stop' });
+    if (id !== generation.current) return;
+    if (!response.ok) return response.error.code === 'unauthenticated' ? show({ kind: 'signIn' }) : fail(response.error.message, 'close');
+    const { text, lang } = response.data;
+    if (!text) return fail("Didn't catch that. Try again.", 'close');
+    const field = wholeField(dictation.current?.element ?? null);
+    if (!field) return fail(`The field is gone. You said: “${text}”`, 'close');
+    const range = field.element.ownerDocument.createRange();
+    range.selectNodeContents(field.element);
+    range.collapse(false);
+    dispatch({ type: 'select', selection: { kind: 'page', element: field.element, range, text }, anchor: getFieldAnchor(field) });
+    dispatch({ type: 'dictated', dictation: { transcript: text, text, at: Math.min(dictation.current?.at ?? field.text.length, field.text.length) } });
+    dispatch({ type: 'detected', detection: lang === 'und' ? 'unknown' : { lang } });
+    if (lang === 'en') return void fixDictation(text);
+    const history = await historyStore.get().catch(() => []);
+    await openMenu();
+    if (id !== generation.current) return;
+    const target = pairFor(topPairs(history, Infinity), lang);
+    if (target) void translateInField(target, lang);
+  }
+
+  /** The grammar panel on the dictated text: a skeleton, then the fix. Its Replace / Ignore edit the panel's copy only. */
+  async function fixDictation(text: string): Promise<void> {
+    const panel = (fix: FixGrammarOk | null): Screen => ({ kind: 'grammar', fix, index: 0, base: 0, field: false, dictated: true });
+    show(panel(null));
+    pendingFix.abort();
+    const id = pendingFix.start(text);
+    const answer = await sendMessage({ type: 'fix-grammar', text, id });
+    if (!pendingFix.isCurrent(id)) return;
+    pendingFix.done();
+    const { screen } = latest.current;
+    if (screen.kind !== 'grammar' || !screen.dictated) return; // closed
+    if (answer.ok) return show(panel(answer.data));
+    if (answer.error.code === 'unauthenticated') return show({ kind: 'signIn' });
+    fail(`${answer.error.message} You said: “${text}”`, 'close');
+  }
+
+  /**
+   * The dictation panel's Insert: `result` (the fixed text or the translation) at the field's caret
+   * as it was when the mic was pressed. replaceSelection trims what it writes, so a needed space
+   * goes in with the word before it.
+   */
+  function insertDictation(result: string): void {
+    const { dictation: said, selection } = latest.current;
+    if (!said || !selection) return;
+    const field = selection.element.isConnected ? wholeField(selection.element) : null;
+    if (!field) return fail(`The field is gone. The text was: “${result}”`, 'close');
+    const at = Math.min(said.at, field.text.length);
+    // ponytail: never across a `}` -- it may close a mention token, whose offsets don't map one to one.
+    const glue = at > 0 && !/[\s\u00a0}]/.test(field.text[at - 1]!);
+    const target = partOf(field, glue ? at - 1 : at, at);
+    if (!target) return fail(`Couldn't write into the field. The text was: “${result}”`, 'close');
+    replaceSelection(target, glue ? `${target.text} ${result}` : result);
+    // A translation was remembered when it answered; a fixed dictation is remembered here.
+    if (latest.current.screen.kind === 'grammar' && result !== said.transcript) remember({ kind: 'grammar', text: said.transcript, result });
+    close();
+    setTimeout(() => {
+      refresh(); // the field's corner icon back, after the close renders
+      scheduleCheck();
+    }, 0);
+  }
+
   /** The hover pill's "Turn off in this field". */
   function disableField(): void {
     const element = latest.current.selection?.element;
@@ -708,6 +819,11 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
   /** Esc, the layout card's F, the grammar panel's ↵ and the menu's digits. Captured and swallowed, or the field would get the keystroke too. */
   function onKeyDown(event: KeyboardEvent): void {
     const { key } = event;
+    if (key === 'Enter' && latest.current.screen.kind === 'recording') {
+      event.preventDefault();
+      event.stopPropagation();
+      return void stopDictation();
+    }
     if (key === 'Escape') {
       // An open panel takes the Escape, so a popup or dialog around the field stays; the next Escape is the page's.
       if (isMenuOpen(latest.current)) {
@@ -751,6 +867,17 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     selectedElement: () => latest.current.selection?.element,
   });
   useEffect(() => stopTimers, []);
+  // The recorder's level meter and live text, forwarded by the worker to this frame while it dictates; its `silent` stops it.
+  useEffect(() => {
+    const onLevel = (message: unknown) => {
+      const { screen } = latest.current;
+      if (!isVoiceLevel(message) || screen.kind !== 'recording' || screen.transcribing) return;
+      if (message.silent) return void stopDictation(); // 3 s of silence: as if Stop was pressed
+      show({ kind: 'recording', level: message.level, ms: message.ms, text: message.text });
+    };
+    browser.runtime.onMessage.addListener(onLevel);
+    return () => browser.runtime.onMessage.removeListener(onLevel);
+  }, []);
 
   const viewActions: ViewActions = {
     onPick: signIn,
@@ -764,6 +891,8 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     onIgnoreEdit: ignoreEdit,
     onReplaceAll: replaceAll,
     onStep: step,
+    onStopDictation: () => void stopDictation(),
+    onInsertDictation: insertDictation,
   };
 
   const callbacks: WidgetCallbacks = {
@@ -776,6 +905,7 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
       void sendMessage({ type: 'open-options' });
     },
     onDisableField: disableField,
+    onDictate: () => void dictate(),
   };
 
   return { state, viewActions, callbacks, marks: underlines.marks };

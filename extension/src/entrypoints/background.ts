@@ -1,9 +1,10 @@
 import { browser, type Browser } from 'wxt/browser';
 import { defineBackground } from 'wxt/utils/define-background';
-import { ApiError, check, detect, fixGrammar, getSettings, rewrite, saveSettings, translate } from '../api';
+import { ApiError, check, detect, fixGrammar, getSettings, rewrite, saveSettings, transcribe, translate, voiceSession } from '../api';
 import { getAccessToken, signIn, signOut } from '../auth/oauth';
 import { storageSession } from '../auth/session';
 import { isMessage, type Account, type Message, type Response } from '../messaging/messages';
+import { isVoiceLevel, type RecorderMessage, type RecorderReply, type VoiceOwner } from '../messaging/recorder';
 import { storageSettings } from '../settings/storage-settings';
 
 export default defineBackground(() => {
@@ -74,6 +75,41 @@ export default defineBackground(() => {
               rewrite({ text: message.text, style: message.style, url: sender.tab?.url }, token),
             ),
           };
+        case 'voice-start': {
+          await ensureRecorder();
+          // The recorder's level messages are forwarded to the dictating frame; the popup hears them itself.
+          const owner = sender.tab?.id === undefined ? undefined : { tabId: sender.tab.id, frameId: sender.frameId ?? 0 };
+          const { error } = await record('start', owner);
+          if (error === 'mic-blocked') {
+            // The offscreen recorder can't prompt; the options page can, once, for the whole extension.
+            await browser.tabs.create({ url: browser.runtime.getURL('/options.html#mic') });
+            return { ok: false, error: { message: 'Allow the microphone in the tab that just opened, then try again.', code: 'mic-blocked' } };
+          }
+          if (error) return { ok: false, error: { message: 'Could not start the microphone.' } };
+          // Live text: the secret is minted while the recorder already listens (it buffers). A
+          // failure is silent -- Stop then sends the file to /transcribe.
+          void asUser(voiceSession)
+            .then(({ secret }) => record('live', owner, secret))
+            .catch(() => {});
+          return { ok: true, data: undefined };
+        }
+        case 'voice-stop': {
+          const { audio, text, error } = await record('stop');
+          // The live session heard it all: only the language is left to ask. "und" when that fails.
+          if (text) {
+            const lang = await asUser((token) => detect({ text, url: sender.tab?.url }, token)).then(({ lang }) => lang, () => 'und');
+            return { ok: true, data: { text, lang } };
+          }
+          if (!audio || error) return { ok: false, error: { message: 'Nothing was recorded.' } };
+          const blob = await (await fetch(audio)).blob();
+          const form = new FormData();
+          form.set('audio', blob, 'speech.webm');
+          if (sender.tab?.url) form.set('url', sender.tab.url);
+          return { ok: true, data: await asUser((token) => transcribe(form, token)) };
+        }
+        case 'voice-cancel':
+          await record('cancel').catch(() => {}); // no recorder yet: nothing to cancel
+          return { ok: true, data: undefined };
         case 'open-options':
           await browser.runtime.openOptionsPage();
           return { ok: true, data: undefined };
@@ -136,6 +172,11 @@ export default defineBackground(() => {
   }
 
   browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (isVoiceLevel(message)) {
+      const { owner } = message;
+      if (owner) browser.tabs.sendMessage(owner.tabId, message, { frameId: owner.frameId }).catch(() => {}); // the tab went away
+      return;
+    }
     if (!isMessage(message)) return;
     handle(message, sender).then(sendResponse);
     return true; // keep the channel open for the async response
@@ -143,6 +184,20 @@ export default defineBackground(() => {
 
   if (import.meta.env.DEV) void reloadPlaygroundWhenReady();
 });
+
+/** The offscreen recorder (entrypoints/offscreen), created on the first dictation and kept. */
+async function ensureRecorder(): Promise<void> {
+  const contexts = await browser.runtime.getContexts({ contextTypes: [browser.runtime.ContextType.OFFSCREEN_DOCUMENT] });
+  if (contexts.length) return;
+  await browser.offscreen.createDocument({
+    url: '/offscreen.html',
+    reasons: [browser.offscreen.Reason.USER_MEDIA],
+    justification: 'Records voice input for transcription',
+  });
+}
+
+const record = (type: RecorderMessage['type'], owner?: VoiceOwner, secret?: string): Promise<RecorderReply> =>
+  browser.runtime.sendMessage({ target: 'offscreen', type, ...(owner ? { owner } : {}), ...(secret ? { secret } : {}) } satisfies RecorderMessage);
 
 const accountFrom = ({ email }: { email?: string }): Account => (email ? { email } : {});
 

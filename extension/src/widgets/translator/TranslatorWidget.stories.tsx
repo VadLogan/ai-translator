@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useEffect, useState } from 'react';
 import { findLanguage } from '../../core/languages';
 import { TranslatorWidget } from './TranslatorWidget';
 import type { WidgetView } from './view';
@@ -19,7 +20,7 @@ const meta = {
   args: {
     // Pretend a line of text was selected here; the widget positions itself against it.
     anchor: { x: 240, top: 160, bottom: 180 },
-    callbacks: { onIconClick: noop, onLanguagePick: noop, onFixLayout: noop, onFixGrammar: noop, onOpenSettings: noop, onDisableField: noop },
+    callbacks: { onIconClick: noop, onLanguagePick: noop, onFixLayout: noop, onFixGrammar: noop, onOpenSettings: noop, onDisableField: noop, onDictate: noop },
   },
   // The story's `dark` follows the toolbar's theme switch, so both themes are one click apart.
   render: (args, { globals }) => <TranslatorWidget {...args} dark={globals['theme'] === 'dark'} />,
@@ -32,6 +33,30 @@ type Story = StoryObj<typeof meta>;
 const story = (view: WidgetView): Story => ({ args: { view, dark: false } });
 
 export const Icon = story({ kind: 'icon' });
+
+/** The show animation, live: the icon appears, click it for the menu, pick a language for the spinner. Replay starts over. */
+export const ShowAnimation: Story = {
+  args: { view: { kind: 'hidden' }, dark: false },
+  render: function ShowAnimation(args, { globals }) {
+    const [view, setView] = useState<WidgetView>({ kind: 'hidden' });
+    const replay = () => {
+      setView({ kind: 'hidden' });
+      setTimeout(() => setView({ kind: 'icon' }), 300);
+    };
+    useEffect(replay, []);
+    const callbacks = {
+      ...args.callbacks,
+      onIconClick: () => setView({ kind: 'languages', languages: FAVORITES, detectedName: 'English', detectedLang: 'en', grammar: 0 }),
+      onLanguagePick: () => setView({ kind: 'busy', label: 'Translating to German…' }),
+    };
+    return (
+      <>
+        <button type="button" className="fixed bottom-4 left-4 rounded-lg bg-tm-subtle px-3 py-1" onClick={replay}>Replay</button>
+        <TranslatorWidget {...args} view={view} callbacks={callbacks} dark={globals['theme'] === 'dark'} />
+      </>
+    );
+  },
+};
 
 export const FieldIcon = story({ kind: 'icon', field: true });
 
@@ -84,7 +109,20 @@ export const Translating = story({
   translation: { lang: 'uk', lines: 2, onCopy: noop },
 });
 
+/** A German dictation with a DE → EN pair: translated at once; the transcript collapsed, Insert writes the translation. */
+export const DictationTranslated = story({
+  kind: 'languages', languages: FAVORITES, detectedName: 'German', detectedLang: 'de', readOnly: true,
+  translation: { lang: 'en', text: "I'll send you the report tomorrow.", lines: 1, onCopy: noop },
+  dictation: { transcript: 'Ich schicke dir morgen den Bericht.', text: "I'll send you the report tomorrow.", onInsert: noop, onCopy: noop },
+});
+
 export const Busy = story({ kind: 'busy', label: 'Перекладаю українською…' });
+
+export const Listening = story({ kind: 'recording', transcribing: false, level: 0.6, seconds: 7, text: 'I have sent the report yesterday and they', onStop: noop, onCancel: noop });
+
+export const ListeningSilent = story({ kind: 'recording', transcribing: false, level: 0, seconds: 2, onStop: noop, onCancel: noop });
+
+export const Transcribing = story({ kind: 'recording', transcribing: true, level: 0, seconds: 9, onStop: noop, onCancel: noop });
 
 export const SignIn = story({ kind: 'signIn', providers: PROVIDERS, onPick: noop });
 
@@ -105,6 +143,17 @@ export const Grammar = story({
   edits: [sending, estimate, finishing],
   index: 0,
   ...grammar,
+});
+
+/** An English dictation: the same panel on the dictated text, then its transcript (collapsed) and Insert / Copy. */
+export const GrammarDictation = story({
+  kind: 'grammar',
+  lang: 'en',
+  html: `I ${fix('sent', 'has send')} the report yesterday.`,
+  edits: [{ kind: 'error', original: 'has send', replacement: 'sent', reason: '"Yesterday" takes the past simple.' }],
+  index: 0,
+  ...grammar,
+  dictation: { transcript: 'I has send the report yesterday.', text: 'I has send the report yesterday.', onInsert: noop, onCopy: noop },
 });
 
 /** Stepped to a blue edit: correct, but not how a native speaker would put it. The first edit was ignored. */

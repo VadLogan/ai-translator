@@ -7,14 +7,15 @@ import type { WidgetView } from '../view';
 
 type Translation = NonNullable<Extract<WidgetView, { kind: 'languages' }>['translation']>;
 
-/** Page text's translation, under the menu's detected line: skeleton lines while it loads, then the text to copy. */
-export function TranslationField({ view }: { view: Translation }) {
+/** Page text's translation, under the menu's detected line: skeleton lines while it loads, then the text to copy. `onInsert`: a dictation's, written into the field. */
+export function TranslationField({ view, onInsert }: { view: Translation; onInsert?: () => void }) {
   return (
     <div className="mx-1 mb-1 rounded-2xl bg-tm-subtle px-3 py-2">
       <div className="flex items-center gap-2">
         <Flag lang={view.lang} width={18} />
         <Text variant="label" className="grow">{languageName(view.lang)}</Text>
         <PillButton variant="ghost" size="xs" isDisabled={view.text === undefined} onPress={view.onCopy}>Copy</PillButton>
+        {onInsert && <PillButton variant="primary" size="xs" isDisabled={view.text === undefined} onPress={onInsert}>Insert</PillButton>}
       </div>
       {view.text !== undefined ? (
         <p lang={view.lang} dir="auto" className="my-0 mt-1.5 max-h-[7.5rem] overflow-auto tm-body leading-relaxed">{view.text}</p>

@@ -14,6 +14,7 @@ import {
 import type { Language } from '../../core/languages';
 import type { Account } from '../../messaging/messages';
 import type { DisabledField } from '../../settings/disabled-fields';
+import type { MicState } from './useMicPermission';
 
 export interface OptionsPageProps {
   /** null = signed out, undefined = still loading. */
@@ -33,6 +34,11 @@ export interface OptionsPageProps {
   disabledFields: readonly DisabledField[];
   onEnableField(field: DisabledField): void;
   onSave(): void;
+  /** The extension's microphone permission, for voice input. */
+  mic: MicState;
+  /** Opened by a dictation the permission blocked: the section is picked out. */
+  micRequested: boolean;
+  onAllowMic(): void;
 }
 
 export function OptionsPage({
@@ -50,6 +56,9 @@ export function OptionsPage({
   disabledFields,
   onEnableField,
   onSave,
+  mic,
+  micRequested,
+  onAllowMic,
 }: OptionsPageProps) {
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-6 p-8">
@@ -153,6 +162,22 @@ export function OptionsPage({
                 </li>
               ))}
             </ul>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card id="mic" className={micRequested && mic !== 'granted' ? 'ring-2 ring-accent' : undefined}>
+        <CardHeader>
+          <CardTitle>Microphone</CardTitle>
+          <CardDescription>Voice input in the popup and in page fields. Allowed once, for the whole extension.</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-row items-center gap-3">
+          {mic === 'granted' ? (
+            <span className="text-sm">Allowed.{micRequested ? ' You can close this tab and dictate again.' : ''}</span>
+          ) : mic === 'denied' ? (
+            <span className="text-sm text-danger">Blocked. Allow it from the address bar's site settings, then reload this page.</span>
+          ) : (
+            <Button variant="primary" size="sm" onPress={onAllowMic}>Allow microphone</Button>
           )}
         </CardContent>
       </Card>

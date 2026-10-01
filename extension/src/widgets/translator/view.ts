@@ -5,6 +5,7 @@ import { findLanguage, languageName, type Language } from '../../core/languages'
 import type { Response } from '../../messaging/messages';
 import { plainText } from '../../content/selection';
 import type { Badge } from '../../components/CountBadge';
+import type { GrammarView } from '../../components/GrammarPanel';
 import { badge, detectedLang, grammarCount, isChecking, isVerdict, menuLanguages, pairTarget, visibleEdits, type Check, type Detection, type State } from './state';
 
 export interface WidgetCallbacks {
@@ -15,6 +16,8 @@ export interface WidgetCallbacks {
   onOpenSettings(): void;
   /** The hover pill's "Turn off in this field". */
   onDisableField(): void;
+  /** The hover pill's mic: voice input into the field. */
+  onDictate(): void;
 }
 
 /** Everything the widget can be showing. toView derives it from the flow's state. */
@@ -45,29 +48,13 @@ export type WidgetView =
     grammar?: number | 'error' | 'checking' | 'layout' | 'gibberish';
     /** Page text, not a field: nothing can be replaced, so only the languages are offered. */
     readOnly?: boolean;
+    /** A voice input being translated: the transcript (collapsed), and Insert on the translation. */
+    dictation?: Dictation;
   }
   | { kind: 'busy'; label: string }
-  /**
-   * The grammar panel, one edit at a time. `html`: `FixGrammarOk.html`, escaped text with each edit
-   * wrapped in `<span class="fix" data-original>`; absent while the fix is loading (a skeleton).
-   * `edits` are the ones still showing, in `html`'s span order minus the ignored ones; `index` is the
-   * shown one. `ignored` are the span positions to draw as their original text. `loading`: `html` is
-   * an earlier fix, still shown while the latest one loads.
-   */
-  | {
-    kind: 'grammar';
-    html?: string;
-    loading?: boolean;
-    /** The text's language code, for the preview's `lang`. */
-    lang?: string;
-    edits: readonly { kind: FixKind; original: string; replacement: string; reason: string }[];
-    index: number;
-    ignored: readonly number[];
-    onReplace: () => void;
-    onIgnore: () => void;
-    onReplaceAll: () => void;
-    onStep: (index: number) => void;
-  }
+  | { kind: 'recording'; transcribing: boolean; level: number; seconds: number; text?: string; onStop: () => void; onCancel: () => void }
+  /** The grammar panel: see `GrammarView`, shared with the toolbar popup. `dictation`: of a voice input, with Insert / Copy. */
+  | ({ kind: 'grammar'; dictation?: Dictation } & GrammarView)
   /**
    * Wrong keyboard layout: `typed` as it is, `fixed` re-typed on the other layout. `from` is what it
    * reads as, `to` the language of the fix. The card's button is `callbacks.onFixLayout`; ✕ only
@@ -79,6 +66,14 @@ export type WidgetView =
   | { kind: 'signIn'; providers: readonly { id: string; name: string }[]; onPick: (id: string) => void }
   | { kind: 'error'; message: string; onBack: () => void };
 
+/** A voice input's panel extras: what was said, and writing the result (`text`) into the field or copying it. */
+export interface Dictation {
+  transcript: string;
+  text?: string;
+  onInsert: () => void;
+  onCopy: () => void;
+}
+
 /** The flow's actions a view needs to wire into its buttons. */
 export interface ViewActions {
   onPick: (provider: string, targetLang?: string) => void;
@@ -88,11 +83,20 @@ export interface ViewActions {
   onIgnoreEdit: (edit: FixEdit) => void;
   onReplaceAll: () => void;
   onStep: (index: number) => void;
+  onStopDictation: () => void;
+  /** Writes the dictation's result (`text`) at the field's caret, then closes. */
+  onInsertDictation: (text: string) => void;
 }
 
 /** Maps the flow's state onto what the presentational widget renders. */
-export function toView(state: State, { onPick, onBack, onClose, onReplaceEdit, onIgnoreEdit, onReplaceAll, onStep }: ViewActions): WidgetView {
+export function toView(state: State, { onPick, onBack, onClose, onReplaceEdit, onIgnoreEdit, onReplaceAll, onStep, onStopDictation, onInsertDictation }: ViewActions): WidgetView {
   const { screen, selection, detection } = state;
+  const dictation = (text: string | undefined): Dictation | undefined => state.dictation ? {
+    transcript: state.dictation.transcript,
+    text,
+    onInsert: () => text !== undefined && onInsertDictation(text),
+    onCopy: () => void navigator.clipboard.writeText(text ?? '').then(onClose),
+  } : undefined;
   switch (screen.kind) {
     case 'icon':
       return { kind: 'icon', field: screen.field, badge: badge(state), checking: isChecking(state), canDisable: !!selection && selection.kind !== 'page' };
@@ -115,10 +119,13 @@ export function toView(state: State, { onPick, onBack, onClose, onReplaceEdit, o
         detectedLang: detectedLang(state),
         grammar: grammarCount(state),
         readOnly: selection?.kind === 'page',
+        dictation: dictation(state.translation?.text),
       };
     }
     case 'busy':
       return { kind: 'busy', label: screen.label };
+    case 'recording':
+      return { kind: 'recording', transcribing: !!screen.transcribing, level: screen.level ?? 0, seconds: (screen.ms ?? 0) / 1000, text: screen.text, onStop: onStopDictation, onCancel: onClose };
     case 'grammar': {
       const { fix, index } = screen;
       const edits = fix ? visibleEdits(state, fix) : [];
@@ -134,6 +141,7 @@ export function toView(state: State, { onPick, onBack, onClose, onReplaceEdit, o
         onIgnore: () => current && onIgnoreEdit(current),
         onReplaceAll,
         onStep,
+        dictation: screen.dictated && state.dictation ? dictation(state.dictation.text) : undefined,
       };
     }
     case 'layout': {

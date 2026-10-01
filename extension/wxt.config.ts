@@ -11,10 +11,11 @@ export default defineConfig({
   outDir: 'output',
   manifest: {
     name: 'AI Translator',
-    description: 'Select text in any input field and translate it in place.',
+    description: 'Translate, fix grammar and dictate in any text field. Pick a language from the icon, fix typos and layout, or speak and insert.',
     // `identity` powers launchWebAuthFlow, the OAuth window in src/auth/oauth.ts. `activeTab` lets
     // the toolbar popup read the tab it opened over (for the per-site switch and history).
-    permissions: ['storage', 'identity', 'activeTab'],
+    // `offscreen` hosts the voice-input recorder (src/entrypoints/offscreen).
+    permissions: ['storage', 'identity', 'activeTab', 'offscreen'],
     // Pins the extension id so chrome.identity's redirect URL is stable across machines and
     // matches [auth] additional_redirect_urls in supabase/config.toml. Replace with the
     // "key" field from the Chrome Web Store listing (or a locally generated one).

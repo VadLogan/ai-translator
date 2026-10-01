@@ -1,5 +1,5 @@
 import { browser } from 'wxt/browser';
-import type { ApiErrorCode, CheckOk, DetectOk, FixGrammarOk, RewriteOk, RewriteStyle, Settings, TranslateOk } from '../../../shared/contract';
+import type { ApiErrorCode, CheckOk, DetectOk, FixGrammarOk, RewriteOk, RewriteStyle, Settings, TranscribeOk, TranslateOk } from '../../../shared/contract';
 import type { ProviderId } from '../auth/providers';
 
 export type Message =
@@ -13,6 +13,10 @@ export type Message =
   | { type: 'check'; text: string; id: string }
   | { type: 'cancel'; id: string }
   | { type: 'rewrite'; text: string; style: RewriteStyle }
+  /** Voice input: the offscreen recorder starts; `voice-stop` ends it and transcribes; `voice-cancel` drops it. */
+  | { type: 'voice-start' }
+  | { type: 'voice-stop' }
+  | { type: 'voice-cancel' }
   | { type: 'open-options' }
   | { type: 'sign-in'; provider: ProviderId }
   | { type: 'sign-out' }
@@ -32,6 +36,9 @@ export interface ResponseMap {
   check: CheckOk;
   cancel: void;
   rewrite: RewriteOk;
+  'voice-start': void;
+  'voice-stop': TranscribeOk;
+  'voice-cancel': void;
   'open-options': void;
   'sign-in': Account;
   'sign-out': void;
@@ -43,7 +50,10 @@ export interface ResponseMap {
 /** Errors don't survive structured cloning, so they travel as plain data. */
 export type Response<T> =
   | { ok: true; data: T }
-  | { ok: false; error: { message: string; code?: ApiErrorCode } };
+  | { ok: false; error: { message: string; code?: ErrorCode } };
+
+/** `mic-blocked`: the extension has no microphone permission yet; the worker opened `options.html#mic`. */
+export type ErrorCode = ApiErrorCode | 'mic-blocked';
 
 export function isMessage(value: unknown): value is Message {
   return typeof value === 'object' && value !== null && typeof (value as { type?: unknown }).type === 'string';

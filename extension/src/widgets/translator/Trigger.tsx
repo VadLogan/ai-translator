@@ -7,17 +7,19 @@ import type { Anchor } from '../../content/selection';
 import { cornerStyle, ICON_SIZE, iconStyle, viewportSize } from './position';
 import type { WidgetView } from './view';
 
-/** The round icon above a selection or in a field's corner, with its badge and the "Turn off in this field" hover pill. */
+/** The round icon above a selection or in a field's corner, with its badge and the hover pill (a field's mic, "Turn off in this field"). */
 export function Trigger({
   anchor,
   view: { field, badge, checking, canDisable, hovered = false },
   onPress,
   onDisable,
+  onDictate,
 }: {
   anchor: Anchor;
   view: Extract<WidgetView, { kind: 'icon' }>;
   onPress: () => void;
   onDisable: () => void;
+  onDictate: () => void;
 }) {
   // The pill stays a moment after the pointer leaves, so crossing the gap to its button keeps it open.
   const [open, setOpen] = useState(hovered);
@@ -43,7 +45,7 @@ export function Trigger({
           ? 'Grammar check failed'
           : `Fix grammar: ${badge === 1 ? '1 error' : `${badge} errors`}`;
   return (
-    <div className="fixed size-[26px]" style={field ? cornerStyle(anchor) : iconStyle(anchor, viewportSize())} onPointerEnter={enter} onPointerLeave={leave}>
+    <div className="fixed size-[26px] motion-safe:animate-tm-appear" style={field ? cornerStyle(anchor) : iconStyle(anchor, viewportSize())} onPointerEnter={enter} onPointerLeave={leave}>
       {canDisable && open && (
         // Behind the icon and growing to the left: the corner icon sits on the field's right edge.
         <div
@@ -51,6 +53,11 @@ export function Trigger({
           aria-label="TypeMeant in this field"
           className="absolute -right-1 -top-1 flex h-[34px] items-center rounded-full bg-tm-surface py-1 pl-1 pr-[34px] shadow-tm-pop"
         >
+          {field && (
+            <IconButton aria-label="Voice input" size={26} onPress={onDictate}>
+              <Icon name="mic" size={14} strokeWidth={2.2} />
+            </IconButton>
+          )}
           <IconButton aria-label="Turn off in this field" size={26} onPress={onDisable}>
             <Icon name="ban" size={14} strokeWidth={2.4} />
           </IconButton>

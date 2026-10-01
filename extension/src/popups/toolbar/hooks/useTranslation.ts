@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ProviderId } from '../../../auth/providers';
 import { findLanguage } from '../../../core/languages';
 import { sendMessage } from '../../../messaging/messages';
-import { defaultPair, orient, type HistoryEntry, type Pair } from '../../../settings/history';
+import { defaultPair, orient, pairFor, topPairs, type HistoryEntry, type Pair } from '../../../settings/history';
 
 type Notice = { message: string; isError: boolean };
 
@@ -30,11 +30,13 @@ export function useTranslation({ favorites, history, remember }: Options) {
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<Notice | null>(null);
   const [signIn, setSignIn] = useState(false);
+  // Dictated text came with its language: no detect for it. `pick`: the next "into" pick translates it.
+  const dictation = useRef<{ text: string; pick: boolean } | null>(null);
 
   // Detect on a typing pause, like the in-page menu does on open. A failure or "und" is just "not detected".
   useEffect(() => {
     if (!text.trim()) setDetected(undefined);
-    if (picked || text.trim().length < 2) return;
+    if (picked || text.trim().length < 2 || text === dictation.current?.text) return;
     let live = true;
     const timer = setTimeout(async () => {
       const response = await sendMessage({ type: 'detect', text });
@@ -79,7 +81,8 @@ export function useTranslation({ favorites, history, remember }: Options) {
     const versions = [...base, response.data.text];
     setResult({ lang: into, versions });
     setVersion(versions.length - 1);
-    if (!base.length) await remember({ text, result: response.data.text, to: into, site: '' /* typed in the popup, not on a page */, at: Date.now(), ...(source ? { from: source } : {}) });
+    const voice = dictation.current?.text === text ? { voice: true as const } : {};
+    if (!base.length) await remember({ text, result: response.data.text, to: into, site: '' /* typed in the popup, not on a page */, at: Date.now(), ...(source ? { from: source } : {}), ...voice });
   };
 
   /** Opens a history entry on Home. */
@@ -95,6 +98,28 @@ export function useTranslation({ favorites, history, remember }: Options) {
     setTarget(entry.to);
     setResult({ lang: entry.to, versions: [entry.result] });
     setVersion(0);
+  };
+
+  /**
+   * Voice input's text, with the language the API heard. English → 'grammar' (the caller opens the
+   * fix); a language the user has a pair for → translated into its target at once; else 'pick':
+   * the caller opens the "into" picker, and that pick translates.
+   */
+  const dictated = (spoken: string, lang: string): 'grammar' | 'translated' | 'pick' => {
+    const known = findLanguage(lang) ? lang : undefined;
+    setText(spoken);
+    setResult(null);
+    setPair(null);
+    setPicked(null);
+    setTarget(undefined);
+    setDetected(known);
+    const to = pairFor(topPairs(history, Infinity), known);
+    dictation.current = { text: spoken, pick: known !== 'en' && !to };
+    if (known === 'en') return 'grammar';
+    if (!to) return 'pick';
+    setTarget(to);
+    void translate(spoken, known, to);
+    return 'translated';
   };
 
   return {
@@ -129,7 +154,12 @@ export function useTranslation({ favorites, history, remember }: Options) {
     choose: (side: 'from' | 'into', lang: string | null) => {
       if (side === 'from') setPicked(lang);
       else if (lang) setTarget(lang);
+      if (side === 'into' && lang && dictation.current?.pick && dictation.current.text === text) {
+        dictation.current.pick = false;
+        void translate(text, sent, lang);
+      }
     },
+    dictated,
     swap: () => {
       if (!from) return;
       setPicked(into);

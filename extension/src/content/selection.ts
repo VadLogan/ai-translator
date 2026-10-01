@@ -315,7 +315,16 @@ export function rangeAt(host: HTMLElement, start: number, end: number): Range | 
     }
     return false;
   };
-  return walk(host) ? range : null;
+  if (walk(host)) return range;
+  // An empty range at the very end (a caret after all the text, or in an empty field) is past every
+  // piece above, which only place `start < next`. It goes after the last text, inside the last block
+  // (`<p><br></p>` included): an editor maps a caret after its paragraph to nowhere.
+  if (start !== end || start !== pos) return null;
+  let last: Node = host;
+  while (last.lastChild && !(last.lastChild instanceof HTMLBRElement)) last = last.lastChild;
+  range.selectNodeContents(last);
+  range.collapse(false);
+  return range;
 }
 
 /** The part `[start, end)` of a whole-field snapshot, as a selection replaceSelection can write. */

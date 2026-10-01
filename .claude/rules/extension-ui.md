@@ -5,7 +5,7 @@ pieces. Behavior lives in hooks; markup lives in components that take props and 
 
 ```
 entrypoints/            WXT only: createRoot / defineContentScript, nothing else
-components/             reusable, presentational: buttons, icons, inputs, typography, menu, list, CountBadge, theme.css, color-scheme
+components/             reusable, presentational: buttons, icons, inputs, typography, menu, list, CountBadge, GrammarPanel, Recording, theme.css, color-scheme
 widgets/translator/     the in-page widget
   mount.ts              the closed shadow host
   Translator.tsx        container: useTranslatorFlow → toView → <TranslatorWidget>
@@ -14,7 +14,7 @@ widgets/translator/     the in-page widget
   TranslatorWidget.tsx Trigger.tsx panels/   presentational, stories beside them
 popups/toolbar/         the toolbar popup
   ToolbarPopup.tsx      container: composes hooks, picks the screen
-  hooks/                useTranslation, useHistory, useActiveSite, usePinned
+  hooks/                useTranslation, useHistory, useActiveSite, usePinned, useDictation, useGrammarFix
   screens/              Home, History, Languages, entries (HistoryRow, HistoryCard); stories beside each
 popups/options/         OptionsApp (container) + OptionsPage (presentational)
 content/                DOM domain logic shared by the widget and the popup's Insert: selection, replace, insert

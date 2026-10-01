@@ -4,6 +4,7 @@ import { CountBadge } from '../../../components/CountBadge';
 import { Flag } from '../../../components/icons';
 import { Divider, Item, Section, Status } from '../../../components/menu';
 import type { WidgetView } from '../view';
+import { Transcript } from './DictationBar';
 import { TranslationField } from './TranslationField';
 
 type Props = {
@@ -22,7 +23,8 @@ export function LanguagesPanel({ view, onLanguagePick, onFixGrammar, onFixLayout
   return (
     <>
       <DetectedHeader name={view.detectedName} lang={view.detectedLang} />
-      {view.translation && <TranslationField view={view.translation} />}
+      {view.dictation && <Transcript text={view.dictation.transcript} />}
+      {view.translation && <TranslationField view={view.translation} onInsert={view.dictation?.onInsert} />}
       {suggested && (
         <Item label={suggested.name} flag={suggested.code} shortcut="1" onPress={() => onLanguagePick(suggested.code)} />
       )}
