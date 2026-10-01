@@ -282,7 +282,6 @@ describe('guardText', () => {
   it.each([
     ['/translate', { text: 'ghbdtn', targetLang: 'en' }, translate],
     ['/detect', { text: 'ghbdtn' }, detectLang],
-    ['/fix-grammar', { text: 'ghbdtn' }, fixGrammar],
     ['/rewrite', { text: 'ghbdtn', style: 'formal' }, rewrite],
   ])('422s a mistyped text on %s before the provider call', async (path, body, provider) => {
     vi.mocked(validateGuard).mockResolvedValueOnce('mistyped');
@@ -315,6 +314,23 @@ describe('guardText', () => {
 
     expect(res.status).toBe(200);
     expect(validateGuard).not.toHaveBeenCalled();
+  });
+
+  it('422s a mistyped fix-grammar from the guard run beside the fix, and aborts the fix', async () => {
+    vi.mocked(validateGuard).mockResolvedValueOnce('mistyped');
+    const res = await post('/fix-grammar', { text: 'ghbdtn' });
+
+    expect(res.status).toBe(422);
+    await expect(res.json()).resolves.toMatchObject({ error: { code: 'mistyped' } });
+    expect((vi.mocked(fixGrammar).mock.lastCall?.[1] as AbortSignal).aborted).toBe(true);
+  });
+
+  it('lets the fix through when the guard itself fails', async () => {
+    vi.mocked(validateGuard).mockRejectedValueOnce(new Error('guard down'));
+    vi.spyOn(console, 'error').mockImplementationOnce(() => {});
+    const res = await post('/fix-grammar', { text: 'Hello there friend' });
+
+    expect(res.status).toBe(200);
   });
 
   it('lets the text through when the guard itself fails', async () => {

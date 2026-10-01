@@ -340,6 +340,18 @@ export function offsetIn(selection: WritableSelection): number {
   return serialize(before, selection.element).text.length;
 }
 
+/** Where the caret sits in `field`'s whole text, or null when it isn't in the field. */
+export function caretIn(field: WritableSelection): number | null {
+  const { element } = field;
+  if (field.kind === 'text-control') return deepActiveElement(element.ownerDocument) === element ? (element as HTMLInputElement | HTMLTextAreaElement).selectionEnd : null;
+  const selection = element.ownerDocument.getSelection();
+  if (!selection?.focusNode || !element.contains(selection.focusNode)) return null;
+  const before = element.ownerDocument.createRange();
+  before.selectNodeContents(element);
+  before.setEnd(selection.focusNode, selection.focusOffset);
+  return serialize(before, element).text.length;
+}
+
 // Generated id parts (uuids, hex hashes, counters) that change on every load.
 const VOLATILE = /[0-9a-f]{8,}(-[0-9a-f]{4,})*|\d+/gi;
 

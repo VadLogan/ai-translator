@@ -15,12 +15,16 @@ import { toEdits, type ModelEdit } from './utils/toEdits.ts';
 export async function fixGrammar({ text }: FixGrammarBody, signal?: AbortSignal): Promise<FixGrammarOk> {
     const ms = benchmark();
     const log = scopedLogger('model-response', text);
-  const response = await client.responses.create({
+  const stream = await client.responses.create({
     model: MODEL,
     instructions: AGENT_INSTRUCTION,
     input: text,
     // Proofreading needs no chain of thought; the default effort spent ~70 hidden tokens (~1 s) per fix.
     reasoning: { effort: 'none' },
+    // Measured ~1 s faster and far steadier than the default tier (1.7-2.2 s vs 1.9-3.4 s), at a higher token price.
+    service_tier: 'priority',
+    // Streamed only to stop at output_text.done: response.completed trails it by 0.1-2 s.
+    stream: true,
     text: {
       format: {
         type: 'json_schema',
@@ -53,25 +57,28 @@ export async function fixGrammar({ text }: FixGrammarBody, signal?: AbortSignal)
       },
     },
   }, { signal });
+  let output: string | undefined;
+  let model: string | undefined;
+  for await (const event of stream) {
+    if (event.type === 'response.created') model = event.response.model;
+    else if (event.type === 'response.output_text.done') {
+      output = event.text;
+      break; // leaving the loop aborts the stream: the answer is all we need
+    } else if (event.type === 'response.failed' || event.type === 'error') throw new Error(`fix-grammar stream: ${event.type}`);
+  }
   log.info(`model-response: ${ms()}ms`)
-  const { edits: labels } = JSON.parse(response.output_text) as { edits: ModelEdit[] };
+  if (output === undefined) throw new Error('fix-grammar stream ended without an answer');
+  const { edits: labels } = JSON.parse(output) as { edits: ModelEdit[] };
   const corrected = applyEdits(text, labels);
   // Offsets come from the diff, never from the model; the model only labels the edits.
   const edits = toEdits(diff(text, corrected), labels);
-  const { usage } = response;
   return {
     // A wrong layout or gibberish never gets here: guardText 422s it first.
     ...fromSegments(editSegments(text, edits)),
     edits,
-    // response.model, not the requested one: the provider resolves an alias to a dated snapshot.
-    model: response.model,
-    ...(usage && {
-      usage: {
-        inputTokens: usage.input_tokens,
-        outputTokens: usage.output_tokens,
-        totalTokens: usage.total_tokens,
-      },
-    }),
+    // The response's model, not the requested one: the provider resolves an alias to a dated snapshot.
+    // No usage: it only arrives with response.completed, which we no longer wait for.
+    ...(model && { model }),
   };
 }
 

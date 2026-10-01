@@ -1,5 +1,5 @@
 import { useEffect, useReducer, useRef, useState } from 'react';
-import type { FixEdit, FixGrammarOk } from '../../../../../shared/contract';
+import type { CheckOk, FixEdit, FixGrammarOk } from '../../../../../shared/contract';
 import { isProviderId } from '../../../auth/providers';
 import { switchLayout } from '../../../core/layout';
 import { findLanguage, type Language } from '../../../core/languages';
@@ -8,9 +8,11 @@ import { historyStore, intoLanguages, topPairs, type HistoryEntry } from '../../
 import { pinnedLanguages } from '../../../settings/pinned';
 import { storageSettings } from '../../../settings/storage-settings';
 import { replaceSelection } from '../../../content/replace';
-import { fieldKey, fieldLabel, getEditableSelection, getFieldAnchor, getFocusedField, getPageSelection, getSelectionAnchor, isSelectionUnchanged, offsetIn, partOf, plainText, wholeField, type EditableSelection, type WritableSelection } from '../../../content/selection';
+import { caretIn, fieldKey, fieldLabel, getEditableSelection, getFieldAnchor, getFocusedField, getPageSelection, getSelectionAnchor, isSelectionUnchanged, offsetIn, partOf, plainText, wholeField, type EditableSelection, type WritableSelection } from '../../../content/selection';
 import { answered, applyEdits, cleanCheck, countFixes, visibleEdits, withoutEdit, withoutFixEdit, detectedLang, hasEnoughWords, hidden, isMenuOpen, isVerdict, menuShortcuts, pairTarget, reducer, type Check, type Screen, type Verdict } from '../state';
 import { toCheck, toDetection, type ViewActions, type WidgetCallbacks } from '../view';
+import { carryOver, cleanFix, isBeingTyped, mergeFixes, splitChunks, splitSentences } from '../chunks';
+import { chunkRequests } from './chunkRequests';
 import { requestSlot } from './requestSlot';
 import { usePageEvents } from './usePageEvents';
 import { useSiteGate } from './useSiteGate';
@@ -46,6 +48,16 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
   // The one background check (POST /check) in flight, and the one fix (POST /fix-grammar) a click asked for.
   const [pendingCheck] = useState(() => requestSlot(cancel));
   const [pendingFix] = useState(() => requestSlot(cancel));
+  // A multi-line field: each finished sentence gets the cheap /check while the user types, and a
+  // paragraph whose checks found errors gets /fix-grammar at once (guarded: its checks passed the guard).
+  const [checks] = useState(() => chunkRequests<CheckOk>((text, id) => sendMessage({ type: 'check', text, id }), cancel));
+  const [fixes] = useState(() => chunkRequests<FixGrammarOk>((text, id) => sendMessage({ type: 'fix-grammar', text, id, guarded: true }), cancel));
+  // The longer pause after the last input: the user is done typing, so the sentence under the caret is checked too (see scheduleCheck).
+  const holdTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  // Typing has paused (or the icon was clicked): the sentence under the caret no longer waits for its full stop. Any input clears it.
+  const finished = useRef(false);
+  // The last failed chunk's error, until the next round of asking.
+  const fieldError = useRef<{ message: string; code?: string }>(undefined);
   // Page text's translation field: one language in flight; picking another aborts it.
   const [pendingTranslation] = useState(() => requestSlot(cancel));
   const gate = useSiteGate(() => close());
@@ -57,7 +69,9 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
   const fail = (message: string, back: 'menu' | 'close' = 'menu') => show({ kind: 'error', message, back });
 
   function close(): void {
-    clearTimeout(checkTimer.current);
+    stopTimers();
+    checks.drop();
+    fixes.drop();
     generation.current++;
     pendingTranslation.abort();
     dispatch({ type: 'close' });
@@ -67,7 +81,7 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
   /** A 'checking' placeholder with no request behind it (an edit cancelled it, then no check followed) would spin forever. */
   function dropOrphanCheck(): void {
     const { check } = latest.current;
-    if (check && !answered(check) && pendingCheck.text === undefined) dispatch({ type: 'checked', check: null });
+    if (check && !answered(check) && pendingCheck.text === undefined && !checks.busy() && !fixes.busy()) dispatch({ type: 'checked', check: null });
   }
 
   function refresh(): void {
@@ -230,7 +244,7 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     const field = wholeField(latest.current.selection?.element ?? null);
     if (!field?.text.trim()) return fail('Type something first.', 'close');
     dispatch({ type: 'select', selection: field, anchor: getFieldAnchor(field), field: true });
-    clearTimeout(checkTimer.current); // the fix brings its own count
+    stopTimers(); // the fix brings its own count
     void loadFix(field);
   }
 
@@ -282,6 +296,17 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     const { check } = latest.current;
     const known = check?.text === target.text ? check : null;
     const panel = (fix: FixGrammarOk | null): Screen => ({ kind: 'grammar', fix, index: 0, field, base: field ? 0 : offsetIn(target) });
+    if (field && isChunked(target)) {
+      // Paragraph by paragraph: the panel opens on what is already known, or a skeleton that publish fills.
+      if (known?.verdict) return showVerdict(target.text, known.verdict);
+      const status = fieldStatus(target.element, target.text);
+      if (status.fixedAll) return show(panel(status.fix));
+      // An applied fix or a Replace's rebase: known, though the caches never saw this text.
+      if (known && settled(known, status)) return show(panel(known.fix ?? cleanFix(target.text)));
+      finished.current = true; // a click is as good as a pause: check the caret's sentence now too
+      checkField(target);
+      return show(panel(null)); // after checkField: its publish runs before the render, on the icon screen
+    }
     if (!prefetch) {
       if (known?.verdict) return showVerdict(target.text, known.verdict);
       if (known?.fix) return show(panel(known.fix));
@@ -340,20 +365,183 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     }
   }
 
-  /** Debounced: one check per pause in typing (or per settled selection), not per keystroke. */
-  function scheduleCheck(delay = 500): void {
+  /** A multi-line field with something to ask: checked sentence by sentence, fixed paragraph by paragraph. */
+  function isChunked(field: WritableSelection): boolean {
+    return !(field.element instanceof HTMLInputElement) && splitChunks(field.text).length > 0;
+  }
+
+  /**
+   * What the caches know of the field's text. A paragraph is fixed when /fix-grammar answered it,
+   * or when all its sentences' checks found 0 errors (then it is never sent to the fix). It needs a
+   * fix once every sentence is checked and one has errors. `errors` counts a fixed paragraph's
+   * edits, else its checks' sum. Until its own fix answers, a paragraph is underlined with an
+   * earlier version's edits that still apply (`carried`), so an edit doesn't wipe its underlines.
+   * `caret`: the sentence being typed there isn't asked yet; its paragraph's ended part (`done`)
+   * is fixed meanwhile, so the underlines don't wait for the user to stop typing.
+   */
+  function fieldStatus(element: HTMLElement, text: string, caret: number | null = null) {
+    const paragraphs = splitChunks(text).map((chunk) => {
+      const sentences = splitSentences(chunk);
+      const typed = sentences.findIndex((s) => isBeingTyped(text, s, caret));
+      const counts = sentences.map((s) => checks.get(element, s.text));
+      const answer = fixes.get(element, chunk.text);
+      const verdict = [answer, ...counts].find((k): k is Verdict => typeof k === 'string');
+      const checked = counts.every((c) => c !== undefined);
+      const errors = counts.reduce((sum, c) => sum + (typeof c === 'object' ? c.errors : 0), 0);
+      const fix = typeof answer === 'object' ? answer : checked && !verdict && !errors ? cleanFix(chunk.text) : undefined;
+      const carried = fix || verdict ? undefined : carriedFix(element, chunk.text);
+      // The ended sentences before the one being typed, as one text: fixed while it is typed on.
+      const ended = typed > 0 ? sentences.slice(0, typed) : [];
+      const last = ended.at(-1);
+      const done = last ? text.slice(chunk.start, last.start + last.text.length) : '';
+      const doneErrors = counts.slice(0, typed).reduce((sum: number | undefined, c) => (sum === undefined || c === undefined ? undefined : sum + (typeof c === 'object' ? c.errors : 0)), 0);
+      const fixDone = !!done && !fix && !verdict && !!doneErrors && fixes.get(element, done) === undefined;
+      return {
+        chunk,
+        sentences: sentences.filter((_, i) => i !== typed),
+        verdict,
+        checked,
+        errors: fix ? countFixes(fix) : errors,
+        fix,
+        carried,
+        // What /fix-grammar is asked for: the paragraph once all of it is checked, else its ended part.
+        toFix: checked && !verdict && !fix ? chunk.text : fixDone ? done : undefined,
+      };
+    });
+    return {
+      paragraphs,
+      verdict: paragraphs.find((p) => p.verdict)?.verdict,
+      checked: paragraphs.every((p) => p.checked),
+      fixedAll: paragraphs.every((p) => p.fix),
+      errors: paragraphs.reduce((sum, p) => sum + p.errors, 0),
+      // Shown (badge aside): the fixed paragraphs, and the carried-over edits of the rest.
+      fix: mergeFixes(text, paragraphs.flatMap((p) => { const fix = p.fix ?? p.carried; return fix ? [{ chunk: p.chunk, fix }] : []; })),
+    };
+  }
+
+  /** The newest earlier version of a paragraph whose fix still says something about `text`. */
+  function carriedFix(element: HTMLElement, text: string): FixGrammarOk | undefined {
+    for (const [earlier, answer] of fixes.entries(element).reverse()) {
+      const fix = typeof answer === 'object' ? carryOver(text, { text: earlier, fix: answer }) : null;
+      if (fix) return fix;
+    }
+    return undefined;
+  }
+
+  /** The check is for this text but didn't come from the caches: an applied fix (clean by construction) or a Replace's rebase. */
+  const settled = (check: Check, status: ReturnType<typeof fieldStatus>): boolean => answered(check) && !check.error && !status.checked;
+
+  /**
+   * The field's background round. Every sentence gets /check -- but the one under the caret waits
+   * until it ends, unless typing has `finished`. publish sends each paragraph whose checks found
+   * errors to /fix-grammar as soon as they answer.
+   */
+  function checkField(field: WritableSelection): void {
+    const status = fieldStatus(field.element, field.text);
+    const { check } = latest.current;
+    if (check?.text === field.text && settled(check, status)) return;
+    // Without the sentence being typed: it is asked once it ends, or once typing pauses.
+    const sentences = fieldStatus(field.element, field.text, caretOf(field)).paragraphs.flatMap((p) => p.sentences);
+    fieldError.current = undefined;
+    checks.request(field.element, sentences.map((s) => s.text), (error) => onPieceAnswer(field.element, error));
+    publish(field.element);
+  }
+
+  /** Where the user is typing in `field`; null once typing has finished (a pause or a click). */
+  const caretOf = (field: WritableSelection): number | null => (finished.current ? null : caretIn(field));
+
+  /** A check or fix answered: remember a failure (until the next round), then re-publish. */
+  function onPieceAnswer(element: HTMLElement, error?: { message: string; code?: string }): void {
+    if (error) fieldError.current = error;
+    publish(element);
+  }
+
+  /**
+   * Turns what the caches know into the whole-field check: a guard verdict if any piece has one,
+   * else the count once every sentence is checked (spinning until then) and the merged fix of the
+   * fixed paragraphs, underlined at once. Cancels requests for text edited away and asks the fixes
+   * the checks call for -- not waiting for typing to pause: a paragraph is only fixed once all its
+   * sentences are checked, and the one being typed isn't until it ends. Fills a grammar panel waiting on it.
+   */
+  function publish(element: HTMLElement): void {
+    const field = wholeField(element);
+    const now = latest.current;
+    if (!field || now.selection?.element !== element) return; // moved on to another field
+    const status = fieldStatus(element, field.text, caretOf(field));
+    if (now.check?.text === field.text && settled(now.check, status)) return;
+    checks.keep(element, status.paragraphs.flatMap((p) => p.sentences.map((s) => s.text)));
+    const toFix = status.paragraphs.flatMap((p) => (p.toFix ? [p.toFix] : []));
+    // A fix for an edited-away paragraph is let finish, not cancelled: its input is billed already,
+    // its output is ~100 tokens, and its edits carry over to the new text (carriedFix) and serve an undo.
+    fixes.keep(element, toFix, true);
+    fixes.request(element, toFix, (error) => onPieceAnswer(element, error));
+    const busy = checks.busy() || fixes.busy();
+    const error = !status.fixedAll && !busy ? fieldError.current : undefined;
+    const { verdict } = status;
+    const check: Check = verdict ? { text: field.text, verdict } : { text: field.text, fix: status.fix, ...(status.checked ? { errors: status.errors } : {}), ...(error ? { error } : {}) };
+    dispatch({ type: 'checked', check });
+    const { screen } = latest.current;
+    if (screen.kind === 'icon' && screen.field) {
+      // Re-select: a paste or autocomplete changes the text with no keyup to refresh it. Only then:
+      // a 'select' resets the screen, and this may run before a just-shown panel has rendered.
+      if (now.selection.text !== field.text) dispatch({ type: 'select', selection: field, anchor: getFieldAnchor(field), field: true });
+    } else if (screen.kind === 'grammar' && screen.field && !screen.fix && !screen.hover && now.selection?.text === field.text) {
+      // A click's skeleton, waiting on the last paragraphs.
+      if (verdict) showVerdict(field.text, verdict);
+      else if (error) showCheckError(error);
+      else if (status.fixedAll) show({ kind: 'grammar', fix: status.fix, index: 0, field: true, base: 0 });
+    }
+  }
+
+  /** Clears both background timers; a cleared throttle must read as "nothing scheduled". */
+  function stopTimers(): void {
     clearTimeout(checkTimer.current);
-    checkTimer.current = setTimeout(() => {
-      const { screen, selection } = latest.current;
-      // A single-line input (search box, filter, form field) shows its icon but costs no request
-      // until the icon is clicked: clicks call checkGrammar themselves. An open menu asks for itself (openMenu).
-      const skip = screen.kind !== 'icon' || selection?.element instanceof HTMLInputElement;
-      // A selection's own text, not its whole field.
-      const target = skip ? null : screen.field ? wholeField(selection?.element ?? null) : selection?.kind !== 'page' ? selection : null;
-      // 3+ words only; the click asks for less.
-      if (target && hasEnoughWords(target.text)) return void checkGrammar(target);
-      dropOrphanCheck();
-    }, delay);
+    clearTimeout(holdTimer.current);
+    checkTimer.current = undefined;
+    holdTimer.current = undefined;
+  }
+
+  /**
+   * The background round. In a multi-line field it is **throttled**: a round every `delay` while the
+   * user types, not one after they stop -- a round only asks sentences that just ended (the rest are
+   * cached), so each sentence is checked, and its paragraph fixed, as soon as its full stop is typed.
+   * The pause (`delay` + 1 s with no input) still has its own debounced round: the sentence under
+   * the caret is checked too, ended or not. A selection is debounced: it is checked once it settles.
+   */
+  function scheduleCheck(delay = 300): void {
+    const { screen, selection } = latest.current;
+    clearTimeout(holdTimer.current);
+    if (screen.kind === 'icon' && screen.field && !(selection?.element instanceof HTMLInputElement)) {
+      checkTimer.current ??= setTimeout(round, delay);
+      holdTimer.current = setTimeout(pause, delay + 1000);
+      return;
+    }
+    clearTimeout(checkTimer.current);
+    checkTimer.current = setTimeout(round, delay);
+  }
+
+  function round(): void {
+    checkTimer.current = undefined;
+    const { screen, selection } = latest.current;
+    // A single-line input (search box, filter, form field) shows its icon but costs no request
+    // until the icon is clicked: clicks call checkGrammar themselves. An open menu asks for itself (openMenu).
+    const skip = screen.kind !== 'icon' || selection?.element instanceof HTMLInputElement;
+    // A selection's own text, not its whole field.
+    const target = skip ? null : screen.field ? wholeField(selection?.element ?? null) : selection?.kind !== 'page' ? selection : null;
+    if (target && screen.kind === 'icon' && screen.field && isChunked(target)) return checkField(target); // ended sentences only
+    // 3+ words only; the click asks for less.
+    if (target && hasEnoughWords(target.text)) return void checkGrammar(target);
+    dropOrphanCheck();
+  }
+
+  /** Typing paused: the user counts as done, so the sentence under the caret is checked too. */
+  function pause(): void {
+    holdTimer.current = undefined;
+    const { screen, selection } = latest.current;
+    const field = screen.kind === 'icon' && screen.field ? wholeField(selection?.element ?? null) : null;
+    if (!field || !isChunked(field)) return;
+    finished.current = true;
+    checkField(field);
   }
 
   /**
@@ -373,11 +561,17 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     if (screen.kind === 'grammar' && !(screen.field && field.text === latest.current.check?.text)) close();
     // Emptied, or too short to check on its own: no spinner waiting on a check that won't come. A click still asks.
     if (!hasEnoughWords(field.text)) {
-      clearTimeout(checkTimer.current);
+      stopTimers();
+      checks.drop();
+      fixes.drop();
       dispatch({ type: 'checked', check: null });
       return;
     }
-    if (wasChecking) dispatch({ type: 'checked', check: { text: field.text } });
+    // Typing again: nothing is fixed until the next pause. The paragraphs the edit didn't touch keep
+    // their count and underlines at once; the touched one spins until checked.
+    finished.current = false;
+    if (isChunked(field)) publish(field.element);
+    else if (wasChecking) dispatch({ type: 'checked', check: { text: field.text } });
     scheduleCheck();
   }
 
@@ -536,7 +730,7 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     },
     selectedElement: () => latest.current.selection?.element,
   });
-  useEffect(() => () => clearTimeout(checkTimer.current), []);
+  useEffect(() => stopTimers, []);
 
   const viewActions: ViewActions = {
     onPick: signIn,

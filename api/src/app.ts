@@ -43,7 +43,7 @@ app.post('/detect', requireUser('Sign in to detect the language'), rateLimit, va
 app.post('/translate', requireUser('Sign in to translate'), rateLimit, validate(parseTranslateBody), guardText, translateController);
 
 // Same body as /detect: text + url.
-app.post('/fix-grammar', requireUser('Sign in to fix grammar'), rateLimit, validate(parseFixGrammarBody), guardText, fixGrammarController);
+app.post('/fix-grammar', requireUser('Sign in to fix grammar'), rateLimit, validate(parseFixGrammarBody), fixGrammarController); // guards itself, in parallel with the fix
 
 // The field icon's badge: the error count only. The fix itself is asked on click (/fix-grammar).
 app.post('/check', requireUser('Sign in to check grammar'), rateLimit, validate(parseDetectBody), checkController); // guards itself, in the same call as the count
