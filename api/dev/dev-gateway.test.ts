@@ -15,6 +15,7 @@ vi.mock('../src/resources/aiClient/requests/grammarQuality.ts', () => ({ grammar
 vi.mock('../src/resources/aiClient/requests/rewrite.ts', () => ({ rewrite: vi.fn(async ({ text, style }) => ({ text: `[${style}] ${text}` })) }));
 vi.mock('../src/resources/aiClient/requests/transcribe.ts', () => ({ transcribe: vi.fn(async () => ({ text: '', model: 'm' })) }));
 vi.mock('../src/resources/aiClient/requests/voiceSession.ts', () => ({ voiceSession: vi.fn(async () => ({ secret: 'ek_test', expiresAt: 1, model: 'm' })) }));
+vi.mock('../src/repositories/wordStats.ts', () => ({ wordStatsRepository: { read: vi.fn(() => ({ total: 3, byDay: { '2026-10-01': 3 } })), add: vi.fn(), addDictation: vi.fn() } }));
 vi.mock('../src/repositories/transcriptions.ts', () => ({ transcriptionsRepository: { save: vi.fn(async () => {}) } }));
 vi.mock('../src/repositories/rewrites.ts', () => ({ rewritesRepository: { save: vi.fn(async () => {}) } }));
 vi.mock('../src/repositories/corrections.ts', () => ({ correctionsRepository: { save: vi.fn(async () => {}) } }));

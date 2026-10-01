@@ -5,7 +5,7 @@ import { fail, type AppEnv } from './utils/http.ts';
 import { requireUser } from './middleware/auth.ts';
 import { rateLimit } from './middleware/rate-limit.ts';
 import { guardText } from './middleware/guard.ts';
-import { parseDetectBody, parseFixGrammarBody, parseRewriteBody, parseSettings, parseTranscribeBody, parseTranslateBody, validate } from './middleware/body.ts';
+import { parseDetectBody, parseDictationBody, parseFixGrammarBody, parseRewriteBody, parseSettings, parseTranscribeBody, parseTranslateBody, validate } from './middleware/body.ts';
 import { getSettings, putSettings } from './controllers/settings.ts';
 import { detectController } from './controllers/detect.ts';
 import { translateController } from './controllers/translate.ts';
@@ -14,6 +14,7 @@ import { rewriteController } from './controllers/rewrite.ts';
 import { checkController } from './controllers/check.ts';
 import { transcribeController } from './controllers/transcribe.ts';
 import { voiceSessionController } from './controllers/voiceSession.ts';
+import { dictationController, statsController } from './controllers/stats.ts';
 
 // Wiring only: CORS, the route table, notFound. Guards are middleware, work is a controller.
 // Never branch on the runtime here -- that belongs in an entrypoint or dev-gateway.ts.
@@ -36,6 +37,11 @@ app.use(
 app.get('/settings', requireUser('Sign in to load your settings'), getSettings);
 
 app.put('/settings', requireUser('Sign in to save your settings'), validate(parseSettings), putSettings);
+
+// Dev stats: words translated and seconds dictated, per UTC day and in total. Not provider routes, so no rateLimit.
+app.get('/stats', requireUser('Sign in to see stats'), statsController);
+
+app.post('/stats/dictation', requireUser('Sign in to use voice input'), validate(parseDictationBody), dictationController);
 
 // rateLimit on the provider routes only, and after requireUser -- it counts per user id.
 // guardText after validate: it reads the body's text, and 422s a wrong layout or gibberish before

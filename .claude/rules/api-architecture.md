@@ -100,6 +100,8 @@ tiny — it lives in `src/`, where `[functions.health]` in `supabase/config.toml
 | a new external connection | `resources/<name>.ts`, read once at module load |
 | a runtime difference | an entrypoint or `dev/dev-gateway.ts` |
 | a local-only tool | `dev/`, plus an `npm` script and a `tsconfig.json` `include` entry |
+| a dev-only counter (no table) | a file-backed repository like `repositories/wordStats.ts` (path via `env()`, read once); the controller wraps the write in a try/catch so it never fails the request -- the deployed edge has no writable disk, so it counts nothing there |
+| a client secret for a provider the extension talks to directly | an AI request that mints it (`requests/voiceSession.ts`, short `expires_after`), a controller that never logs the secret |
 
 ## Constraints that outrank tidiness
 

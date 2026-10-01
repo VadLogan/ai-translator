@@ -28,7 +28,8 @@ export interface HomeProps {
   onTextChange(text: string): void;
   onTranslate(): void;
   /** Voice input: the mic on the text card, then the listening / transcribing card. */
-  dictation: 'idle' | 'listening' | 'transcribing';
+  /** `finishing`: stopped, the live text already in the input; no card, the mic stays off. */
+  dictation: 'idle' | 'listening' | 'transcribing' | 'finishing';
   /** While listening: the mic's loudness (0..1), the time so far and the words heard so far. */
   dictationLevel: number;
   dictationSeconds: number;
@@ -139,7 +140,7 @@ export function Home(props: HomeProps) {
           </IconButton>
         </div>
 
-        {props.dictation !== 'idle' && (
+        {(props.dictation === 'listening' || props.dictation === 'transcribing') && (
           <div className="rounded-3xl bg-tm-surface p-1.5 shadow-tm-card" role="dialog" aria-label="Voice input">
             <Recording transcribing={props.dictation === 'transcribing'} level={props.dictationLevel} seconds={props.dictationSeconds} text={props.dictationText} onStop={props.onStopDictation} onCancel={props.onCancelDictation} />
           </div>

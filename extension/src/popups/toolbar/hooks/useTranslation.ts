@@ -122,9 +122,17 @@ export function useTranslation({ favorites, history, remember }: Options) {
     return 'translated';
   };
 
+  /** The live text at Stop: into the input at once, not detected (the final transcript brings its language). */
+  const previewDictation = (spoken: string) => {
+    dictation.current = { text: spoken, pick: false };
+    setText(spoken);
+    setResult(null);
+  };
+
   return {
     text,
     setText,
+    previewDictation,
     from,
     fromDetected: !picked && detected !== undefined,
     into,

@@ -14,6 +14,7 @@ import { grammarQuality } from './resources/aiClient/requests/grammarQuality.ts'
 import { transcribe } from './resources/aiClient/requests/transcribe.ts';
 import { transcriptionsRepository } from './repositories/transcriptions.ts';
 import { voiceSession } from './resources/aiClient/requests/voiceSession.ts';
+import { wordStatsRepository } from './repositories/wordStats.ts';
 
 // The real providers call OpenAI; tests only cover the HTTP layer.
 vi.mock('./resources/aiClient/requests/translate.ts', () => ({
@@ -26,6 +27,7 @@ vi.mock('./resources/aiClient/requests/grammarQuality.ts', () => ({ grammarQuali
 vi.mock('./resources/aiClient/requests/rewrite.ts', () => ({ rewrite: vi.fn(async ({ text, style }) => ({ text: `[${style}] ${text}` })) }));
 vi.mock('./resources/aiClient/requests/transcribe.ts', () => ({ transcribe: vi.fn(async () => ({ text: 'hello there', model: 'm' })) }));
 vi.mock('./resources/aiClient/requests/voiceSession.ts', () => ({ voiceSession: vi.fn(async () => ({ secret: 'ek_test', expiresAt: 1, model: 'm' })) }));
+vi.mock('./repositories/wordStats.ts', () => ({ wordStatsRepository: { read: vi.fn(() => ({ total: 3, byDay: { '2026-10-01': 3 }, dictationSeconds: { total: 9.5, byDay: { '2026-10-01': 9.5 } } })), add: vi.fn(), addDictation: vi.fn() } }));
 vi.mock('./repositories/transcriptions.ts', () => ({ transcriptionsRepository: { save: vi.fn(async () => {}) } }));
 vi.mock('./repositories/rewrites.ts', () => ({ rewritesRepository: { save: vi.fn(async () => {}) } }));
 vi.mock('./repositories/corrections.ts', () => ({ correctionsRepository: { save: vi.fn(async () => {}) } }));
@@ -570,5 +572,53 @@ describe('POST /voice-session', () => {
   it('502s when the provider fails', async () => {
     vi.mocked(voiceSession).mockRejectedValueOnce(new Error('boom'));
     expect((await mint()).status).toBe(502);
+  });
+});
+
+describe('GET /stats', () => {
+  it('returns the word counts', async () => {
+    const res = await app.request('/api/stats', { headers: { authorization: `Bearer ${userToken()}` } });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ total: 3, byDay: { '2026-10-01': 3 }, dictationSeconds: { total: 9.5, byDay: { '2026-10-01': 9.5 } } });
+  });
+
+  it('401s without a token', async () => {
+    expect((await app.request('/api/stats')).status).toBe(401);
+  });
+
+  it('counts the words of a successful translation, and never fails it', async () => {
+    vi.mocked(wordStatsRepository.add).mockImplementationOnce(() => { throw new Error('read-only disk'); });
+    const res = await post({ text: 'Hello there', targetLang: 'pl' });
+    expect(res.status).toBe(200);
+    expect(wordStatsRepository.add).toHaveBeenCalledWith('Hello there');
+  });
+});
+
+describe('POST /stats/dictation', () => {
+  const report = (body: unknown, authorization: string | null = `Bearer ${userToken()}`) =>
+    app.request('/api/stats/dictation', { method: 'POST', headers: { 'content-type': 'application/json', ...(authorization ? { authorization } : {}) }, body: JSON.stringify(body) });
+
+  it("adds one recording's seconds, words and model", async () => {
+    expect((await report({ seconds: 7.4, words: 18, model: 'gpt-live-transcribe' })).status).toBe(204);
+    expect(wordStatsRepository.addDictation).toHaveBeenCalledWith(7.4, 18, 'gpt-live-transcribe');
+  });
+
+  it('takes a report without words or model (transcribing failed)', async () => {
+    expect((await report({ seconds: 2 })).status).toBe(204);
+    expect(wordStatsRepository.addDictation).toHaveBeenCalledWith(2, undefined, undefined);
+  });
+
+  it('answers 204 even when the counter cannot write', async () => {
+    vi.mocked(wordStatsRepository.addDictation).mockImplementationOnce(() => { throw new Error('read-only disk'); });
+    expect((await report({ seconds: 3 })).status).toBe(204);
+  });
+
+  it('401s without a token', async () => {
+    expect((await report({ seconds: 3 }, null)).status).toBe(401);
+  });
+
+  it.each([[{}], [{ seconds: 0 }], [{ seconds: -1 }], [{ seconds: 601 }], [{ seconds: '5' }], [{ seconds: 5, words: 1.5 }], [{ seconds: 5, words: -1 }], [{ seconds: 5, words: 10_001 }], [{ seconds: 5, model: 7 }], [{ seconds: 5, model: 'x'.repeat(65) }], [{ seconds: 5, model: 'a b' }]])('400s on %j', async (body) => {
+    expect((await report(body)).status).toBe(400);
+    expect(wordStatsRepository.addDictation).not.toHaveBeenCalled();
   });
 });

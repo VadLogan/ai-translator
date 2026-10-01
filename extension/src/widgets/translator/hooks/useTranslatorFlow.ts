@@ -6,6 +6,8 @@ import { switchLayout } from '../../../core/layout';
 import { findLanguage, type Language } from '../../../core/languages';
 import { sendMessage } from '../../../messaging/messages';
 import { isVoiceLevel } from '../../../messaging/recorder';
+import { liveLanguage } from '../../../core/liveLanguage';
+import { sentenceFixes } from '../../../core/sentenceFixes';
 import { historyStore, intoLanguages, pairFor, topPairs, type HistoryEntry } from '../../../settings/history';
 import { pinnedLanguages } from '../../../settings/pinned';
 import { storageSettings } from '../../../settings/storage-settings';
@@ -72,6 +74,7 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
 
   function close(): void {
     if (latest.current.screen.kind === 'recording') void sendMessage({ type: 'voice-cancel' }); // releases the mic
+    if (latest.current.screen.kind === 'recording' || latest.current.dictation) dictationFix.reset(); // its sentence fixes are no use now
     stopTimers();
     checks.drop();
     fixes.drop();
@@ -711,6 +714,13 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     underlines.relayout();
   }
 
+  // The live text's language, asked while the user speaks so Stop can skip "Transcribing…".
+  const [liveLang] = useState(() => liveLanguage(async (text) => {
+    const answer = await sendMessage({ type: 'detect', text });
+    return answer.ok ? answer.data.lang : undefined;
+  }));
+  // An English dictation's grammar fix, made sentence by sentence while it is spoken.
+  const [dictationFix] = useState(() => sentenceFixes((text, id) => sendMessage({ type: 'fix-grammar', text, id }), cancel));
   // Where the dictation goes: the field's caret offset when the mic was pressed.
   const dictation = useRef<{ element: HTMLElement; at: number }>(undefined);
 
@@ -721,6 +731,8 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     // Read before the press moves focus into the widget: a textarea keeps its selectionEnd, a contenteditable the document selection.
     const caret = field.kind === 'text-control' ? (field.element as HTMLInputElement | HTMLTextAreaElement).selectionEnd : caretIn(field);
     dictation.current = { element: field.element, at: caret ?? field.text.length };
+    liveLang.reset();
+    dictationFix.reset();
     stopTimers();
     dispatch({ type: 'select', selection: field, anchor: getFieldAnchor(field), field: true });
     show({ kind: 'recording' });
@@ -739,43 +751,94 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
    * translated into its target at once; any other gets the menu's languages to pick from. The
    * selection becomes a page-kind stand-in holding the transcript, so the page-text menu and its
    * translation field work on it unchanged.
+   *
+   * When the live text's language is known already (`liveLang`, asked while the user spoke), that
+   * panel opens at once on the live text, in its loading state, and the final transcript (~0.8 s
+   * later) fills it in: only then is the fix or translation asked, so nothing is asked twice.
+   * Otherwise "Transcribing…" shows until the transcript and its language are back.
    */
   async function stopDictation(): Promise<void> {
     const { screen } = latest.current;
     if (screen.kind !== 'recording' || screen.transcribing) return;
     const id = generation.current;
-    show({ kind: 'recording', transcribing: true });
     dictation.current?.element.focus({ preventScroll: true }); // Stop unmounts: keep focus in the field, not on <body>
-    const response = await sendMessage({ type: 'voice-stop' });
+    const early = screen.text && liveLang.lang ? { text: screen.text, lang: liveLang.lang } : null;
+    let target: string | undefined;
+    if (early) {
+      const opened = await openDictation(early.text, early.lang);
+      if (opened === null || id !== generation.current) return;
+      target = opened;
+    } else {
+      show({ kind: 'recording', transcribing: true });
+    }
+    const response = await sendMessage({ type: 'voice-stop', ...(early ? { lang: early.lang } : {}) });
     if (id !== generation.current) return;
     if (!response.ok) return response.error.code === 'unauthenticated' ? show({ kind: 'signIn' }) : fail(response.error.message, 'close');
-    const { text, lang } = response.data;
+    const { text } = response.data;
     if (!text) return fail("Didn't catch that. Try again.", 'close');
+    const lang = early?.lang ?? response.data.lang;
+    if (early) {
+      // The final transcript replaces the live text the panel opened on.
+      const { selection, screen: now, check, dictation: said } = latest.current;
+      if (selection?.kind !== 'page' || !said) return;
+      dispatch({ type: 'edited', selection: { ...selection, text }, screen: now, check });
+      dispatch({ type: 'dictated', dictation: { ...said, transcript: text, text } });
+      await new Promise((resolve) => setTimeout(resolve, 0)); // latest.current catches up with the final text
+      if (id !== generation.current) return;
+    } else {
+      const opened = await openDictation(text, lang);
+      if (opened === null || id !== generation.current) return;
+      target = opened;
+    }
+    if (lang === 'en') return void fixDictation(text);
+    // The pair's target, or a language picked from the menu meanwhile (its translation was of the live text).
+    const into = target ?? latest.current.translation?.lang;
+    if (into) void translateInField(into, lang);
+  }
+
+  /**
+   * Opens the dictation's panel on `text`: the page-kind stand-in selection, the detected language,
+   * then the grammar panel's skeleton (English) or the menu, with the pair's target as the
+   * translation field's skeleton. Asks nothing. Returns that target (undefined: none), or null when
+   * the field is gone.
+   */
+  async function openDictation(text: string, lang: string): Promise<string | undefined | null> {
     const field = wholeField(dictation.current?.element ?? null);
-    if (!field) return fail(`The field is gone. You said: “${text}”`, 'close');
+    if (!field) {
+      fail(`The field is gone. You said: “${text}”`, 'close');
+      return null;
+    }
     const range = field.element.ownerDocument.createRange();
     range.selectNodeContents(field.element);
     range.collapse(false);
     dispatch({ type: 'select', selection: { kind: 'page', element: field.element, range, text }, anchor: getFieldAnchor(field) });
     dispatch({ type: 'dictated', dictation: { transcript: text, text, at: Math.min(dictation.current?.at ?? field.text.length, field.text.length) } });
     dispatch({ type: 'detected', detection: lang === 'und' ? 'unknown' : { lang } });
-    if (lang === 'en') return void fixDictation(text);
+    if (lang === 'en') {
+      show({ kind: 'grammar', fix: null, index: 0, base: 0, field: false, dictated: true });
+      return undefined;
+    }
+    // The menu at once: left on the icon screen across the awaits below, the focus refresh that
+    // Stop's refocus queued would re-select the field and drop this stand-in.
+    show({ kind: 'languages' });
     const history = await historyStore.get().catch(() => []);
     await openMenu();
-    if (id !== generation.current) return;
     const target = pairFor(topPairs(history, Infinity), lang);
-    if (target) void translateInField(target, lang);
+    if (target) dispatch({ type: 'translation', translation: { lang: target } }); // a skeleton until the final text is translated
+    return target;
   }
 
-  /** The grammar panel on the dictated text: a skeleton, then the fix. Its Replace / Ignore edit the panel's copy only. */
+  /**
+   * The grammar panel on the dictated text: a skeleton, then the fix. Its Replace / Ignore edit the
+   * panel's copy only. The sentences fixed while the user spoke are reused (`dictationFix`), so
+   * usually only the last one is still asked.
+   */
   async function fixDictation(text: string): Promise<void> {
     const panel = (fix: FixGrammarOk | null): Screen => ({ kind: 'grammar', fix, index: 0, base: 0, field: false, dictated: true });
     show(panel(null));
-    pendingFix.abort();
-    const id = pendingFix.start(text);
-    const answer = await sendMessage({ type: 'fix-grammar', text, id });
-    if (!pendingFix.isCurrent(id)) return;
-    pendingFix.done();
+    const id = generation.current;
+    const answer = await dictationFix.finish(text);
+    if (id !== generation.current) return;
     const { screen } = latest.current;
     if (screen.kind !== 'grammar' || !screen.dictated) return; // closed
     if (answer.ok) return show(panel(answer.data));
@@ -873,6 +936,8 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
       const { screen } = latest.current;
       if (!isVoiceLevel(message) || screen.kind !== 'recording' || screen.transcribing) return;
       if (message.silent) return void stopDictation(); // 3 s of silence: as if Stop was pressed
+      liveLang.feed(message.text);
+      if (liveLang.lang === 'en') dictationFix.feed(message.text); // its grammar panel is coming: fix the ended sentences now
       show({ kind: 'recording', level: message.level, ms: message.ms, text: message.text });
     };
     browser.runtime.onMessage.addListener(onLevel);

@@ -1,15 +1,15 @@
 /**
- * Worker ↔ offscreen recorder. `live` hands it the minted Realtime secret (`secret`), sent once the
- * API answers, after `start`. Separate from `Message`: only the worker sends these. `owner` (on
+ * Worker ↔ offscreen recorder. `live` hands it the minted Realtime secret (`secret`) and the model
+ * that session transcribes with (`model`), sent once the API answers, after `start`. Separate from `Message`: only the worker sends these. `owner` (on
  * `start`): the tab frame that is dictating, echoed on every `VoiceLevel` so the worker can forward
  * it there without remembering anything; absent = the toolbar popup.
  */
-export type RecorderMessage = { target: 'offscreen'; type: 'start' | 'stop' | 'cancel' | 'live'; owner?: VoiceOwner; secret?: string };
+export type RecorderMessage = { target: 'offscreen'; type: 'start' | 'stop' | 'cancel' | 'live'; owner?: VoiceOwner; secret?: string; model?: string };
 
 export type VoiceOwner = { tabId: number; frameId: number };
 
-/** On `stop`: `audio`, the recording as a data: url; `text`, the live session's final transcript when it completed. */
-export type RecorderReply = { audio?: string; text?: string; error?: 'mic-blocked' | 'mic-failed' };
+/** On `stop`: `audio`, the recording as a data: url; `seconds`, how long it ran; `text` (and its `model`), the live session's final transcript when it completed. */
+export type RecorderReply = { audio?: string; seconds?: number; text?: string; model?: string; error?: 'mic-blocked' | 'mic-failed' };
 
 /**
  * While recording, ~10 times a second: how loud the mic is (0..1), how long it has been

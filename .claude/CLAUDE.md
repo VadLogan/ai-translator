@@ -2,6 +2,9 @@
 - **graphify** (`.claude/skills/graphify/SKILL.md`) - any input to knowledge graph. Trigger: `/graphify`
 When the user types `/graphify`, use the installed graphify skill or instructions before doing anything else.
 
+# Docs
+- **update-project-docs** (`.claude/skills/update-project-docs/SKILL.md`) - records what a session decided or found and fixes doc drift in `CLAUDE.md`, `.claude/rules/` and `docs/`. Trigger: `/update-project-docs`, "update docs", or the end of a change set.
+
 # Prompts
 When a request is only typo-ridden or loosely worded but its meaning is clear, open with one `**Understood as:** …` line stating the cleaned-up request, then proceed without waiting.
 

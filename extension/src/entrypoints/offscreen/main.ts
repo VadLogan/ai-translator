@@ -31,12 +31,14 @@ const FINISH_WAIT_MS = 3000;
 
 interface Live {
   socket: WebSocket | null;
+  /** The model the session transcribes with, from the worker's `live`. */
+  model?: string;
   /** PCM frames recorded before the socket opened. */
   pending: string[];
   transcript: LiveTranscript;
 }
 
-let recording: { recorder: MediaRecorder; chunks: Blob[]; stopped: Promise<void>; timer: number; tap: () => void; live: Live } | null = null;
+let recording: { recorder: MediaRecorder; chunks: Blob[]; stopped: Promise<void>; timer: number; tap: () => void; live: Live; started: number } | null = null;
 // One message at a time: getUserMedia can take seconds on a cold mic, and a Stop pressed meanwhile must find the recording.
 let queue: Promise<unknown> = Promise.resolve();
 
@@ -70,7 +72,7 @@ async function handle(message: RecorderMessage): Promise<RecorderReply> {
         stopTap(); // the bars, the clock and the stream stop with it
         if (recorder.state === 'recording') recorder.stop();
       }, MAX_SECONDS * 1000);
-      recording = { recorder, chunks, stopped, timer, tap: stopTap, live };
+      recording = { recorder, chunks, stopped, timer, tap: stopTap, live, started: Date.now() };
       return {};
     }
     case 'live': {
@@ -79,6 +81,7 @@ async function handle(message: RecorderMessage): Promise<RecorderReply> {
       const { live } = recording;
       const socket = new WebSocket(REALTIME_URL, ['realtime', `openai-insecure-api-key.${message.secret}`]);
       live.socket = socket;
+      live.model = message.model;
       socket.onopen = () => live.pending.splice(0).forEach((audio) => append(socket, audio));
       socket.onmessage = (event) => (live.transcript = applyEvent(live.transcript, JSON.parse(event.data)));
       socket.onerror = () => (live.transcript = { ...live.transcript, failed: true });
@@ -87,13 +90,15 @@ async function handle(message: RecorderMessage): Promise<RecorderReply> {
     case 'stop': {
       if (!recording) return { error: 'mic-failed' };
       const { recorder, chunks, stopped, live } = recording;
+      // Mic start to Stop; the cap stopped the recording itself at MAX_SECONDS, whenever Stop came.
+      const seconds = Math.min((Date.now() - recording.started) / 1000, MAX_SECONDS);
       recording.tap(); // no more frames: what was said so far is all there is
       if (recorder.state !== 'inactive') recorder.stop();
       await stopped;
       const text = await finish(live);
       release();
       // A data: url, because runtime messages are JSON and a Blob would not survive them.
-      return { audio: await dataUrl(new Blob(chunks, { type: recorder.mimeType })), ...(text ? { text } : {}) };
+      return { audio: await dataUrl(new Blob(chunks, { type: recorder.mimeType })), seconds, ...(text ? { text, model: live.model } : {}) };
     }
     case 'cancel':
       release();

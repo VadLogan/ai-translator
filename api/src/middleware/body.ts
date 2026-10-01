@@ -3,12 +3,15 @@ import {
   HOSTNAME,
   LANGUAGE_CODE,
   MAX_AUDIO_BYTES,
+  MAX_DICTATION_SECONDS,
+  MAX_DICTATION_WORDS,
   MAX_DISABLED_SITES,
   MAX_FAVORITE_LANGUAGES,
   MAX_TEXT_LENGTH,
   MAX_URL_LENGTH,
   REWRITE_STYLES,
   type DetectBody,
+  type DictationBody,
   type FixGrammarBody,
   type RewriteBody,
   type RewriteStyle,
@@ -104,4 +107,18 @@ export function parseTranscribeBody(body: unknown): TranscribeBody | string {
   if (audio.size > MAX_AUDIO_BYTES) return `audio must be at most ${MAX_AUDIO_BYTES} bytes`;
   if (url !== null && (typeof url !== 'string' || url.length > MAX_URL_LENGTH)) return 'url is invalid';
   return { audio, ...(typeof url === 'string' ? { url } : {}) };
+}
+
+/** One recording for the dev stats: its seconds (above 0, at most MAX_DICTATION_SECONDS) and, optionally, its transcript's word count and the model that made it. */
+export function parseDictationBody(body: unknown): DictationBody | string {
+  const { seconds, words, model } = (body ?? {}) as { seconds?: unknown; words?: unknown; model?: unknown };
+  if (typeof seconds !== 'number' || !Number.isFinite(seconds) || seconds <= 0 || seconds > MAX_DICTATION_SECONDS) {
+    return `seconds must be a number above 0 and at most ${MAX_DICTATION_SECONDS}`;
+  }
+  if (words !== undefined && (!Number.isInteger(words) || (words as number) < 0 || (words as number) > MAX_DICTATION_WORDS)) {
+    return `words must be a whole number from 0 to ${MAX_DICTATION_WORDS}`;
+  }
+  // A model id is short and plain ("gpt-live-transcribe"); bounded, so a bad report can't bloat the stats file.
+  if (model !== undefined && (typeof model !== 'string' || !/^[\w.:-]{1,64}$/.test(model))) return 'model is invalid';
+  return { seconds, ...(words !== undefined ? { words: words as number } : {}), ...(model !== undefined ? { model: model as string } : {}) };
 }

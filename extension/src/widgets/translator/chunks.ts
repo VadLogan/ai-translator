@@ -1,11 +1,9 @@
 import type { FixGrammarOk } from '../../../../shared/contract';
 import { hasEnoughWords } from './state';
+import { cleanFix, escapeHtml, isFinished, mergeFixes, type Chunk } from '../../core/fixEdits';
 
-/** A piece of a field's text sent to /fix-grammar on its own; `start` is where it sits in the field. */
-export interface Chunk {
-  start: number;
-  text: string;
-}
+// Moved to core/fixEdits.ts: the voice input's per-sentence fixes (popup and widget) use them too.
+export { cleanFix, isFinished, mergeFixes, type Chunk };
 
 const MAX_CHUNK = 600;
 
@@ -62,12 +60,6 @@ export function splitSentences(chunk: Chunk): Chunk[] {
   return groups.map(({ start, text }) => ({ start, text: text.trimEnd() }));
 }
 
-/** The fix of a text the check found clean: unchanged, nothing to underline, no request needed. */
-export const cleanFix = (text: string): FixGrammarOk => ({ text, html: escapeHtml(text), edits: [] });
-
-/** The sentence is done: ends in . ! ? … (or CJK ones), maybe followed by a closing quote or bracket. */
-export const isFinished = (text: string): boolean => /[.!?…。！？]["'”’»)\]]*\s*$/.test(text);
-
 /**
  * `sentence` (of the field's `text`) is the one being typed: the caret is inside it (editing the
  * middle of a sentence, ended or not: "…and bou|ght some apples."), or after it with only
@@ -79,27 +71,6 @@ export function isBeingTyped(text: string, sentence: Chunk, caret: number | null
   const end = sentence.start + sentence.text.length;
   if (caret < end) return true;
   return !isFinished(sentence.text) && !text.slice(end, caret).trim();
-}
-
-/**
- * The field-wide fix made of its chunks' fixes, as if the API had fixed the whole field: edits
- * moved to field offsets, `text` and `html` the field with each chunk swapped for its fixed version.
- * `parts` in field order.
- */
-export function mergeFixes(text: string, parts: { chunk: Chunk; fix: FixGrammarOk }[]): FixGrammarOk {
-  const merged: FixGrammarOk = { text: '', html: '', edits: [] };
-  let at = 0;
-  for (const { chunk, fix } of parts) {
-    const gap = text.slice(at, chunk.start);
-    merged.text += gap + fix.text;
-    merged.html += escapeHtml(gap) + fix.html;
-    merged.edits.push(...fix.edits.map((e) => ({ ...e, start: e.start + chunk.start, end: e.end + chunk.start })));
-    at = chunk.start + chunk.text.length;
-  }
-  const rest = text.slice(at);
-  merged.text += rest;
-  merged.html += escapeHtml(rest);
-  return merged;
 }
 
 /**
@@ -141,6 +112,3 @@ export function fixOf(text: string, edits: FixGrammarOk['edits']): FixGrammarOk 
   }
   return { text: fixed + text.slice(at), html: html + escapeHtml(text.slice(at)), edits };
 }
-
-// The API's escaping (api/.../fix-grammar/utils/escapeHtml.ts), so merged html reads the same.
-const escapeHtml = (s: string) => s.replace(/[&<>"']/g, (ch) => `&#${ch.charCodeAt(0)};`);

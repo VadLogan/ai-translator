@@ -5,6 +5,7 @@ import { scopedLogger } from '../resources/logger.ts';
 import { translate } from '../resources/aiClient/requests/translate.ts';
 import { translationsRepository, type TranslationRecord } from '../repositories/translations.ts';
 import { detectionsRepository } from '../repositories/detections.ts';
+import { wordStatsRepository } from '../repositories/wordStats.ts';
 
 export async function translateController(c: Context<AppEnv>) {
   const body = c.get('body') as TranslateBody; // validate(parseTranslateBody) ran first
@@ -36,6 +37,12 @@ export async function translateController(c: Context<AppEnv>) {
     const result = await translate(body);
     log.info(`← ${ms()}ms`, result);
    // save({ result });
+    // The dev word counter must never fail a translation.
+    try {
+      wordStatsRepository.add(body.text);
+    } catch (statsError) {
+      log.error('word stats failed', statsError);
+    }
     return c.json(result);
   } catch (error) {
     log.error(`✗ ${ms()}ms`, error);

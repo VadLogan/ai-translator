@@ -4,6 +4,7 @@ import type { GrammarView } from '../../../components/GrammarPanel';
 import { applyEdits, withoutFixEdit } from '../../../core/fixEdits';
 import { sendMessage } from '../../../messaging/messages';
 import type { HistoryEntry } from '../../../settings/history';
+import type { sentenceFixes } from '../../../core/sentenceFixes';
 
 const editKey = (edit: FixEdit) => `${edit.original}→${edit.replacement}`;
 
@@ -22,11 +23,12 @@ export function useGrammarFix({ text, setText, remember, onError }: {
   const [state, setState] = useState<{ text: string; fix: FixGrammarOk | null; index: number; ignored: string[]; voice?: boolean } | null>(null);
   const request = useRef('');
 
-  const start = async (of: string, voice = false) => {
+  /** `fixer`: a dictation's sentence fixes, mostly made while it was spoken; finished instead of one request. */
+  const start = async (of: string, voice = false, fixer?: ReturnType<typeof sentenceFixes>) => {
     if (request.current) void sendMessage({ type: 'cancel', id: request.current });
     const id = (request.current = crypto.randomUUID());
     setState({ text: of, fix: null, index: 0, ignored: [], voice });
-    const response = await sendMessage({ type: 'fix-grammar', text: of, id });
+    const response = fixer ? await fixer.finish(of) : await sendMessage({ type: 'fix-grammar', text: of, id });
     if (request.current !== id) return;
     request.current = '';
     if (!response.ok) {
@@ -83,5 +85,5 @@ export function useGrammarFix({ text, setText, remember, onError }: {
     return () => removeEventListener('keydown', onKey);
   }, []);
 
-  return { view, start: (of: string, voice?: boolean) => void start(of, voice) };
+  return { view, start: (of: string, voice?: boolean, fixer?: ReturnType<typeof sentenceFixes>) => void start(of, voice, fixer) };
 }

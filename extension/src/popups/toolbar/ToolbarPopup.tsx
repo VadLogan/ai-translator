@@ -29,9 +29,10 @@ export function ToolbarPopup() {
   // Dictated English gets the grammar fix; a language with no usual pair, the "into" picker.
   const dictation = useDictation({
     onError: translation.fail,
+    onPreview: translation.previewDictation,
     onText: (text, lang) => {
       const next = translation.dictated(text, lang);
-      if (next === 'grammar') grammar.start(text, true);
+      if (next === 'grammar') grammar.start(text, true, dictation.fixer);
       else if (next === 'pick') setScreen({ pick: 'into' });
     },
   });

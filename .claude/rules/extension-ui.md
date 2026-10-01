@@ -18,6 +18,9 @@ popups/toolbar/         the toolbar popup
   screens/              Home, History, Languages, entries (HistoryRow, HistoryCard); stories beside each
 popups/options/         OptionsApp (container) + OptionsPage (presentational)
 content/                DOM domain logic shared by the widget and the popup's Insert: selection, replace, insert
+core/                   pure logic shared by the surfaces, each file with its test: languages, layout, sites,
+                        fixEdits (fix helpers), pcm, liveTranscript, liveLanguage, sentenceFixes (voice input)
+entrypoints/offscreen/  the one mic recorder (not UI): driven by the worker, never imported by a surface
 ```
 
 ## Rules
@@ -27,7 +30,8 @@ content/                DOM domain logic shared by the widget and the popup's In
 - **Hooks own `sendMessage`, storage and timers.** Containers only compose hooks and pass props; nothing in a container needs a comment about *how* it works.
 - **Props are narrow.** A screen declares what it renders; never spread one big props object into every screen.
 - **Pure logic gets a test** (`state.ts`, `view.ts`, `position.ts`, `requestSlot.ts`, `settings/history.ts`). Hooks are covered through them and through the playground.
-- A piece moves to `components/` once a **second** surface uses it, not before.
+- A piece moves to `components/` once a **second** surface uses it, not before. Logic does the same into `core/` (it moved `mergeFixes` & co. out of `widgets/translator/chunks.ts`, which re-exports them so its callers and tests didn't change). `core/` never imports a surface; it may take a sender as a parameter (`liveLanguage(ask)`, `sentenceFixes(ask, cancel)`) so it stays testable without `chrome.*`.
+- **A once-subscribed listener calls the latest callbacks through a ref** (`useDictation`'s `latest`): a handler from the first render holds stale props (it once looked up the language pair in an outdated history).
 
 ## Constraints that outrank tidiness
 

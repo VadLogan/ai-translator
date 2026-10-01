@@ -15,7 +15,8 @@ export type Message =
   | { type: 'rewrite'; text: string; style: RewriteStyle }
   /** Voice input: the offscreen recorder starts; `voice-stop` ends it and transcribes; `voice-cancel` drops it. */
   | { type: 'voice-start' }
-  | { type: 'voice-stop' }
+  /** `lang`: already detected on the live text, so the worker skips its own /detect. */
+  | { type: 'voice-stop'; lang?: string }
   | { type: 'voice-cancel' }
   | { type: 'open-options' }
   | { type: 'sign-in'; provider: ProviderId }

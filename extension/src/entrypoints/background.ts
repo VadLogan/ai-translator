@@ -1,6 +1,6 @@
 import { browser, type Browser } from 'wxt/browser';
 import { defineBackground } from 'wxt/utils/define-background';
-import { ApiError, check, detect, fixGrammar, getSettings, rewrite, saveSettings, transcribe, translate, voiceSession } from '../api';
+import { ApiError, check, detect, fixGrammar, getSettings, rewrite, reportDictation, saveSettings, transcribe, translate, voiceSession } from '../api';
 import { getAccessToken, signIn, signOut } from '../auth/oauth';
 import { storageSession } from '../auth/session';
 import { isMessage, type Account, type Message, type Response } from '../messaging/messages';
@@ -89,23 +89,41 @@ export default defineBackground(() => {
           // Live text: the secret is minted while the recorder already listens (it buffers). A
           // failure is silent -- Stop then sends the file to /transcribe.
           void asUser(voiceSession)
-            .then(({ secret }) => record('live', owner, secret))
+            .then(({ secret, model }) => record('live', owner, secret, model))
             .catch(() => {});
           return { ok: true, data: undefined };
         }
         case 'voice-stop': {
-          const { audio, text, error } = await record('stop');
-          // The live session heard it all: only the language is left to ask. "und" when that fails.
+          const { audio, seconds, text, model, error } = await record('stop');
+          // The dev stats: the recording's seconds, its transcript's words and the model that made it,
+          // once that is known. Not awaited, and a failure never reaches the user.
+          const report = (said = '', by?: string) => {
+            const words = said.trim() ? said.trim().split(/\s+/).length : 0;
+            if (seconds) void asUser((token) => reportDictation({ seconds, words, ...(by ? { model: by } : {}) }, token)).catch(() => {});
+          };
+          // The live session heard it all: only the language is left -- known already when the UI
+          // detected it on the live text, else asked now ("und" when that fails).
           if (text) {
-            const lang = await asUser((token) => detect({ text, url: sender.tab?.url }, token)).then(({ lang }) => lang, () => 'und');
+            report(text, model);
+            const lang = message.lang ?? (await asUser((token) => detect({ text, url: sender.tab?.url }, token)).then(({ lang }) => lang, () => 'und'));
             return { ok: true, data: { text, lang } };
           }
-          if (!audio || error) return { ok: false, error: { message: 'Nothing was recorded.' } };
+          if (!audio || error) {
+            report();
+            return { ok: false, error: { message: 'Nothing was recorded.' } };
+          }
           const blob = await (await fetch(audio)).blob();
           const form = new FormData();
           form.set('audio', blob, 'speech.webm');
           if (sender.tab?.url) form.set('url', sender.tab.url);
-          return { ok: true, data: await asUser((token) => transcribe(form, token)) };
+          try {
+            const transcribed = await asUser((token) => transcribe(form, token));
+            report(transcribed.text, transcribed.model);
+            return { ok: true, data: transcribed };
+          } catch (transcribeError) {
+            report(); // the time was spent all the same
+            throw transcribeError;
+          }
         }
         case 'voice-cancel':
           await record('cancel').catch(() => {}); // no recorder yet: nothing to cancel
@@ -196,8 +214,8 @@ async function ensureRecorder(): Promise<void> {
   });
 }
 
-const record = (type: RecorderMessage['type'], owner?: VoiceOwner, secret?: string): Promise<RecorderReply> =>
-  browser.runtime.sendMessage({ target: 'offscreen', type, ...(owner ? { owner } : {}), ...(secret ? { secret } : {}) } satisfies RecorderMessage);
+const record = (type: RecorderMessage['type'], owner?: VoiceOwner, secret?: string, model?: string): Promise<RecorderReply> =>
+  browser.runtime.sendMessage({ target: 'offscreen', type, ...(owner ? { owner } : {}), ...(secret ? { secret } : {}), ...(model ? { model } : {}) } satisfies RecorderMessage);
 
 const accountFrom = ({ email }: { email?: string }): Account => (email ? { email } : {});
 

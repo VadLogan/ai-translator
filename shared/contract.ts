@@ -58,6 +58,15 @@ export interface VoiceSessionOk {
   model: string;
 }
 
+/** The dev stats' dictation: how long one recording ran (mic start to Stop) and how many words its transcript has. */
+export interface DictationBody {
+  seconds: number;
+  /** Words of the final transcript; 0 or absent when nothing was heard or transcribing failed. */
+  words?: number;
+  /** The model that transcribed it (live or upload); absent when transcribing failed. */
+  model?: string;
+}
+
 /** Grammar fix: the same text + url as detection. */
 export interface FixGrammarBody extends DetectBody {
   /**
@@ -173,3 +182,7 @@ export const MAX_DISABLED_SITES = 100;
 export const MAX_URL_LENGTH = 2048;
 /** One dictation: 60 s of webm/opus is ~0.5 MB. */
 export const MAX_AUDIO_BYTES = 5 * 1024 * 1024;
+/** Longer than any recording can run (the recorder stops itself at 60 s), so a bad report can't skew the stats. */
+export const MAX_DICTATION_SECONDS = 600;
+/** Far more than 600 s of speech can hold, so a bad report can't skew the stats. */
+export const MAX_DICTATION_WORDS = 10_000;

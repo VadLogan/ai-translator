@@ -2,6 +2,7 @@ import type {
   ApiErrorCode,
   CheckBody,
   CheckOk,
+  DictationBody,
   DetectBody,
   DetectOk,
   FixGrammarBody,
@@ -57,6 +58,10 @@ export const transcribe = (form: FormData, accessToken: string | null, baseUrl =
 /** A short-lived secret for a live (Realtime) transcription session; the recorder streams the mic with it. */
 export const voiceSession = (accessToken: string | null, baseUrl = BASE_URL) =>
   call<VoiceSessionOk>('/voice-session', { method: 'POST' }, accessToken, baseUrl);
+
+/** The dev stats: how long one dictation ran. */
+export const reportDictation = (body: DictationBody, accessToken: string | null, baseUrl = BASE_URL) =>
+  call<null>('/stats/dictation', { method: 'POST', body }, accessToken, baseUrl);
 
 /** Settings live server-side so they follow the user across devices. */
 export const getSettings = (accessToken: string | null, baseUrl = BASE_URL) =>
