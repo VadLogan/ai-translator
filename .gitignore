@@ -9,5 +9,6 @@ extension/.output
 extension/output
 extension/.wxt
 api/.env
+api/word-stats.json
 graphify-out/cost.json        # local only
 # graphify-out/cache/         # optional: commit for speed, skip to keep repo small

@@ -4,6 +4,7 @@ import { MAX_TEXT_LENGTH, type ApiErrorCode, type TranslateBody, type TranslateO
 import { translate } from './translate.ts';
 import { checkDb } from './db.ts';
 import { translationsRepository } from './repositories/translations.ts';
+import { addWords, readWordStats } from './word-stats.ts';
 import { randomUUID } from 'node:crypto';
 
 const RATE_LIMIT = 60; // requests per minute per IP
@@ -49,6 +50,9 @@ app.get('/health', async (c) => {
   return c.json({ ok: db !== 'down', db }, db === 'down' ? 503 : 200);
 });
 
+// Dev stats: words translated per UTC day and in total.
+app.get('/stats', (c) => c.json(readWordStats()));
+
 app.post('/translate', async (c) => {
   const ip = c.req.header('x-forwarded-for')?.split(',')[0]?.trim() ?? 'local';
   if (isRateLimited(ip)) return fail(c, 429, 'rate-limited', 'Too many requests, slow down');
@@ -73,6 +77,11 @@ app.post('/translate', async (c) => {
     const result = await translate(parsed);
     console.info(`[translate ${id}] ← ${ms()}ms`, JSON.stringify(result, null, 2));
     save({ result });
+    try {
+      addWords(parsed.text);
+    } catch (statsError) {
+      console.error(`[translate ${id}] word stats failed`, statsError);
+    }
     return c.json(result);
   } catch (error) {
     console.error(`[translate ${id}] ✗ ${ms()}ms`, error);

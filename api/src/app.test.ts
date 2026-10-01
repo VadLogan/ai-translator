@@ -3,6 +3,7 @@ import { app } from './app.ts';
 import { checkDb } from './db.ts';
 import { translate } from './translate.ts';
 import { translationsRepository } from './repositories/translations.ts';
+import { addWords, readWordStats } from './word-stats.ts';
 
 // The real provider calls OpenAI; tests only cover the HTTP layer.
 vi.mock('./translate.ts', () => ({
@@ -10,6 +11,7 @@ vi.mock('./translate.ts', () => ({
 }));
 vi.mock('./db.ts', () => ({ checkDb: vi.fn() }));
 vi.mock('./repositories/translations.ts', () => ({ translationsRepository: { save: vi.fn(async () => {}) } }));
+vi.mock('./word-stats.ts', () => ({ addWords: vi.fn(), readWordStats: vi.fn() }));
 vi.spyOn(console, 'info').mockImplementation(() => {});
 
 const post = (body: unknown) =>
@@ -28,17 +30,19 @@ describe('POST /translate', () => {
     expect(translationsRepository.save).toHaveBeenLastCalledWith(
       expect.objectContaining({ request: { text: 'Hello', targetLang: 'de' }, result: { text: '[de] Hello' } }),
     );
+    expect(addWords).toHaveBeenLastCalledWith('Hello');
   });
 
   it('502s when the provider fails and saves the error', async () => {
     const boom = new Error('provider down');
     vi.mocked(translate).mockRejectedValueOnce(boom);
     vi.spyOn(console, 'error').mockImplementationOnce(() => {});
-    const res = await post({ text: 'Hello', targetLang: 'de' });
+    const res = await post({ text: 'Failing', targetLang: 'de' });
 
     expect(res.status).toBe(502);
     await expect(res.json()).resolves.toMatchObject({ error: { code: 'provider-failed' } });
     expect(translationsRepository.save).toHaveBeenLastCalledWith(expect.objectContaining({ error: boom }));
+    expect(addWords).not.toHaveBeenCalledWith('Failing');
   });
 
   it('still answers when saving fails', async () => {
@@ -98,4 +102,10 @@ describe('GET /health', () => {
     expect(res.status).toBe(503);
     await expect(res.json()).resolves.toEqual({ ok: false, db: 'down' });
   });
+});
+
+it('GET /stats returns the word stats', async () => {
+  const stats = { total: 5, byDay: { '2026-10-01': 5 } };
+  vi.mocked(readWordStats).mockReturnValueOnce(stats);
+  await expect((await app.request('/stats')).json()).resolves.toEqual(stats);
 });
