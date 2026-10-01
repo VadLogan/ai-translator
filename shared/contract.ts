@@ -54,8 +54,25 @@ export interface FixGrammarOk {
    * deletion is an empty span.
    */
   html: string;
+  /** The same edits as `html`'s spans, in order, with where they sit in the request text: the inline underlines. */
+  edits: FixEdit[];
   usage?: TokenUsage;
   model?: string;
+}
+
+export const FIX_KINDS = ['error', 'native'] as const;
+/** `error`: grammar, spelling, punctuation. `native`: correct, but not how a native speaker would say it. */
+export type FixKind = (typeof FIX_KINDS)[number];
+
+/** One edit of a fix. `start` / `end` index into the request text: `text.slice(start, end) === original`. Never empty. */
+export interface FixEdit {
+  start: number;
+  end: number;
+  original: string;
+  replacement: string;
+  kind: FixKind;
+  /** One short sentence, in the text's language. May be empty. */
+  reason: string;
 }
 
 /** The background check behind the field icon's badge: the same text + url as detection. */

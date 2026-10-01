@@ -13,6 +13,7 @@ export async function fixGrammarController(c: Context<AppEnv>) {
   const ms = benchmark();
   const log = scopedLogger('fix-grammar', id);
 
+  // Disabled for now, both outcomes (calls commented below).
   // Not awaited: saving must not slow down or fail the request.
   const save = (outcome: Pick<CorrectionRecord, 'result' | 'error'>) =>
     waitUntil(
@@ -29,7 +30,7 @@ export async function fixGrammarController(c: Context<AppEnv>) {
     return c.json(result);
   } catch (error) {
     log.error(`✗ ${ms()}ms`, error);
-    save({ error });
+    // save({ error });
     return fail(c, 502, 'provider-failed', 'Grammar fix failed');
   }
 }

@@ -16,7 +16,8 @@ export default defineBackground(() => {
         case 'translate': {
           // Fetched here, not in the content script: host_permissions exempt the worker from page CORS.
           // The url comes from the sender, not the message: the browser fills it in, so a
-          // compromised page can't forge where the extension was used.
+          // compromised page can't forge where the extension was used. Only a tab has one: the
+          // toolbar popup and the options page are not a site, so they send no url.
           const controller = new AbortController();
           if (message.id) checks.set(message.id, controller);
           try {
@@ -28,7 +29,7 @@ export default defineBackground(() => {
                     text: message.text,
                     targetLang: message.targetLang,
                     ...(message.sourceLang ? { sourceLang: message.sourceLang } : {}),
-                    url: sender.tab?.url ?? sender.url,
+                    url: sender.tab?.url,
                   },
                   token,
                   controller.signal,
@@ -43,13 +44,13 @@ export default defineBackground(() => {
           // Same reasons as translate, url included.
           return {
             ok: true,
-            data: await asUser((token) => detect({ text: message.text, url: sender.tab?.url ?? sender.url }, token)),
+            data: await asUser((token) => detect({ text: message.text, url: sender.tab?.url }, token)),
           };
         case 'fix-grammar':
         case 'check': {
           const controller = new AbortController();
           checks.set(message.id, controller);
-          const body = { text: message.text, url: sender.tab?.url ?? sender.url };
+          const body = { text: message.text, url: sender.tab?.url };
           try {
             return {
               ok: true,
@@ -70,7 +71,7 @@ export default defineBackground(() => {
           return {
             ok: true,
             data: await asUser((token) =>
-              rewrite({ text: message.text, style: message.style, url: sender.tab?.url ?? sender.url }, token),
+              rewrite({ text: message.text, style: message.style, url: sender.tab?.url }, token),
             ),
           };
         case 'open-options':

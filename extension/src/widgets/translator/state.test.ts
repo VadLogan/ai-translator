@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { answered, badge, cleanCheck, countFixes, grammarCount, hasEnoughWords, isChecking, isMistyped, detectedLang, hidden, isMenuOpen, menuLanguages, menuShortcuts, pairTarget, reducer } from './state';
+import { answered, applyEdits, badge, cleanCheck, countFixes, showsUnderlines, visibleEdits, withoutEdit, grammarCount, hasEnoughWords, isChecking, isMistyped, detectedLang, hidden, isMenuOpen, menuLanguages, menuShortcuts, pairTarget, reducer } from './state';
 import type { EditableSelection } from '../../content/selection';
 import { findLanguage } from '../../core/languages';
 
@@ -36,9 +36,68 @@ it('a focused field gets the corner icon, which is not an open menu', () => {
   expect(isMenuOpen(state)).toBe(false);
 });
 
-it('counts one error per span.fix', () => {
-  expect(countFixes('I <span class="fix" data-original="has">have</span> gone<span class="fix" data-original="">.</span>')).toBe(2);
-  expect(countFixes('All good &lt;span class="fix"&gt;')).toBe(0);
+const edit = (start: number, original: string, replacement: string, kind: 'error' | 'native' = 'error') => ({ start, end: start + original.length, original, replacement, kind, reason: '' });
+// 'I has gone home' → 'I have gone home.'
+const fix = {
+  text: 'I have gone home.',
+  html: 'I <span class="fix" data-original="has">have</span> gone <span class="fix" data-original="home">home.</span>',
+  edits: [edit(2, 'has', 'have'), edit(11, 'home', 'home.')],
+};
+
+it('counts one error per edit', () => {
+  expect(countFixes(fix)).toBe(2);
+  expect(countFixes({ text: 'ok', html: 'ok', edits: [] })).toBe(0);
+});
+
+it('applies edits right to left, so earlier offsets hold', () => {
+  expect(applyEdits('I has gone home', fix.edits)).toBe('I have gone home.');
+  expect(applyEdits('I has gone home', [fix.edits[1]!])).toBe('I has gone home.');
+});
+
+it('rebases the check after one edit is replaced in the field', () => {
+  const next = withoutEdit({ text: 'I has gone home', errors: 2, fix }, fix.edits[0]!);
+  expect(next.text).toBe('I have gone home');
+  expect(next.errors).toBe(1);
+  expect(next.fix?.edits).toEqual([edit(12, 'home', 'home.')]);
+  expect(next.fix?.html).toBe('I have gone <span class="fix" data-original="home">home.</span>');
+  // The shifted edit still points at its words in the new text.
+  expect(next.text.slice(12, 16)).toBe('home');
+});
+
+it('underlines only a multi-line field whose fix matches its text, minus ignored edits', () => {
+  const element = { localName: 'textarea' } as HTMLElement;
+  const field = { kind: 'text-control', text: 'I has gone home', element } as unknown as EditableSelection;
+  let state = reducer(hidden, { type: 'select', selection: field, anchor, field: true });
+  state = reducer(state, { type: 'checked', check: { text: 'I has gone home', errors: 2, fix } });
+  expect(showsUnderlines(state)).toBe(true);
+  // Typed on: the fix is stale.
+  expect(showsUnderlines(reducer(state, { type: 'select', selection: { ...field, text: 'I has gone home!' } as EditableSelection, anchor, field: true }))).toBe(false);
+  // A single-line input never gets them.
+  const input = { ...field, element: { localName: 'input' } } as unknown as EditableSelection;
+  expect(showsUnderlines(reducer(state, { type: 'select', selection: input, anchor, field: true }))).toBe(false);
+
+  state = reducer(state, { type: 'ignore', edit: fix.edits[0]! });
+  expect(visibleEdits(state)).toEqual([fix.edits[1]]);
+  // Survives closing and re-selecting the same field; another field starts clean.
+  state = reducer(reducer(state, { type: 'close' }), { type: 'select', selection: field, anchor, field: true });
+  expect(visibleEdits(state)).toEqual([fix.edits[1]]);
+  const other = { ...field, element: { localName: 'textarea' } } as unknown as EditableSelection;
+  expect(visibleEdits(reducer(state, { type: 'select', selection: other, anchor, field: true }))).toHaveLength(2);
+});
+
+it('keeps underlines under a hover-opened grammar panel only, and steps past ignored edits', () => {
+  const field = { kind: 'text-control', text: 'I has gone home', element: { localName: 'textarea' } } as unknown as EditableSelection;
+  let state = reducer(hidden, { type: 'select', selection: field, anchor, field: true });
+  state = reducer(state, { type: 'checked', check: { text: 'I has gone home', errors: 2, fix } });
+  const panel = { kind: 'grammar', fix, index: 1, base: 0, field: true } as const;
+  expect(showsUnderlines(reducer(state, { type: 'show', screen: panel }))).toBe(false);
+  state = reducer(state, { type: 'show', screen: { ...panel, hover: true } });
+  expect(showsUnderlines(state)).toBe(true);
+  // Ignoring the last edit shown moves back onto the one left; ignoring that one closes to the field icon.
+  state = reducer(state, { type: 'ignore', edit: fix.edits[1]! });
+  expect(state.screen).toMatchObject({ kind: 'grammar', index: 0 });
+  state = reducer(state, { type: 'ignore', edit: fix.edits[0]! });
+  expect(state.screen).toEqual({ kind: 'icon', field: true });
 });
 
 it('badges the field icon only while the check matches the text', () => {

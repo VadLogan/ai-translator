@@ -17,9 +17,9 @@ vi.mock('./resources/aiClient/requests/translate.ts', () => ({
   translate: vi.fn(async ({ text, targetLang }) => ({ text: `[${targetLang}] ${text}` })),
 }));
 vi.mock('./resources/aiClient/requests/detect.ts', () => ({ detectLang: vi.fn(async () => ({ lang: 'en' })) }));
-vi.mock('./resources/aiClient/requests/fix-grammar/fix-grammar.ts', () => ({ fixGrammar: vi.fn(async ({ text }) => ({ text: `fixed: ${text}`, html: `fixed: ${text}` })) }));
-vi.mock('./resources/aiClient/requests/validateGuard.ts', () => ({ validateGuard: vi.fn(async () => null) }));
-vi.mock('./resources/aiClient/requests/grammarQuality.ts', () => ({ grammarQuality: vi.fn(async () => ({ errors: 2 })) }));
+vi.mock('./resources/aiClient/requests/fix-grammar/fix-grammar.ts', () => ({ fixGrammar: vi.fn(async ({ text }) => ({ text: `fixed: ${text}`, html: `fixed: ${text}`, edits: [] })) }));
+vi.mock('./resources/aiClient/requests/validateGuard.ts', () => ({ validateGuard: vi.fn(async () => null), GUARD_MESSAGES: { mistyped: 'mistyped', gibberish: 'gibberish' } }));
+vi.mock('./resources/aiClient/requests/grammarQuality.ts', () => ({ grammarQuality: vi.fn(async () => ({ errors: 2, verdict: null })) }));
 vi.mock('./resources/aiClient/requests/rewrite.ts', () => ({ rewrite: vi.fn(async ({ text, style }) => ({ text: `[${style}] ${text}` })) }));
 vi.mock('./repositories/rewrites.ts', () => ({ rewritesRepository: { save: vi.fn(async () => {}) } }));
 vi.mock('./repositories/corrections.ts', () => ({ correctionsRepository: { save: vi.fn(async () => {}) } }));
@@ -228,12 +228,12 @@ describe('POST /fix-grammar', () => {
     const res = await fix({ text: 'i has went', url: 'https://teams.microsoft.com/chat' }, `Bearer ${userToken(sub)}`);
 
     expect(res.status).toBe(200);
-    await expect(res.json()).resolves.toEqual({ text: 'fixed: i has went', html: 'fixed: i has went' });
+    await expect(res.json()).resolves.toEqual({ text: 'fixed: i has went', html: 'fixed: i has went', edits: [] });
     expect(correctionsRepository.save).toHaveBeenLastCalledWith(
       expect.objectContaining({
         userId: sub,
         request: { text: 'i has went', url: 'https://teams.microsoft.com/chat' },
-        result: { text: 'fixed: i has went', html: 'fixed: i has went' },
+        result: { text: 'fixed: i has went', html: 'fixed: i has went', edits: [] },
       }),
     );
   });
@@ -283,7 +283,6 @@ describe('guardText', () => {
     ['/translate', { text: 'ghbdtn', targetLang: 'en' }, translate],
     ['/detect', { text: 'ghbdtn' }, detectLang],
     ['/fix-grammar', { text: 'ghbdtn' }, fixGrammar],
-    ['/check', { text: 'ghbdtn' }, grammarQuality],
     ['/rewrite', { text: 'ghbdtn', style: 'formal' }, rewrite],
   ])('422s a mistyped text on %s before the provider call', async (path, body, provider) => {
     vi.mocked(validateGuard).mockResolvedValueOnce('mistyped');
@@ -342,6 +341,16 @@ describe('POST /check', () => {
     expect(res.status).toBe(200);
     await expect(res.json()).resolves.toEqual({ errors: 2 });
     expect(vi.mocked(grammarQuality).mock.lastCall?.[1]).toBeInstanceOf(AbortSignal);
+  });
+
+  it('422s the verdict asked in the same call, without a separate guard call', async () => {
+    vi.mocked(validateGuard).mockClear();
+    vi.mocked(grammarQuality).mockResolvedValueOnce({ errors: 0, verdict: 'mistyped' });
+    const res = await check({ text: 'ghbdtn' });
+
+    expect(res.status).toBe(422);
+    await expect(res.json()).resolves.toMatchObject({ error: { code: 'mistyped' } });
+    expect(validateGuard).not.toHaveBeenCalled();
   });
 
   it('401s without a user token', async () => {

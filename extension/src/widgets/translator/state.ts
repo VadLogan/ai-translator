@@ -1,4 +1,4 @@
-import type { FixGrammarOk } from '../../../../shared/contract';
+import type { FixEdit, FixGrammarOk } from '../../../../shared/contract';
 import type { Language } from '../../core/languages';
 import type { Anchor, EditableSelection } from '../../content/selection';
 import type { Pair } from '../../settings/history';
@@ -11,8 +11,14 @@ export type Screen =
   | { kind: 'icon'; field?: boolean }
   | { kind: 'languages' }
   | { kind: 'busy'; label: string }
-  /** `fix` is null while POST /fix-grammar, asked by the click, is still running: the panel shows a skeleton. */
-  | { kind: 'grammarFixed'; fix: FixGrammarOk | null }
+  /**
+   * The grammar panel, one edit at a time. `fix` is null while POST /fix-grammar is still running (a
+   * skeleton). `index` is the shown edit among the visible ones. `hover`: opened from an underline, so
+   * it closes when the pointer leaves. `field`: the fix is the whole field's (the corner icon, an
+   * underline), not a selection's (the menu's "Grammar fix"). `base`: where the fixed text starts in
+   * its field -- 0 for the whole field, the selection's offset otherwise.
+   */
+  | { kind: 'grammar'; fix: FixGrammarOk | null; index: number; base: number; field: boolean; hover?: boolean }
   /** The guard found a wrong keyboard layout: the local re-type is all that is offered. */
   | { kind: 'layout' }
   /** The guard found random keystrokes: a notice. Nothing else is offered until the text changes. */
@@ -40,6 +46,8 @@ export interface State {
   detection: Detection | null;
   /** The latest grammar check and the text it ran on; `errors`, `verdict` and `error` all absent = in flight. */
   check: Check | null;
+  /** Edits the user waved off in this field (`editKey`), so a re-check doesn't bring them back. Kept until another field is selected. */
+  ignored: { element: HTMLElement; keys: string[] } | null;
 }
 
 export interface Check {
@@ -67,18 +75,43 @@ export type Action =
   | { type: 'detected'; detection: Detection }
   | { type: 'translation'; translation: State['translation'] }
   | { type: 'show'; screen: Screen }
-  | { type: 'checked'; check: State['check'] };
+  | { type: 'checked'; check: State['check'] }
+  /** The field moved under the widget (a scroll): same screen, new anchor. */
+  | { type: 'moved'; anchor: Anchor }
+  | { type: 'ignore'; edit: FixEdit }
+  /** One edit was written into the field: the selection re-read, the panel and the check rebased onto the new text. */
+  | { type: 'edited'; selection: EditableSelection; screen: Screen; check: Check | null };
 
-export const hidden: State = { selection: null, anchor: { x: 0, top: 0, bottom: 0 }, screen: { kind: 'icon' }, languages: [], pairs: [], translation: null, detection: null, check: null };
+export const hidden: State = { selection: null, anchor: { x: 0, top: 0, bottom: 0 }, screen: { kind: 'icon' }, languages: [], pairs: [], translation: null, detection: null, check: null, ignored: null };
 
 export function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'select':
       // A different selection is a different question: start over. The grammar check is kept: it
       // answers for a text, not a field, and badge() hides it once the text differs.
-      return { ...hidden, selection: action.selection, anchor: action.anchor, screen: { kind: 'icon', field: action.field }, check: state.check };
+      return {
+        ...hidden,
+        selection: action.selection,
+        anchor: action.anchor,
+        screen: { kind: 'icon', field: action.field },
+        check: state.check,
+        ignored: state.ignored?.element === action.selection.element ? state.ignored : null,
+      };
     case 'close':
-      return state.selection ? { ...hidden, check: state.check } : state;
+      return state.selection ? { ...hidden, check: state.check, ignored: state.ignored } : state;
+    case 'moved':
+      return state.selection ? { ...state, anchor: action.anchor } : state;
+    case 'ignore': {
+      const { selection, ignored } = state;
+      if (!selection || selection.kind === 'page') return state;
+      const keys = ignored?.element === selection.element ? ignored.keys : [];
+      const next = { ...state, ignored: { element: selection.element, keys: [...keys, editKey(action.edit)] } };
+      const { screen } = state;
+      if (screen.kind !== 'grammar' || !screen.fix) return next;
+      const left = visibleEdits(next, screen.fix).length;
+      // The next edit slides into the ignored one's place; none left = back to the field.
+      return { ...next, screen: left ? { ...screen, index: Math.min(screen.index, left - 1) } : { kind: 'icon', field: screen.field } };
+    }
     case 'open':
       return { ...state, screen: { kind: 'languages' }, languages: action.languages, pairs: action.pairs };
     case 'detected':
@@ -89,6 +122,8 @@ export function reducer(state: State, action: Action): State {
       return state.selection ? { ...state, screen: action.screen } : state;
     case 'checked':
       return { ...state, check: action.check };
+    case 'edited':
+      return state.selection ? { ...state, selection: action.selection, screen: action.screen, check: action.check } : state;
   }
 }
 
@@ -120,8 +155,58 @@ export const menuShortcuts = (state: State): string[] => {
   return [...(target ? [target] : []), ...menuLanguages(state).map((language) => language.code)];
 };
 
-/** Each edit in `FixGrammarOk.html` is one `span.fix`; the text around them is escaped, so this can't miscount. */
-export const countFixes = (html: string): number => html.match(/<span class="fix"/g)?.length ?? 0;
+/** One error per edit: `FixGrammarOk.edits` and its html's `span.fix` are the same list. */
+export const countFixes = (fix: FixGrammarOk): number => fix.edits.length;
+
+/** What an ignored edit is remembered by: the same suggestion on a re-checked text has new offsets. */
+export const editKey = (edit: FixEdit): string => `${edit.original}→${edit.replacement}`;
+
+const SPAN = /<span class="fix" data-original="[^"]*">([^<]*)<\/span>/g;
+
+/**
+ * The check after one edit was applied in the field: that edit gone, the later ones shifted by the
+ * length change, and its span turned into plain text. Its text is the field's new text, so the
+ * input the replacement fires finds it already checked and asks nothing.
+ */
+export function withoutEdit(check: Check, edit: FixEdit): Check {
+  const fix = check.fix && withoutFixEdit(check.fix, edit);
+  if (!fix || fix === check.fix) return check;
+  return { text: applyEdits(check.text, [edit]), errors: fix.edits.length, fix };
+}
+
+/** `fix` once `edit` was applied to the text it was made for: the edit gone, the later ones shifted, its span unwrapped. */
+export function withoutFixEdit(fix: FixGrammarOk, edit: FixEdit): FixGrammarOk {
+  const index = fix.edits.findIndex((e) => e.start === edit.start && e.end === edit.end);
+  if (index < 0) return fix;
+  const delta = edit.replacement.length - (edit.end - edit.start);
+  const edits = fix.edits.filter((_, i) => i !== index).map((e, i) => (i < index ? e : { ...e, start: e.start + delta, end: e.end + delta }));
+  let n = 0;
+  const html = fix.html.replace(SPAN, (span, inner: string) => (n++ === index ? inner : span));
+  return { ...fix, html, edits };
+}
+
+/** `text` with `edits` applied; right to left, so the earlier offsets still hold. */
+export function applyEdits(text: string, edits: readonly FixEdit[]): string {
+  return [...edits].sort((a, b) => b.start - a.start).reduce((out, e) => out.slice(0, e.start) + e.replacement + out.slice(e.end), text);
+}
+
+/** The edits of `fix` (the check's by default) the user hasn't ignored in this field. */
+export function visibleEdits({ selection, check, ignored }: State, fix = check?.fix): FixEdit[] {
+  const edits = fix?.edits ?? [];
+  const keys = ignored && ignored.element === selection?.element ? ignored.keys : [];
+  return keys.length ? edits.filter((edit) => !keys.includes(editKey(edit))) : edits;
+}
+
+/**
+ * Underlines are drawn on a multi-line field (textarea, contenteditable) while its corner icon or a
+ * hover-opened grammar panel is up, and only while the fix is for the text in it: a stale fix is never drawn.
+ */
+export function showsUnderlines(state: State): boolean {
+  const { screen, selection, check } = state;
+  const onField = (screen.kind === 'icon' && !!screen.field) || (screen.kind === 'grammar' && !!screen.hover);
+  if (!onField || !selection || selection.kind === 'page' || selection.element?.localName === 'input') return false;
+  return !!check?.fix && check.text === selection.text && visibleEdits(state).length > 0;
+}
 
 /** A check that found nothing to fix: text the user just applied from a fix is clean by construction, no request needed. */
 export const cleanCheck = (text: string): Check => ({ text, errors: 0 });

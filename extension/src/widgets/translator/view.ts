@@ -1,11 +1,11 @@
-import type { DetectOk, RewriteStyle } from '../../../../shared/contract';
+import type { DetectOk, FixEdit, FixKind } from '../../../../shared/contract';
 import { PROVIDERS } from '../../auth/providers';
 import { layoutLanguages, switchLayout } from '../../core/layout';
 import { findLanguage, languageName, type Language } from '../../core/languages';
 import type { Response } from '../../messaging/messages';
 import { plainText } from '../../content/selection';
 import type { Badge } from '../../components/CountBadge';
-import { badge, detectedLang, grammarCount, isChecking, isVerdict, menuLanguages, pairTarget, type Check, type Detection, type State } from './state';
+import { badge, detectedLang, grammarCount, isChecking, isVerdict, menuLanguages, pairTarget, visibleEdits, type Check, type Detection, type State } from './state';
 
 export interface WidgetCallbacks {
   onIconClick(): void;
@@ -47,16 +47,24 @@ export type WidgetView =
     readOnly?: boolean;
   }
   | { kind: 'busy'; label: string }
+  /**
+   * The grammar panel, one edit at a time. `html`: `FixGrammarOk.html`, escaped text with each edit
+   * wrapped in `<span class="fix" data-original>`; absent while the fix is loading (a skeleton).
+   * `edits` are the ones still showing, in `html`'s span order minus the ignored ones; `index` is the
+   * shown one. `ignored` are the span positions to draw as their original text.
+   */
   | {
-    kind: 'grammarFixed';
-    /** `FixGrammarOk.html`: escaped text with each edit wrapped in `<span class="fix" data-original>`.
-     *  Absent while the check is still running: a skeleton, with nothing to press. */
+    kind: 'grammar';
     html?: string;
     /** The text's language code, for the preview's `lang`. */
     lang?: string;
+    edits: readonly { kind: FixKind; original: string; replacement: string; reason: string }[];
+    index: number;
+    ignored: readonly number[];
     onReplace: () => void;
-    onCopy: () => void;
-    onRewrite: (style: RewriteStyle) => void;
+    onIgnore: () => void;
+    onReplaceAll: () => void;
+    onStep: (index: number) => void;
   }
   /**
    * Wrong keyboard layout: `typed` as it is, `fixed` re-typed on the other layout. `from` is what it
@@ -73,14 +81,15 @@ export type WidgetView =
 export interface ViewActions {
   onPick: (provider: string, targetLang?: string) => void;
   onBack: () => void;
-  onReplace: (text: string) => void;
-  onCopyFix: (text: string) => void;
-  onRewrite: (style: RewriteStyle) => void;
   onClose: () => void;
+  onReplaceEdit: (edit: FixEdit) => void;
+  onIgnoreEdit: (edit: FixEdit) => void;
+  onReplaceAll: () => void;
+  onStep: (index: number) => void;
 }
 
 /** Maps the flow's state onto what the presentational widget renders. */
-export function toView(state: State, { onPick, onBack, onReplace, onCopyFix, onRewrite, onClose }: ViewActions): WidgetView {
+export function toView(state: State, { onPick, onBack, onClose, onReplaceEdit, onIgnoreEdit, onReplaceAll, onStep }: ViewActions): WidgetView {
   const { screen, selection, detection } = state;
   switch (screen.kind) {
     case 'icon':
@@ -108,14 +117,20 @@ export function toView(state: State, { onPick, onBack, onReplace, onCopyFix, onR
     }
     case 'busy':
       return { kind: 'busy', label: screen.label };
-    case 'grammarFixed': {
-      const { fix } = screen;
+    case 'grammar': {
+      const { fix, index } = screen;
+      const edits = fix ? visibleEdits(state, fix) : [];
+      const current = edits[index];
       return {
-        kind: 'grammarFixed',
+        kind: 'grammar',
         html: fix ? plainText(selection, fix.html) : undefined,
-        onReplace: () => fix && onReplace(fix.text),
-        onCopy: () => fix && onCopyFix(fix.text),
-        onRewrite,
+        edits: edits.map(({ kind, original, replacement, reason }) => ({ kind, original: plainText(selection, original), replacement: plainText(selection, replacement), reason })),
+        index,
+        ignored: fix ? fix.edits.flatMap((edit, i) => (edits.includes(edit) ? [] : [i])) : [],
+        onReplace: () => current && onReplaceEdit(current),
+        onIgnore: () => current && onIgnoreEdit(current),
+        onReplaceAll,
+        onStep,
       };
     }
     case 'layout': {

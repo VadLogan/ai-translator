@@ -45,9 +45,8 @@ export function PillButton({ variant = 'secondary', size = 'lg', className = '',
 
 const ICON_TONE = {
   neutral: 'bg-tm-neutral text-tm-ink hover:bg-tm-neutral/80',
-  /** Pressed "liked" state. */
+  /** Pressed state (a starred entry). */
   accent: 'bg-tm-soft text-tm-accent-text hover:bg-tm-soft/80',
-  /** Pressed "disliked" state. */
   danger: 'bg-tm-danger-soft text-tm-danger-ink hover:bg-tm-danger-soft/80',
   primary: 'bg-tm-accent text-tm-on-accent hover:bg-tm-accent-hover',
   ghost: 'bg-transparent text-tm-muted hover:bg-tm-neutral',

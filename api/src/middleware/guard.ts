@@ -1,12 +1,7 @@
 import { createMiddleware } from 'hono/factory';
 import { fail, requestId, type AppEnv } from '../utils/http.ts';
 import { scopedLogger } from '../resources/logger.ts';
-import { validateGuard, type GuardVerdict } from '../resources/aiClient/requests/validateGuard.ts';
-
-const MESSAGES = {
-  mistyped: 'Typed on the wrong keyboard layout',
-  gibberish: "This doesn't look like text",
-} as const;
+import { GUARD_MESSAGES, validateGuard, type GuardVerdict } from '../resources/aiClient/requests/validateGuard.ts';
 
 /**
  * 422s a text that is no language -- a wrong keyboard layout or random keystrokes -- before the
@@ -25,7 +20,7 @@ export const guardText = createMiddleware<AppEnv>(async (c, next) => {
   } catch (error) {
     scopedLogger('guard', requestId().id).error('guard failed, letting the text through', error);
   }
-  if (verdict) return fail(c, 422, verdict, MESSAGES[verdict]);
+  if (verdict) return fail(c, 422, verdict, GUARD_MESSAGES[verdict]);
 
   await next();
 });

@@ -8,8 +8,7 @@ import { pairLabel, type HistoryEntry, type TranslationEntry } from '../../../se
 export interface EntryActions {
   /** Opens the entry on Home. */
   onRestore(entry: HistoryEntry): void;
-  /** undefined clears the rating. */
-  onRate(entry: HistoryEntry, rating: HistoryEntry['rating']): void;
+  onToggleStar(entry: HistoryEntry): void;
   onCopyEntry(entry: HistoryEntry): void;
   /** Opens the entry on Home and asks for another translation. */
   onRetryEntry(entry: TranslationEntry): void;
@@ -48,30 +47,24 @@ export function HistoryRow({ entry, onPress }: { entry: HistoryEntry; onPress: (
   );
 }
 
-export function HistoryCard({ entry, actions: { onRestore, onRate, onCopyEntry, onRetryEntry, onDelete } }: { entry: HistoryEntry; actions: EntryActions }) {
-  const rate = (rating: 'good' | 'bad') => onRate(entry, entry.rating === rating ? undefined : rating);
+export function HistoryCard({ entry, actions: { onRestore, onToggleStar, onCopyEntry, onRetryEntry, onDelete } }: { entry: HistoryEntry; actions: EntryActions }) {
   return (
     <article className="flex flex-col gap-1.5 rounded-[20px] bg-tm-surface py-3 pl-3.5 pr-3 shadow-tm-card">
       <div className="flex items-center gap-1.5">
         <KindIcon entry={entry} />
         <StatusChip>{pairLabel(entry)}</StatusChip>
         <Text variant="meta" className="min-w-0 grow truncate text-[12px]">{where(entry)}</Text>
-        <IconButton aria-label="Mark as a good translation" aria-pressed={entry.rating === 'good'} tone={entry.rating === 'good' ? 'accent' : 'ghost'} size={28} onPress={() => rate('good')}>
-          <Icon name="like" size={14} strokeWidth={1.9} />
+        <IconButton aria-label="Star" aria-pressed={!!entry.starred} tone={entry.starred ? 'accent' : 'ghost'} size={28} onPress={() => onToggleStar(entry)}>
+          <Icon name="star" size={14} strokeWidth={1.9} className={entry.starred ? '[&_path]:fill-current' : undefined} />
         </IconButton>
-        <IconButton aria-label="Mark as a bad translation" aria-pressed={entry.rating === 'bad'} tone={entry.rating === 'bad' ? 'danger' : 'ghost'} size={28} onPress={() => rate('bad')}>
-          <Icon name="dislike" size={14} strokeWidth={1.9} />
-        </IconButton>
-        {/* A bad translation's next step is another try, so it takes the copy slot. */}
-        {entry.rating === 'bad' && entry.kind !== 'grammar' ? (
-          <IconButton aria-label="Translate this again" tone="accent" size={28} onPress={() => onRetryEntry(entry)}>
+        {entry.kind !== 'grammar' && (
+          <IconButton aria-label="Translate this again" tone="ghost" size={28} onPress={() => onRetryEntry(entry)}>
             <Icon name="retry" size={14} strokeWidth={2} />
           </IconButton>
-        ) : (
-          <IconButton aria-label="Copy this translation" tone="ghost" size={28} onPress={() => onCopyEntry(entry)}>
-            <Icon name="copy" size={14} strokeWidth={1.9} />
-          </IconButton>
         )}
+        <IconButton aria-label="Copy this translation" tone="ghost" size={28} onPress={() => onCopyEntry(entry)}>
+          <Icon name="copy" size={14} strokeWidth={1.9} />
+        </IconButton>
         <IconButton aria-label="Delete from history" tone="ghost" size={28} onPress={() => onDelete(entry)}>
           <Icon name="trash" size={14} strokeWidth={1.9} />
         </IconButton>

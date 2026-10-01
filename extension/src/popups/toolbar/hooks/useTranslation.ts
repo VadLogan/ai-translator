@@ -11,15 +11,13 @@ interface Options {
   history: readonly HistoryEntry[];
   /** Saves a new translation to history. */
   remember(entry: HistoryEntry): Promise<void>;
-  /** The page's hostname, recorded on history entries. */
-  host: string;
 }
 
 /**
  * Home's translator: the text, the language pair (picked, detected, or from history), the answer
  * with its "Try another" versions, and the notice / sign-in line under the button.
  */
-export function useTranslation({ favorites, history, remember, host }: Options) {
+export function useTranslation({ favorites, history, remember }: Options) {
   const [text, setText] = useState('');
   // A source the user picked beats a detected one; neither = let the API detect.
   const [picked, setPicked] = useState<string | null>(null);
@@ -81,7 +79,7 @@ export function useTranslation({ favorites, history, remember, host }: Options) 
     const versions = [...base, response.data.text];
     setResult({ lang: into, versions });
     setVersion(versions.length - 1);
-    if (!base.length) await remember({ text, result: response.data.text, to: into, site: host, at: Date.now(), ...(source ? { from: source } : {}) });
+    if (!base.length) await remember({ text, result: response.data.text, to: into, site: '' /* typed in the popup, not on a page */, at: Date.now(), ...(source ? { from: source } : {}) });
   };
 
   /** Opens a history entry on Home. */

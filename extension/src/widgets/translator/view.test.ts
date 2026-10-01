@@ -4,7 +4,7 @@ import { findLanguage } from '../../core/languages';
 import { hidden, reducer, type State } from './state';
 import { toCheck, toDetection, toView } from './view';
 
-const actions = { onPick: vi.fn(), onBack: vi.fn(), onReplace: vi.fn(), onCopyFix: vi.fn(), onRewrite: vi.fn(), onClose: vi.fn() };
+const actions = { onPick: vi.fn(), onBack: vi.fn(), onClose: vi.fn(), onReplaceEdit: vi.fn(), onIgnoreEdit: vi.fn(), onReplaceAll: vi.fn(), onStep: vi.fn() };
 const anchor = { x: 1, top: 2, bottom: 3 };
 const selected = (text: string, kind = 'input'): State =>
   reducer(hidden, { type: 'select', selection: { text, kind } as unknown as EditableSelection, anchor });
@@ -63,4 +63,21 @@ it('turns a check answer into a count, a verdict or an error', () => {
   expect(toCheck('t', { ok: true, data: { errors: 2 } })).toEqual({ text: 't', errors: 2 });
   expect(toCheck('t', { ok: false, error: { message: 'x', code: 'gibberish' } })).toEqual({ text: 't', verdict: 'gibberish' });
   expect(toCheck('t', { ok: false, error: { message: 'down' } })).toEqual({ text: 't', error: { message: 'down' } });
+});
+
+it('maps the grammar panel onto the shown edit, skipping ignored ones', () => {
+  const until = { start: 0, end: 5, original: 'until', replacement: 'by', kind: 'native' as const, reason: 'A deadline takes "by".' };
+  const teh = { start: 13, end: 16, original: 'teh', replacement: 'the', kind: 'error' as const, reason: 'Spelling.' };
+  const fix = { text: 'by Friday see the file', html: '', edits: [until, teh] };
+  const field = { kind: 'text-control', text: 'until Friday see teh file', element: {} } as unknown as EditableSelection;
+  let state = reducer(reducer(hidden, { type: 'select', selection: field, anchor }), { type: 'checked', check: { text: 'until Friday see teh file', errors: 2, fix } });
+  state = reducer(state, { type: 'show', screen: { kind: 'grammar', fix, index: 1, base: 0, field: true } });
+  let view = toView(state, actions);
+  expect(view).toMatchObject({ kind: 'grammar', index: 1, ignored: [], edits: [{ original: 'until' }, { original: 'teh', replacement: 'the', kind: 'error' }] });
+  if (view.kind === 'grammar') view.onReplace();
+  expect(actions.onReplaceEdit).toHaveBeenCalledWith(teh);
+
+  state = reducer(state, { type: 'ignore', edit: until });
+  view = toView(state, actions);
+  expect(view).toMatchObject({ kind: 'grammar', index: 0, ignored: [0], edits: [{ original: 'teh' }] });
 });

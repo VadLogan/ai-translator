@@ -23,7 +23,7 @@ export function History({ history, onBack, onClearAll, undo, ...actions }: Histo
   const q = query.trim().toLowerCase();
   const shown = history.filter(
     (entry) =>
-      (filter === 'all' || (filter === 'liked' ? entry.rating === 'good' : pairLabel(entry) === filter)) &&
+      (filter === 'all' || (filter === 'starred' ? entry.starred : pairLabel(entry) === filter)) &&
       (!q || entry.text.toLowerCase().includes(q) || entry.result.toLowerCase().includes(q)),
   );
   return (
@@ -46,7 +46,7 @@ export function History({ history, onBack, onClearAll, undo, ...actions }: Histo
           fill
           value={filter}
           onChange={setFilter}
-          options={[{ value: 'all', label: 'All' }, ...pairs.map((pair) => ({ value: pair, label: pair })), { value: 'liked', label: 'Liked' }]}
+          options={[{ value: 'all', label: 'All' }, ...pairs.map((pair) => ({ value: pair, label: pair })), { value: 'starred', label: 'Starred' }]}
         />
       </div>
       <div className="flex min-h-0 grow flex-col gap-2 overflow-y-auto px-4 pb-3.5">

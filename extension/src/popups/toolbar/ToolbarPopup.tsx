@@ -21,7 +21,7 @@ export function ToolbarPopup() {
   const pins = usePinned();
   // The site switch reports into the translator's notice line, the popup's one message slot.
   const site = useActiveSite((message) => translation.fail(message));
-  const translation = useTranslation({ favorites: site.favorites, history: history.history, remember: history.add, host: site.tab.host });
+  const translation = useTranslation({ favorites: site.favorites, history: history.history, remember: history.add });
   const { favorites } = site;
 
   const home = () => (history.dropUndo(), setScreen('home'));
@@ -46,7 +46,7 @@ export function ToolbarPopup() {
           history={history.history}
           onBack={home}
           onRestore={restore}
-          onRate={history.rate}
+          onToggleStar={history.toggleStar}
           onCopyEntry={(entry) => void navigator.clipboard.writeText(entry.result)}
           onRetryEntry={(entry) => {
             home();

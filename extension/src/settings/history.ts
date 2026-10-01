@@ -7,8 +7,8 @@ interface Common {
   site: string;
   /** Epoch ms; also the entry's id. */
   at: number;
-  /** The user's thumbs up / down. Local only: there is no feedback endpoint yet. */
-  rating?: 'good' | 'bad';
+  /** Starred by the user. Local only: there is no feedback endpoint yet. */
+  starred?: boolean;
 }
 
 /**
@@ -120,7 +120,7 @@ export const historyStore = {
     await item.setValue(list);
     return list;
   },
-  /** Rating, deleting, clearing and undoing all write the whole list. */
+  /** Starring, deleting, clearing and undoing all write the whole list. */
   async set(list: HistoryEntry[]): Promise<HistoryEntry[]> {
     await item.setValue(list);
     return list;

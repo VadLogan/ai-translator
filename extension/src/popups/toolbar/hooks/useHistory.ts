@@ -18,7 +18,7 @@ export function useHistory() {
   return {
     history,
     add: async (entry: HistoryEntry) => setHistory(await historyStore.add(entry)),
-    rate: (entry: HistoryEntry, rating: HistoryEntry['rating']) => void save(history.map((e) => (e.at === entry.at ? { ...e, rating } : e))),
+    toggleStar: (entry: HistoryEntry) => void save(history.map((e) => (e.at === entry.at ? { ...e, starred: !e.starred } : e))),
     remove: (entry: HistoryEntry) => remove(history.filter((e) => e.at !== entry.at), 'Deleted 1 translation'),
     clearAll: () => remove([], `Cleared ${history.length} translations`),
     undo: undo && { label: undo.label, onUndo: () => (void save(undo.previous), setUndo(null)) },

@@ -5,8 +5,8 @@ import { toView } from './view';
 
 /** The container: the flow decides, toView maps, TranslatorWidget renders. */
 export function Translator(options: FlowOptions) {
-  const { state, viewActions, callbacks } = useTranslatorFlow(options);
+  const { state, viewActions, callbacks, marks } = useTranslatorFlow(options);
   const dark = usePrefersDark();
   if (!state.selection) return null;
-  return <TranslatorWidget view={toView(state, viewActions)} anchor={state.anchor} dark={dark} callbacks={callbacks} />;
+  return <TranslatorWidget view={toView(state, viewActions)} anchor={state.anchor} dark={dark} callbacks={callbacks} marks={marks} />;
 }

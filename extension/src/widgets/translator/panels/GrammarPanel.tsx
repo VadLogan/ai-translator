@@ -1,17 +1,19 @@
 import type { ReactNode } from 'react';
 import { Skeleton, Spinner } from '@heroui/react';
-import { Kbd, PillButton } from '../../../components/buttons';
+import { IconButton, Kbd, PillButton } from '../../../components/buttons';
 import { Icon } from '../../../components/icons';
-import { Divider, Item, Section } from '../../../components/menu';
+import { Divider } from '../../../components/menu';
 import { Text } from '../../../components/typography';
 import type { WidgetView } from '../view';
 
-/** The grammar fix: a skeleton while it loads, the highlighted fix with Replace / Copy, then the rewrites. */
-export function GrammarPanel({ view }: { view: Extract<WidgetView, { kind: 'grammarFixed' }> }) {
+/**
+ * The grammar fix, one edit at a time: the fixed text with the shown edit picked out, then that
+ * edit (kind, `original → replacement`, why) with Replace / Ignore / Replace all and ‹ › between them.
+ */
+export function GrammarPanel({ view }: { view: Extract<WidgetView, { kind: 'grammar' }> }) {
   const loading = view.html === undefined;
-  const { nodes, changes } = loading ? { nodes: [], changes: 0 } : fixedText(view.html!);
-  // Nothing to fix: echoing the text and offering to "replace" it with itself helps no one.
-  const clean = !loading && changes === 0;
+  const count = view.edits.length;
+  const edit = view.edits[view.index];
   return (
     <>
       <div className="flex h-10 items-center gap-2 pl-2.5 pr-1">
@@ -22,8 +24,8 @@ export function GrammarPanel({ view }: { view: Extract<WidgetView, { kind: 'gram
             <Icon name="check" size={11} strokeWidth={3.4} />
           </span>
         )}
-        <Text variant="label" className="grow">{loading ? 'Checking grammar…' : changes ? 'Grammar fixed' : 'Nothing to fix'}</Text>
-        {changes > 0 && <Text variant="meta" className="pr-1.5">{changes === 1 ? '1 change' : `${changes} changes`}</Text>}
+        <Text variant="label" className="grow">{loading ? 'Checking grammar…' : count ? 'Grammar fixed' : 'Nothing to fix'}</Text>
+        {count > 0 && <Text variant="meta" className="pr-1.5">{count === 1 ? '1 change' : `${count} changes`}</Text>}
       </div>
       {loading ? (
         <div aria-busy className="mx-1 flex flex-col gap-2 rounded-2xl bg-tm-subtle px-3 py-3.5">
@@ -31,48 +33,74 @@ export function GrammarPanel({ view }: { view: Extract<WidgetView, { kind: 'gram
           <Skeleton className="h-3 w-4/5 rounded-full" />
           <Skeleton className="h-3 w-3/5 rounded-full" />
         </div>
-      ) : clean ? (
-        <Text variant="meta" className="block px-2.5 pb-1">
-          No grammar issues. Want it to sound more native or more official? Try a rewrite below.
-        </Text>
-      ) : (
+      ) : count > 0 && (
         <p lang={view.lang} className="mx-1 my-0 rounded-2xl bg-tm-subtle px-3 py-2.5 tm-body leading-relaxed">
-          {nodes}
+          {fixedText(view.html!, view.index, view.ignored, view.onStep)}
         </p>
       )}
-      {!clean && (
-        <div className="flex gap-1.5 px-1 pb-1 pt-2">
-          <PillButton variant="primary" size="md" className="grow" isDisabled={loading} onPress={view.onReplace}>
-            Replace <Kbd tone="onAccent">↵</Kbd>
-          </PillButton>
-          <PillButton size="md" isDisabled={loading} onPress={view.onCopy}>Copy</PillButton>
-        </div>
+      {edit && (
+        <>
+          <div className="pt-1.5"><Divider /></div>
+          <div className="flex flex-col gap-2 px-2 pb-1 pt-2">
+            <div className="flex items-center gap-1.5">
+              <span className={`size-2 rounded-full ${edit.kind === 'native' ? 'bg-tm-accent' : 'bg-tm-danger-ink'}`} />
+              <span className={`grow tm-label ${edit.kind === 'native' ? 'text-tm-accent-text' : 'text-tm-danger-ink'}`}>
+                {edit.kind === 'native' ? 'Sounds more native' : 'Grammar'}
+              </span>
+              {count > 1 && (
+                <>
+                  <Text variant="meta" className="pr-1">{view.index + 1} of {count}</Text>
+                  <IconButton aria-label="Previous" size={28} isDisabled={view.index === 0} onPress={() => view.onStep(view.index - 1)}>
+                    <Icon name="back" size={14} />
+                  </IconButton>
+                  <IconButton aria-label="Next" size={28} isDisabled={view.index === count - 1} onPress={() => view.onStep(view.index + 1)}>
+                    <Icon name="forward" size={14} />
+                  </IconButton>
+                </>
+              )}
+            </div>
+            <div className="flex flex-wrap items-center gap-1.5 tm-body">
+              {edit.original.trim() && <span className="text-tm-muted line-through">{edit.original}</span>}
+              <Icon name="forward" size={12} strokeWidth={2.2} className="text-tm-placeholder" />
+              <span className="font-semibold">{edit.replacement.trim() || '(remove)'}</span>
+            </div>
+            {edit.reason && <Text variant="helper">{edit.reason}</Text>}
+            <div className="flex gap-1.5 pt-1">
+              <PillButton variant="primary" size="md" onPress={view.onReplace}>
+                Replace <Kbd tone="onAccent">↵</Kbd>
+              </PillButton>
+              <PillButton size="md" onPress={view.onIgnore}>Ignore</PillButton>
+              {count > 1 && <PillButton size="md" onPress={view.onReplaceAll}>Replace all · {count}</PillButton>}
+            </div>
+          </div>
+        </>
       )}
-      <Divider />
-      <Section title={clean ? 'Rewrite' : 'Rewrite further'}>
-        <Item label="More native" icon="moreNative" shortcut="N" disabled={loading} onPress={() => view.onRewrite('natural')} />
-        <Item label="More official" icon="moreOfficial" shortcut="O" disabled={loading} onPress={() => view.onRewrite('formal')} />
-      </Section>
     </>
   );
 }
 
 /**
- * `FixGrammarOk.html` as React nodes: text stays text, each `span.fix` becomes a highlight titled
- * with what it replaced. Parsed rather than injected, so nothing but text reaches the page.
+ * `FixGrammarOk.html` as React nodes: text stays text, each `span.fix` a highlight -- the shown edit
+ * strong, the others soft, an ignored one back to its original text. Clicking a highlight shows that
+ * edit. Parsed rather than injected, so nothing but text reaches the page.
  */
-function fixedText(html: string): { nodes: ReactNode[]; changes: number } {
+function fixedText(html: string, index: number, ignored: readonly number[], onStep: (index: number) => void): ReactNode[] {
   const body = new DOMParser().parseFromString(html, 'text/html').body;
-  let changes = 0;
-  const nodes = [...body.childNodes].map((node, index) => {
+  let span = -1;
+  let shown = -1;
+  return [...body.childNodes].map((node, key) => {
     if (!(node instanceof Element) || !node.classList.contains('fix')) return node.textContent;
-    changes++;
-    const original = node.getAttribute('data-original') ?? '';
+    span++;
+    if (ignored.includes(span)) return node.getAttribute('data-original') ?? '';
+    const at = ++shown;
     return (
-      <span key={index} title={original ? `was: ${original}` : 'added'} className="rounded bg-tm-soft px-0.5 text-tm-accent-text">
+      <span
+        key={key}
+        onClick={() => onStep(at)}
+        className={`cursor-pointer rounded px-0.5 ${at === index ? 'bg-tm-accent/25 font-semibold text-tm-ink' : 'bg-tm-soft text-tm-accent-text'}`}
+      >
         {node.textContent}
       </span>
     );
   });
-  return { nodes, changes };
 }

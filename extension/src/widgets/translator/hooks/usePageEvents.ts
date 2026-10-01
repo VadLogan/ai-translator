@@ -7,6 +7,10 @@ export interface PageHandlers {
   onKeyDown(event: KeyboardEvent): void;
   /** Focus moved into a page field. */
   onFocusIn(): void;
+  /** The selected field moved: a scroll of it or of the page, or a resize. */
+  onScroll(): void;
+  /** The pointer moved, at most once a frame; `overWidget` = it is over the widget itself. */
+  onPointer(x: number, y: number, overWidget: boolean): void;
   /** The element the widget belongs to, so scrolling an unrelated pane doesn't close it. */
   selectedElement(): Element | undefined;
 }
@@ -17,8 +21,9 @@ export interface PageHandlers {
  */
 export function usePageEvents(host: HTMLElement, handlers: PageHandlers): void {
   useEffect(() => {
-    const { close, refresh, onInput, onKeyDown, onFocusIn, selectedElement } = handlers;
+    const { close, refresh, onInput, onKeyDown, onFocusIn, onScroll, onPointer, selectedElement } = handlers;
     const owns = (event: Event) => event.composedPath().includes(host);
+    let frame = 0;
     const listeners: [EventTarget, string, (event: Event) => void, AddEventListenerOptions?][] = [
       [document, 'mousedown', (event) => !owns(event) && close()],
       // Deferred: let the browser finalize the selection first.
@@ -38,7 +43,22 @@ export function usePageEvents(host: HTMLElement, handlers: PageHandlers): void {
       // Deferred like mouseup: model-based editors (Lexical, ProseMirror) move the selection after
       // the key event, so reading it synchronously would miss it.
       [document, 'keyup', (event) => (event as KeyboardEvent).key !== 'Escape' && setTimeout(refresh, 0)],
-      // Close only when the scroll moves the selected field: pages like Teams scroll unrelated panes
+      // Hovering an underline opens its card. Once a frame: mousemove fires far more often than that.
+      [
+        document,
+        'mousemove',
+        (event) => {
+          if (frame) return;
+          const { clientX, clientY } = event as MouseEvent;
+          const over = owns(event);
+          frame = requestAnimationFrame(() => {
+            frame = 0;
+            onPointer(clientX, clientY, over);
+          });
+        },
+        { passive: true },
+      ],
+      // React only when the scroll moves the selected field: pages like Teams scroll unrelated panes
       // (chat list, typing indicators) constantly, which would otherwise kill the menu.
       [
         window,
@@ -46,14 +66,15 @@ export function usePageEvents(host: HTMLElement, handlers: PageHandlers): void {
         (event) => {
           const { target } = event;
           const field = selectedElement();
-          if (field && (target === document || (target instanceof Node && target.contains(field)))) close();
+          if (field && (target === document || (target instanceof Node && target.contains(field)))) onScroll();
         },
         { capture: true, passive: true },
       ],
-      [window, 'resize', () => close()],
+      [window, 'resize', () => onScroll()],
     ];
     for (const [target, type, listener, options] of listeners) target.addEventListener(type, listener, options);
     return () => {
+      cancelAnimationFrame(frame);
       for (const [target, type, listener, options] of listeners) target.removeEventListener(type, listener, options);
     };
   }, []);

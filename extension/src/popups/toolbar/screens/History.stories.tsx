@@ -12,7 +12,7 @@ const meta = {
     history: HISTORY,
     onBack: noop,
     onRestore: noop,
-    onRate: noop,
+    onToggleStar: noop,
     onCopyEntry: noop,
     onRetryEntry: noop,
     onDelete: noop,

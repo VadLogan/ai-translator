@@ -1,5 +1,5 @@
 import { useEffect, useReducer, useRef, useState } from 'react';
-import type { RewriteStyle } from '../../../../../shared/contract';
+import type { FixEdit, FixGrammarOk } from '../../../../../shared/contract';
 import { isProviderId } from '../../../auth/providers';
 import { switchLayout } from '../../../core/layout';
 import { findLanguage, type Language } from '../../../core/languages';
@@ -8,12 +8,13 @@ import { historyStore, intoLanguages, topPairs, type HistoryEntry } from '../../
 import { pinnedLanguages } from '../../../settings/pinned';
 import { storageSettings } from '../../../settings/storage-settings';
 import { replaceSelection } from '../../../content/replace';
-import { fieldKey, fieldLabel, getEditableSelection, getFieldAnchor, getFocusedField, getPageSelection, getSelectionAnchor, isSelectionUnchanged, plainText, wholeField, type EditableSelection } from '../../../content/selection';
-import { answered, cleanCheck, countFixes, detectedLang, hasEnoughWords, hidden, isMenuOpen, isVerdict, menuShortcuts, pairTarget, reducer, type Check, type Screen, type Verdict } from '../state';
+import { fieldKey, fieldLabel, getEditableSelection, getFieldAnchor, getFocusedField, getPageSelection, getSelectionAnchor, isSelectionUnchanged, offsetIn, partOf, plainText, wholeField, type EditableSelection, type WritableSelection } from '../../../content/selection';
+import { answered, applyEdits, cleanCheck, countFixes, visibleEdits, withoutEdit, withoutFixEdit, detectedLang, hasEnoughWords, hidden, isMenuOpen, isVerdict, menuShortcuts, pairTarget, reducer, type Check, type Screen, type Verdict } from '../state';
 import { toCheck, toDetection, type ViewActions, type WidgetCallbacks } from '../view';
 import { requestSlot } from './requestSlot';
 import { usePageEvents } from './usePageEvents';
 import { useSiteGate } from './useSiteGate';
+import { useUnderlines } from './useUnderlines';
 
 export interface FlowOptions {
   /** The shadow host: events inside it are the widget's own, not "outside clicks". */
@@ -48,6 +49,9 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
   // Page text's translation field: one language in flight; picking another aborts it.
   const [pendingTranslation] = useState(() => requestSlot(cancel));
   const gate = useSiteGate(() => close());
+  // True while the panel writes one edit into the field: that input is ours and must not close the panel.
+  const writingEdit = useRef(false);
+  const underlines = useUnderlines(latest, { open: openSuggestion, close: closeSuggestion });
 
   const show = (screen: Screen) => dispatch({ type: 'show', screen });
   const fail = (message: string, back: 'menu' | 'close' = 'menu') => show({ kind: 'error', message, back });
@@ -260,7 +264,7 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
   function openGrammar(): void {
     const { selection } = latest.current;
     if (!selection || selection.kind === 'page') return;
-    void loadFix(selection);
+    void loadFix(selection, false, false);
   }
 
   function showCheckError(error: { message: string; code?: string }): void {
@@ -272,14 +276,16 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
    * Opens the grammar panel on `target`'s fix: the one already fetched for this text, or a skeleton
    * until POST /fix-grammar answers. Its answer also replaces the badge's count with its own.
    * `prefetch`: asked in the background once a check found errors, so the click opens it at once.
+   * `field`: `target` is the whole field (the corner icon), not a selection in it.
    */
-  async function loadFix(target: EditableSelection, prefetch = false): Promise<void> {
+  async function loadFix(target: WritableSelection, prefetch = false, field = true): Promise<void> {
     const { check } = latest.current;
     const known = check?.text === target.text ? check : null;
+    const panel = (fix: FixGrammarOk | null): Screen => ({ kind: 'grammar', fix, index: 0, field, base: field ? 0 : offsetIn(target) });
     if (!prefetch) {
       if (known?.verdict) return showVerdict(target.text, known.verdict);
-      if (known?.fix) return show({ kind: 'grammarFixed', fix: known.fix });
-      show({ kind: 'grammarFixed', fix: null });
+      if (known?.fix) return show(panel(known.fix));
+      show(panel(null));
     }
     if (pendingFix.text === target.text) return; // in flight: its answer fills the panel
     pendingFix.abort();
@@ -292,13 +298,13 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     if (!pendingFix.isCurrent(id)) return; // cancelled by an edit
     pendingFix.done();
     const now = latest.current;
-    const waiting = now.screen.kind === 'grammarFixed' && !now.screen.fix && now.selection?.text === target.text;
+    const waiting = now.screen.kind === 'grammar' && !now.screen.fix && now.selection?.text === target.text;
     // A failed prefetch nobody clicked keeps the check's count: a click asks again.
     if (prefetch && !waiting && !answer.ok) return;
-    const done: Check = answer.ok ? { text: target.text, errors: countFixes(answer.data.html), fix: answer.data } : toCheck(target.text, answer);
+    const done: Check = answer.ok ? { text: target.text, errors: countFixes(answer.data), fix: answer.data } : toCheck(target.text, answer);
     dispatch({ type: 'checked', check: done });
     if (!waiting) return; // closed or moved on
-    if (answer.ok) show({ kind: 'grammarFixed', fix: answer.data });
+    if (answer.ok) show(panel(answer.data));
     else if (done.verdict) showVerdict(target.text, done.verdict);
     else showCheckError(answer.error);
   }
@@ -353,16 +359,18 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
   /**
    * The field changed. A check or fix for the old text is cancelled at once, not after the pause,
    * and the icon keeps spinning into the next check. An open grammar panel closes: it showed the
-   * old text's fix, and a fix is only asked on click.
+   * old text's fix, and a fix is only asked on click -- unless the panel is writing one of its own edits.
    */
   function onInput(): void {
+    if (writingEdit.current) return;
     const { selection, screen } = latest.current;
     const field = wholeField(selection?.element ?? null);
     if (!field) return scheduleCheck();
     const wasChecking = pendingCheck.text !== undefined && pendingCheck.text !== field.text;
     if (wasChecking) pendingCheck.abort();
     if (pendingFix.text !== undefined && pendingFix.text !== field.text) pendingFix.abort();
-    if (screen.kind === 'grammarFixed') close();
+    // An editor that applies the panel's paste later (not inside replaceSelection) fires its input after the rebase: the text already matches.
+    if (screen.kind === 'grammar' && !(screen.field && field.text === latest.current.check?.text)) close();
     // Emptied, or too short to check on its own: no spinner waiting on a check that won't come. A click still asks.
     if (!hasEnoughWords(field.text)) {
       clearTimeout(checkTimer.current);
@@ -373,23 +381,7 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     scheduleCheck();
   }
 
-  /** Rewrites the field's original text; the rewrite fixes errors along the way. */
-  async function rewrite(style: RewriteStyle): Promise<void> {
-    const { selection } = latest.current;
-    if (!selection) return;
-    const id = ++generation.current;
-    show({ kind: 'busy', label: 'Rewriting…' });
-    const response = await sendMessage({ type: 'rewrite', text: selection.text, style });
-    if (id !== generation.current) return;
-    if (!response.ok) {
-      const { code, message } = response.error;
-      if (isVerdict(code)) showVerdict(selection.text, code, message);
-      else fail(message, 'close');
-    } else apply(response.data.text);
-  }
-
-  function apply(text: string): void {
-    const { selection } = latest.current;
+  function apply(text: string, selection = latest.current.selection): void {
     if (!selection || selection.kind === 'page') return;
     if (!isSelectionUnchanged(selection)) return fail('The text changed. Try again.', 'close');
     const wholeText = wholeField(selection.element)?.text;
@@ -402,11 +394,94 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     remember({ kind: 'grammar', text: selection.text, result: text }, selection);
   }
 
-  /** The grammar panel's Copy: page text is never replaced, so a copied fix is what gets used. */
-  function copyFix(text: string): void {
-    const { selection } = latest.current;
-    if (selection) remember({ kind: 'grammar', text: selection.text, result: text }, selection);
-    void navigator.clipboard.writeText(plainText(selection, text)).then(close);
+  /**
+   * Hovering an underline: the grammar panel on that edit, under the underline's first line. Only
+   * over the field's own icon screen or another hover-opened panel (not over a menu or a clicked panel).
+   */
+  function openSuggestion(edit: FixEdit, line: DOMRect): void {
+    const state = latest.current;
+    const { screen, check } = state;
+    const hovering = screen.kind === 'grammar' && screen.hover;
+    if (!check?.fix || !((screen.kind === 'icon' && screen.field) || hovering)) return;
+    const index = visibleEdits(state).findIndex((e) => e.start === edit.start && e.end === edit.end);
+    if (index < 0) return;
+    dispatch({ type: 'moved', anchor: { x: line.left - 6, top: line.top, bottom: line.bottom } });
+    show({ kind: 'grammar', fix: check.fix, index, field: true, base: 0, hover: true });
+  }
+
+  function closeSuggestion(): void {
+    const { screen } = latest.current;
+    if (screen.kind === 'grammar' && screen.hover) show({ kind: 'icon', field: true });
+  }
+
+  /**
+   * The panel's Replace: only the shown edit's words in the field. The panel's fix (and, for the
+   * whole field, the check) is rebased onto the new text (withoutFixEdit), so the other edits and
+   * underlines stay put, the replacement's input asks nothing, and the next edit slides into view.
+   * Closes after the last one.
+   */
+  function replaceEdit(edit: FixEdit): void {
+    const { screen, selection, check } = latest.current;
+    if (screen.kind !== 'grammar' || !screen.fix || !selection || selection.kind === 'page') return;
+    const field = wholeField(selection.element);
+    const part = field && partOf(field, screen.base + edit.start, screen.base + edit.end);
+    if (!part || part.text !== edit.original) return fail('The text changed. Try again.', 'close');
+    writingEdit.current = true;
+    try {
+      replaceSelection(part, edit.replacement);
+    } finally {
+      writingEdit.current = false;
+    }
+    remember({ kind: 'grammar', text: edit.original, result: edit.replacement }, selection);
+    const fix = withoutFixEdit(screen.fix, edit);
+    const nextCheck = screen.field && check?.fix ? withoutEdit(check, edit) : check;
+    const length = selection.text.length + edit.replacement.length - (edit.end - edit.start);
+    const after = wholeField(selection.element);
+    const nextSelection = after && partOf(after, screen.base, screen.base + length);
+    const left = visibleEdits({ ...latest.current, check: nextCheck }, fix).length;
+    if (!nextSelection || !left) {
+      close();
+      dispatch({ type: 'checked', check: nextCheck });
+      return void setTimeout(refresh, 0); // the corner icon and the other underlines back, after the close renders
+    }
+    selection.element.focus({ preventScroll: true });
+    dispatch({ type: 'edited', selection: nextSelection, screen: { ...screen, fix, index: Math.min(screen.index, left - 1) }, check: nextCheck });
+    underlines.relayout();
+  }
+
+  /**
+   * The panel's Ignore. Focus goes back to the field first: pressing the button focused it, and when
+   * the panel unmounts focus would fall to <body>, whose focusout refresh closes the widget.
+   */
+  function ignoreEdit(edit: FixEdit): void {
+    latest.current.selection?.element.focus({ preventScroll: true });
+    dispatch({ type: 'ignore', edit });
+  }
+
+  /** The panel's Replace all: every edit still showing, through the whole-target Replace. */
+  function replaceAll(): void {
+    const state = latest.current;
+    const { screen, selection } = state;
+    if (screen.kind !== 'grammar' || !screen.fix || !selection || selection.kind === 'page') return;
+    if (!screen.field) return apply(applyEdits(selection.text, visibleEdits(state, screen.fix)));
+    const field = wholeField(selection.element);
+    if (!field || field.text !== state.check?.text) return fail('The text changed. Try again.', 'close');
+    apply(applyEdits(field.text, visibleEdits(state, screen.fix)), field);
+  }
+
+  /** The panel's ‹ › and a click on a highlight. */
+  function step(index: number): void {
+    const { screen } = latest.current;
+    if (screen.kind === 'grammar') show({ ...screen, index });
+  }
+
+  /** The selected field moved. Its icon, underlines and grammar panel follow it (a hover-opened one falls back to the icon); anything else closes. */
+  function onScroll(): void {
+    const { screen, selection } = latest.current;
+    if (!selection || !((screen.kind === 'icon' && screen.field) || (screen.kind === 'grammar' && screen.field))) return close();
+    if (screen.kind === 'grammar' && screen.hover) show({ kind: 'icon', field: true }); // it sat under an underline that just moved
+    dispatch({ type: 'moved', anchor: getFieldAnchor(selection) });
+    underlines.relayout();
   }
 
   /** The hover pill's "Turn off in this field". */
@@ -417,7 +492,7 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     close();
   }
 
-  /** Esc, the layout card's F, the grammar panel's ↵ / N / O and the menu's digits. Captured and swallowed, or the field would get the keystroke too. */
+  /** Esc, the layout card's F, the grammar panel's ↵ and the menu's digits. Captured and swallowed, or the field would get the keystroke too. */
   function onKeyDown(event: KeyboardEvent): void {
     const { key } = event;
     if (key === 'Escape') {
@@ -434,15 +509,13 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
       event.stopPropagation();
       return fixLayout();
     }
-    // A skeleton panel has nothing to apply yet, so the keys stay the field's.
-    // Clean text offers no Replace, so its Enter stays the field's (in Teams, Enter sends).
-    const keys = screen.kind === 'grammarFixed' && screen.fix && countFixes(screen.fix.html) > 0 ? ['Enter', 'n', 'o'] : ['n', 'o'];
-    if (screen.kind === 'grammarFixed' && screen.fix && keys.includes(key)) {
+    // A skeleton or clean panel has nothing to apply, so Enter stays the field's (in Teams, Enter
+    // sends); a hover-opened panel takes it only while the pointer is on it.
+    const edit = screen.kind === 'grammar' && screen.fix ? visibleEdits(latest.current, screen.fix)[screen.index] : undefined;
+    if (edit && key === 'Enter' && !(screen.kind === 'grammar' && screen.hover && !underlines.isOnCard())) {
       event.preventDefault();
       event.stopPropagation();
-      if (key === 'Enter') apply(screen.fix.text);
-      else void rewrite(key === 'n' ? 'natural' : 'formal');
-      return;
+      return replaceEdit(edit);
     }
     // Menu shortcut badges: "1".."9" pick the pair's target, then the favorites.
     const code = /^[1-9]$/.test(key) && isMenuOpen(latest.current) ? menuShortcuts(latest.current)[Number(key) - 1] : undefined;
@@ -454,6 +527,8 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     refresh,
     onInput,
     onKeyDown,
+    onScroll,
+    onPointer: underlines.onPointer,
     // A field focused with text already in it is checked too, so its icon is ready before typing.
     onFocusIn: () => {
       setTimeout(refresh, 0);
@@ -470,10 +545,11 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
       if (screen.kind === 'error' && screen.back === 'close') close();
       else void openMenu();
     },
-    onReplace: apply,
-    onCopyFix: copyFix,
     onClose: close,
-    onRewrite: (style) => void rewrite(style),
+    onReplaceEdit: replaceEdit,
+    onIgnoreEdit: ignoreEdit,
+    onReplaceAll: replaceAll,
+    onStep: step,
   };
 
   const callbacks: WidgetCallbacks = {
@@ -488,7 +564,7 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     onDisableField: disableField,
   };
 
-  return { state, viewActions, callbacks };
+  return { state, viewActions, callbacks, marks: underlines.marks };
 }
 
 /** Omit that keeps a union a union: `Omit<A | B, K>` would collapse it to their common keys. */

@@ -92,26 +92,51 @@ export const Error = story({ kind: 'error', message: 'Rate limit reached. Try ag
 
 const fix = (text: string, original: string) => `<span class="fix" data-original="${original}">${text}</span>`;
 
-export const GrammarFixed = story({
-  kind: 'grammarFixed',
-  lang: 'pl',
-  html: `${fix('Dzień', 'Dzien')} dobry, w ${fix('załączniku', 'zalaczniku')} ${fix('przesyłam', 'przesylam')} zaktualizowany kosztorys na prace ${fix('wykończeniowe', 'wykonczeniowe')}.`,
-  onReplace: noop,
-  onCopy: noop,
-  onRewrite: noop,
-});
+const grammar = { onReplace: noop, onIgnore: noop, onReplaceAll: noop, onStep: noop, ignored: [] };
+const sending = { kind: 'error', original: 'I send', replacement: "I'm sending", reason: 'Something happening now takes the present continuous.' } as const;
+const estimate = { kind: 'error', original: 'estimte', replacement: 'estimate', reason: 'Spelling.' } as const;
+const finishing = { kind: 'native', original: 'finish works', replacement: 'finishing work', reason: '"Work" here is uncountable; the trade is "finishing work".' } as const;
 
-export const GrammarNothingToFix = story({
-  kind: 'grammarFixed',
+/** The corner icon's click: the first of the fix's edits, picked out in the text. */
+export const Grammar = story({
+  kind: 'grammar',
   lang: 'en',
-  html: 'Good morning, the updated estimate is attached.',
-  onReplace: noop,
-  onCopy: noop,
-  onRewrite: noop,
+  html: `${fix("I'm sending", 'I send')} you the updated ${fix('estimate', 'estimte')} for the ${fix('finishing work', 'finish works')}.`,
+  edits: [sending, estimate, finishing],
+  index: 0,
+  ...grammar,
 });
 
-export const GrammarChecking = story({ kind: 'grammarFixed', onReplace: noop, onCopy: noop, onRewrite: noop });
+/** Stepped to a blue edit: correct, but not how a native speaker would put it. The first edit was ignored. */
+export const GrammarNative = story({
+  kind: 'grammar',
+  lang: 'en',
+  html: `${fix("I'm sending", 'I send')} you the updated ${fix('estimate', 'estimte')} for the ${fix('finishing work', 'finish works')}.`,
+  edits: [estimate, finishing],
+  index: 1,
+  ...grammar,
+  ignored: [0],
+});
+
+/** The last edit left: no stepper, no Replace all. */
+export const GrammarLastEdit = story({ kind: 'grammar', lang: 'en', html: `the updated ${fix('estimate', 'estimte')}.`, edits: [estimate], index: 0, ...grammar });
+
+export const GrammarNothingToFix = story({ kind: 'grammar', lang: 'en', html: 'Good morning, the updated estimate is attached.', edits: [], index: 0, ...grammar });
+
+export const GrammarChecking = story({ kind: 'grammar', edits: [], index: 0, ...grammar });
 
 export const Layout = story({ kind: 'layout', typed: 'Ghbdsn', fixed: 'Привіт', from: 'en', to: 'uk', onClose: noop });
 
 export const NotText = story({ kind: 'notText' });
+
+/** The field icon over a textarea with its underlines. */
+export const FieldUnderlines: Story = {
+  args: {
+    view: { kind: 'icon', field: true, badge: 2 },
+    dark: false,
+    marks: [
+      { kind: 'error', rects: [{ left: 120, bottom: 150, width: 56 }] },
+      { kind: 'native', rects: [{ left: 60, bottom: 172, width: 84 }] },
+    ],
+  },
+};

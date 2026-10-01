@@ -50,13 +50,11 @@ export const Icon: StoryObj = {
   render: () => (
     <div className="flex max-w-[600px] flex-col gap-3.5 rounded-3xl bg-tm-surface p-5 font-tm shadow-tm-card">
       <Row label="Filled round">
-        <IconButton aria-label="Good"><Glyph name="like" size={15} strokeWidth={1.9} /></IconButton>
-        <IconButton aria-label="Bad"><Glyph name="dislike" size={15} strokeWidth={1.9} /></IconButton>
+        <IconButton aria-label="Star"><Glyph name="star" size={15} strokeWidth={1.9} /></IconButton>
         <IconButton aria-label="Swap" size={36}><Glyph name="swap" size={15} strokeWidth={1.9} /></IconButton>
       </Row>
       <Row label="Pressed states">
-        <IconButton aria-label="Liked" aria-pressed tone="accent"><Glyph name="like" size={15} strokeWidth={1.9} /></IconButton>
-        <IconButton aria-label="Disliked" aria-pressed tone="danger"><Glyph name="dislike" size={15} strokeWidth={1.9} /></IconButton>
+        <IconButton aria-label="Starred" aria-pressed tone="accent"><Glyph name="star" size={15} strokeWidth={1.9} className="[&_path]:fill-current" /></IconButton>
       </Row>
       <Row label="Primary round">
         <IconButton aria-label="Start speaking" tone="primary" size={36}><Glyph name="mic" size={17} strokeWidth={1.9} /></IconButton>

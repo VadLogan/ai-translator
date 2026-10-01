@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it } from 'vitest';
-import { fieldKey, getEditableSelection, getFocusedField, getPageSelection, getSelectionAnchor, isSelectionUnchanged, isTextControl, plainText } from './selection';
+import { fieldKey, getEditableSelection, partOf, rangeAt, wholeField, getFocusedField, getPageSelection, getSelectionAnchor, isSelectionUnchanged, isTextControl, plainText } from './selection';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -223,5 +223,37 @@ describe('mentions', () => {
 
     expect(snapshot).toMatchObject({ kind: 'content-editable', text: '{{1}}i agre' });
     expect(snapshot.kind === 'content-editable' && snapshot.atoms?.map((atom) => atom.tagName)).toEqual(['BLOCKQUOTE']);
+  });
+});
+
+describe('rangeAt', () => {
+  it('finds offsets of the serialized text in the DOM, a chip counting as its token', () => {
+    document.body.innerHTML =
+      '<div contenteditable="true">Hi <span data-mention-id="1" contenteditable="false">@Ann Lee</span>, <b>pleas</b> see teh file</div>';
+    const host = document.querySelector('div')!;
+    const field = wholeField(host)!;
+    expect(field.text).toBe('Hi {{1}}, pleas see teh file');
+
+    for (const word of ['pleas', 'teh', 'Hi']) {
+      const start = field.text.indexOf(word);
+      expect(rangeAt(host, start, start + word.length)?.toString()).toBe(word);
+    }
+    // Across an element boundary.
+    const from = field.text.indexOf(', pleas');
+    expect(rangeAt(host, from, from + ', pleas'.length)?.toString()).toBe(', pleas');
+    // Over the token: the whole chip.
+    expect(rangeAt(host, 3, 8)?.toString()).toBe('@Ann Lee');
+    expect(rangeAt(host, 0, 999)).toBeNull();
+  });
+
+  it('cuts a part of the field that replaceSelection can write', () => {
+    document.body.innerHTML = '<div contenteditable="true">see <i>teh</i> file</div>';
+    const field = wholeField(document.querySelector('div'))!;
+    const part = partOf(field, 4, 7)!;
+    expect(part).toMatchObject({ kind: 'content-editable', text: 'teh' });
+    expect(part.kind === 'content-editable' && part.range.toString()).toBe('teh');
+
+    document.body.innerHTML = '<textarea>see teh file</textarea>';
+    expect(partOf(wholeField(document.querySelector('textarea'))!, 4, 7)).toMatchObject({ kind: 'text-control', start: 4, end: 7, text: 'teh' });
   });
 });

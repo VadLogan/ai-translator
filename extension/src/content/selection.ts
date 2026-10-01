@@ -219,18 +219,23 @@ const MIRROR_STYLES = [
   'borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth', 'width', 'direction',
 ] as const;
 
-/**
- * Text controls expose no rect for their selection, so lay the same text out in an off-screen
- * mirror and measure the selected span there. Falls back to the whole field when that can't be
- * measured (no layout engine, or the selection scrolled out of the field).
- */
+/** Text controls expose no rect for their selection, so it is measured in a mirror; the whole field when that fails. */
 function textControlAnchor(snapshot: Extract<EditableSelection, { kind: 'text-control' }>): Anchor {
-  const { element, start } = snapshot;
+  const box = snapshot.element.getBoundingClientRect();
+  const rect = textControlRects(snapshot.element, [snapshot])[0]?.at(-1);
+  return rect ? { x: rect.right, top: rect.top, bottom: rect.bottom } : { x: box.right, top: box.top, bottom: box.bottom };
+}
+
+/**
+ * Viewport rects (one per line) of each `[start, end)` range of a text control's value, ranges in
+ * order and apart. Lays the same text out in one off-screen mirror, one span per range, so a
+ * field's worth of underlines costs a single layout. Rects scrolled out of the field, and anything
+ * that can't be measured (no layout engine), come back empty.
+ */
+export function textControlRects(element: HTMLInputElement | HTMLTextAreaElement, ranges: readonly { start: number; end: number }[]): DOMRect[][] {
   const doc = element.ownerDocument;
-  const box = element.getBoundingClientRect();
-  const field: Anchor = { x: box.right, top: box.top, bottom: box.bottom };
   const style = doc.defaultView?.getComputedStyle(element);
-  if (!style) return field;
+  if (!style) return ranges.map(() => []);
 
   const mirror = doc.createElement('div');
   for (const property of MIRROR_STYLES) mirror.style[property] = style[property];
@@ -242,23 +247,97 @@ function textControlAnchor(snapshot: Extract<EditableSelection, { kind: 'text-co
   mirror.style.whiteSpace = element instanceof HTMLTextAreaElement ? 'pre-wrap' : 'pre';
   mirror.style.overflowWrap = 'break-word';
 
-  const marker = doc.createElement('span');
-  marker.textContent = snapshot.text;
-  mirror.append(doc.createTextNode(element.value.slice(0, start)), marker);
+  const { value } = element;
+  let at = 0;
+  const markers = ranges.map(({ start, end }) => {
+    const marker = doc.createElement('span');
+    marker.textContent = value.slice(start, end);
+    mirror.append(doc.createTextNode(value.slice(at, start)), marker);
+    at = end;
+    return marker;
+  });
+  // The rest too: the words after a range decide where its line wraps.
+  mirror.append(doc.createTextNode(value.slice(at)));
   doc.body.append(mirror);
   const origin = mirror.getBoundingClientRect();
-  const rect = lastRect(marker.getClientRects()) ?? marker.getBoundingClientRect();
+  const box = element.getBoundingClientRect();
+  const rects = markers.map((marker) =>
+    [...marker.getClientRects()].map(
+      (r) => new DOMRect(box.left + (r.left - origin.left) - element.scrollLeft, box.top + (r.top - origin.top) - element.scrollTop, r.width, r.height),
+    ),
+  );
   mirror.remove();
-  if (!rect.height) return field;
+  return rects.map((lines) => inside(lines, box));
+}
 
-  const top = box.top + (rect.top - origin.top) - element.scrollTop;
-  const anchor: Anchor = {
-    x: box.left + (rect.right - origin.left) - element.scrollLeft,
-    top,
-    bottom: top + rect.height,
+/** Rects on screen within the field: a line scrolled out of it would otherwise drag marks off it. */
+function inside(rects: DOMRect[], box: DOMRect): DOMRect[] {
+  return rects.filter((r) => r.height > 0 && r.bottom >= box.top && r.top <= box.bottom);
+}
+
+/** Viewport rects of a contenteditable range, one per line, clipped to the field like textControlRects. */
+export function rangeRects(range: Range, host: HTMLElement): DOMRect[] {
+  return inside([...range.getClientRects()], host.getBoundingClientRect());
+}
+
+/**
+ * The DOM range of `[start, end)` in a contenteditable's serialized text (wholeField's `text`):
+ * text nodes count their length, each mention counts as its {{n}} token and is never entered --
+ * the same walk serialize makes. Null when the offsets run past the text.
+ */
+export function rangeAt(host: HTMLElement, start: number, end: number): Range | null {
+  const range = host.ownerDocument.createRange();
+  let pos = 0;
+  let atoms = 0;
+  let started = false;
+  // Places the range's ends that fall in this piece of text, [pos, next). True once the end is placed.
+  const place = (next: number, setStart: () => void, setEnd: () => void): boolean => {
+    if (!started && start < next) {
+      setStart();
+      started = true;
+    }
+    if (started && end <= next) {
+      setEnd();
+      return true;
+    }
+    pos = next;
+    return false;
   };
-  // A selection scrolled out of the field would otherwise drag the icon off it.
-  return anchor.bottom < box.top || anchor.top > box.bottom ? field : anchor;
+  const walk = (node: Node): boolean => {
+    for (const child of node.childNodes) {
+      if (child instanceof Element && child.matches(MENTION)) {
+        // A cut token takes in the whole chip, as serialize widens a range over one.
+        if (place(pos + `{{${++atoms}}}`.length, () => range.setStartBefore(child), () => range.setEndAfter(child))) return true;
+      } else if (child.nodeType === Node.TEXT_NODE) {
+        const from = pos;
+        if (place(pos + (child as Text).length, () => range.setStart(child, start - from), () => range.setEnd(child, end - from))) return true;
+      } else if (walk(child)) return true;
+    }
+    return false;
+  };
+  return walk(host) ? range : null;
+}
+
+/** The part `[start, end)` of a whole-field snapshot, as a selection replaceSelection can write. */
+export function partOf(field: WritableSelection, start: number, end: number): WritableSelection | null {
+  const text = field.text.slice(start, end);
+  if (field.kind === 'text-control') return { ...field, start, end, text };
+  const range = rangeAt(field.element, start, end);
+  return range && { ...field, range, text };
+}
+
+/**
+ * Where `selection`'s text starts in its whole field's text (`wholeField`), so an edit of the
+ * selection's fix can be found in the field. ponytail: a mention before the selection counts as its
+ * whole-field token, so its digits can shift this by one past {{9}}; an edit that then misses is
+ * refused by the caller's text check.
+ */
+export function offsetIn(selection: WritableSelection): number {
+  if (selection.kind === 'text-control') return selection.start;
+  const before = selection.element.ownerDocument.createRange();
+  before.selectNodeContents(selection.element);
+  before.setEnd(selection.range.startContainer, selection.range.startOffset);
+  return serialize(before, selection.element).text.length;
 }
 
 // Generated id parts (uuids, hex hashes, counters) that change on every load.
