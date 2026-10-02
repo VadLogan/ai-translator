@@ -223,6 +223,7 @@ describe('mentions', () => {
 
     expect(snapshot).toMatchObject({ kind: 'content-editable', text: '{{1}}i agre' });
     expect(snapshot.kind === 'content-editable' && snapshot.atoms?.map((atom) => atom.tagName)).toEqual(['BLOCKQUOTE']);
+    expect(plainText(snapshot, '{{1}}I agree')).toBe('I agree');
   });
 });
 

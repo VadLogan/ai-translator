@@ -139,8 +139,8 @@ export function wholeField(element: HTMLElement | null): WritableSelection | nul
 // plus any non-editable island, plus links, plus quoted earlier messages (Teams replies carry itemtype
 // .../Reply; any blockquote) -- all kept verbatim so a fix touches only the user's own prose;
 // extend when a real editor's chip slips through.
-const MENTION =
-  '[data-mention-id], [data-mention], [itemtype*="Mention"], .mention, [contenteditable="false"], a[href], blockquote, [itemtype*="Reply"]';
+const QUOTE = 'blockquote, [itemtype*="Reply"]';
+const MENTION = `[data-mention-id], [data-mention], [itemtype*="Mention"], .mention, [contenteditable="false"], a[href], ${QUOTE}`;
 
 /** The outermost mention around a node, inside the host. */
 function mentionAround(node: Node, host: HTMLElement): Element | null {
@@ -167,10 +167,18 @@ function serialize(range: Range, host: HTMLElement): { range: Range; text: strin
   return { range, text: fragment.textContent ?? '', atoms };
 }
 
-/** Tokens back to the chips' own text: for what the user reads (panels, history), never for writing. */
+/**
+ * Tokens back to the chips' own text: for what the user reads (panels, history), never for writing.
+ * A quoted earlier message reads as nothing -- it isn't the user's text, and its header would run into it.
+ */
 export function plainText(selection: EditableSelection | null, text: string): string {
   const atoms = selection?.kind === 'content-editable' ? selection.atoms : undefined;
-  return atoms ? text.replace(/\{\{(\d+)\}\}/g, (token, n) => atoms[Number(n) - 1]?.textContent ?? token) : text;
+  if (!atoms) return text;
+  return text.replace(/\{\{(\d+)\}\}/g, (token, n) => {
+    const atom = atoms[Number(n) - 1];
+    if (!atom) return token;
+    return atom.matches(QUOTE) ? '' : (atom.textContent ?? '');
+  });
 }
 
 /** The field's bottom-right corner, where its icon sits. */
