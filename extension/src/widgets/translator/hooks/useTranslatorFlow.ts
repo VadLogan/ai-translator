@@ -831,17 +831,27 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
   /**
    * The grammar panel on the dictated text: a skeleton, then the fix. Its Replace / Ignore edit the
    * panel's copy only. The sentences fixed while the user spoke are reused (`dictationFix`), so
-   * usually only the last one is still asked.
+   * usually only the last one is still asked. While some are still pending, the panel shows the
+   * sentences fixed so far (`loading`), and each answer fills in more.
    */
   async function fixDictation(text: string): Promise<void> {
-    const panel = (fix: FixGrammarOk | null): Screen => ({ kind: 'grammar', fix, index: 0, base: 0, field: false, dictated: true });
-    show(panel(null));
+    show({ kind: 'grammar', fix: null, index: 0, base: 0, field: false, dictated: true });
     const id = generation.current;
-    const answer = await dictationFix.finish(text);
+    // A fix of `text` onto the panel, whose copy a Replace on an earlier part may have edited meanwhile.
+    const update = (fix: FixGrammarOk, loading: boolean): void => {
+      const { screen, dictation: said } = latest.current;
+      if (id !== generation.current || screen.kind !== 'grammar' || !screen.dictated || !said) return; // closed
+      const rebased = said.text === text ? fix : carryOver(said.text, { text, fix });
+      if (!rebased) return loading ? undefined : show({ ...screen, loading: false });
+      const left = visibleEdits(latest.current, rebased).length;
+      if (loading && !left) return; // nothing to show yet: the skeleton stays
+      show({ ...screen, fix: rebased, index: Math.max(0, Math.min(screen.index, left - 1)), loading });
+    };
+    const answer = await dictationFix.finish(text, (fix) => update(fix, true));
     if (id !== generation.current) return;
     const { screen } = latest.current;
     if (screen.kind !== 'grammar' || !screen.dictated) return; // closed
-    if (answer.ok) return show(panel(answer.data));
+    if (answer.ok) return update(answer.data, false);
     if (answer.error.code === 'unauthenticated') return show({ kind: 'signIn' });
     fail(`${answer.error.message} You said: “${text}”`, 'close');
   }

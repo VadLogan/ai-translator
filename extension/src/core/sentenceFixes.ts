@@ -2,6 +2,8 @@ import type { FixGrammarOk } from '../../../shared/contract';
 import type { Response } from '../messaging/messages';
 import { cleanFix, isFinished, mergeFixes, type Chunk } from './fixEdits';
 
+const isVerdict = (code: string | undefined) => code === 'mistyped' || code === 'gibberish';
+
 const LIMIT = 2; // fixes in flight while the user speaks
 
 type Ask = (text: string, id: string) => Promise<Response<FixGrammarOk>>;
@@ -50,16 +52,19 @@ export function sentenceFixes(ask: Ask, cancel: (id: string) => void) {
       }
     },
 
-    async finish(text: string): Promise<Response<FixGrammarOk>> {
+    /** `onProgress`: the fix of the sentences answered so far (the rest left as said), each time one answers while others are pending. */
+    async finish(text: string, onProgress?: (fix: FixGrammarOk) => void): Promise<Response<FixGrammarOk>> {
       const parts = sentences(text);
-      const answers = await Promise.all(parts.map((part) => fixOf(part.text)));
-      const failed = answers.find((answer) => !answer.ok && answer.error.code !== 'mistyped' && answer.error.code !== 'gibberish');
+      const fixes: (FixGrammarOk | undefined)[] = parts.map(() => undefined);
+      const merged = () => mergeFixes(text, parts.flatMap((chunk, i) => (fixes[i] ? [{ chunk, fix: fixes[i] }] : [])));
+      const answers = await Promise.all(parts.map((part, i) => fixOf(part.text).then((answer) => {
+        fixes[i] = answer.ok ? answer.data : isVerdict(answer.error.code) ? cleanFix(part.text) : undefined;
+        if (fixes[i] && fixes.includes(undefined)) onProgress?.(merged());
+        return answer;
+      })));
+      const failed = answers.find((answer) => !answer.ok && !isVerdict(answer.error.code));
       if (failed && !failed.ok) return failed;
-      const fixes = parts.map((chunk, i) => {
-        const answer = answers[i]!;
-        return { chunk, fix: answer.ok ? answer.data : cleanFix(chunk.text) };
-      });
-      return { ok: true, data: mergeFixes(text, fixes) };
+      return { ok: true, data: merged() };
     },
 
     /** A new dictation: what is in flight is cancelled, nothing is reused. */

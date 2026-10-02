@@ -11,7 +11,7 @@ import { Text } from './typography';
  * wrapped in `<span class="fix" data-original>`; absent while the fix is loading (a skeleton).
  * `edits` are the ones still showing, in `html`'s span order minus the ignored ones; `index` is the
  * shown one. `ignored` are the span positions to draw as their original text. `loading`: `html` is
- * an earlier fix, still shown while the latest one loads.
+ * what is fixed so far (or an earlier fix), shown while the rest loads.
  */
 export interface GrammarView {
   html?: string;
@@ -38,18 +38,17 @@ export function GrammarPanel({ view }: { view: GrammarView }) {
   return (
     <>
       <div className="flex h-10 items-center gap-2 pl-2.5 pr-1">
-        {loading ? (
+        {loading || view.loading ? (
           <Spinner size="sm" className="text-tm-accent" />
         ) : (
           <span className="flex size-5 items-center justify-center rounded-full bg-tm-success text-tm-ink">
             <Icon name="check" size={11} strokeWidth={3.4} />
           </span>
         )}
-        <Text variant="label">{loading ? 'Checking grammar…' : count ? 'Grammar fixed' : 'Nothing to fix'}</Text>
-        {/* An earlier fix stays readable while the latest one loads. */}
-        {view.loading && <Spinner size="sm" aria-label="Updating" className="scale-75 text-tm-accent" />}
+        {/* What is fixed so far stays readable while the rest loads. */}
+        <Text variant="label">{loading ? 'Checking grammar…' : view.loading ? 'Checking the rest…' : count ? 'Grammar fixed' : 'Nothing to fix'}</Text>
         <span className="grow" />
-        {count > 0 && <Text variant="meta" className="pr-1.5">{count === 1 ? '1 change' : `${count} changes`}</Text>}
+        {count > 0 && <Text variant="meta" className="pr-1.5">{count === 1 ? '1 change' : `${count} changes`}{view.loading && ' so far'}</Text>}
       </div>
       {loading ? (
         <div aria-busy className="mx-1 flex flex-col gap-2 rounded-2xl bg-tm-subtle px-3 py-3.5">

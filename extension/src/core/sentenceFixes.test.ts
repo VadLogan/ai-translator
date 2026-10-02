@@ -73,3 +73,17 @@ it('cancels what is in flight on reset', () => {
   expect(cancel).toHaveBeenCalledTimes(1);
 });
 
+
+it('reports the sentences fixed so far while others are pending', async () => {
+  let release!: () => void;
+  const held = new Promise<void>((resolve) => (release = resolve));
+  const ask = vi.fn(async (text: string) => (text.startsWith('They') ? held.then(() => fake(text)) : fake(text)));
+  const progress = vi.fn();
+  const answer = sentenceFixes(ask, vi.fn()).finish('I has send it. They was happy.', progress);
+  await flush();
+  expect(progress).toHaveBeenCalledTimes(1);
+  expect(progress.mock.calls[0]![0].text).toBe('I sent it. They was happy.');
+  release();
+  expect((await answer).ok && (await answer as { data: FixGrammarOk }).data.text).toBe('I sent it. They were happy.');
+  expect(progress).toHaveBeenCalledTimes(1); // the last answer is finish's own
+});

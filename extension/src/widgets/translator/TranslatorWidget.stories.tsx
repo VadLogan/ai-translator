@@ -167,7 +167,7 @@ export const GrammarNative = story({
   ignored: [0],
 });
 
-/** An earlier fix shown while the latest one loads: the text stays, a spinner beside the title. */
+/** What is fixed so far, shown while the rest loads: a spinner and "Checking the rest…" in the title. */
 export const GrammarUpdating = story({
   kind: 'grammar',
   lang: 'en',
