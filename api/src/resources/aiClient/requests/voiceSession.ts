@@ -1,5 +1,6 @@
 import type { VoiceSessionOk } from '../../../../../shared/contract.ts';
 import { LIVE_TRANSCRIBE_MODEL, client } from '../client.ts';
+import { DICTATION_PROMPT } from './dictationPrompt.ts';
 
 // Long enough to open the socket; the session itself outlives the secret.
 const SECRET_SECONDS = 120;
@@ -17,7 +18,7 @@ export async function voiceSession(): Promise<VoiceSessionOk> {
       audio: {
         input: {
           format: { type: 'audio/pcm', rate: 24000 },
-          transcription: { model: LIVE_TRANSCRIBE_MODEL },
+          transcription: { model: LIVE_TRANSCRIBE_MODEL, prompt: DICTATION_PROMPT },
           noise_reduction: { type: 'near_field' },
           turn_detection: null,
         },
