@@ -27,9 +27,9 @@ export const HISTORY_LIMIT = 200;
 
 const item = storage.defineItem<HistoryEntry[]>('local:popupHistory', { fallback: [] });
 
-/** Newest first, capped. */
+/** Newest first, capped. An entry with an existing `at` replaces it (a grammar fix run rewriting its one entry). */
 export const withEntry = (list: readonly HistoryEntry[], entry: HistoryEntry): HistoryEntry[] =>
-  [entry, ...list].slice(0, HISTORY_LIMIT);
+  [entry, ...list.filter((e) => e.at !== entry.at)].slice(0, HISTORY_LIMIT);
 
 /** "PL → EN"; an undetected source shows the target alone; a grammar fix reads "Grammar". */
 export const pairLabel = (entry: HistoryEntry | Pair): string =>
@@ -70,17 +70,19 @@ export function orient(pair: Pair, detected: string | undefined): Pair {
   return { from: detected, to: pair.to };
 }
 
-/** Entries under "Today", "Yesterday", or the weekday / date, in list order. */
+/** "Today", "Yesterday", or the weekday / date. */
+export function dayLabel(at: number, now = Date.now()): string {
+  const days = Math.round((new Date(now).setHours(0, 0, 0, 0) - new Date(at).setHours(0, 0, 0, 0)) / DAY);
+  return days <= 0 ? 'Today'
+    : days === 1 ? 'Yesterday'
+    : new Date(at).toLocaleDateString('en', days < 7 ? { weekday: 'long' } : { day: 'numeric', month: 'long' });
+}
+
+/** Entries under their `dayLabel`, in list order. */
 export function byDay(list: readonly HistoryEntry[], now = Date.now()): { day: string; entries: HistoryEntry[] }[] {
-  const today = new Date(now).setHours(0, 0, 0, 0);
   const groups: { day: string; entries: HistoryEntry[] }[] = [];
   for (const entry of list) {
-    const start = new Date(entry.at).setHours(0, 0, 0, 0);
-    const days = Math.round((today - start) / DAY);
-    const day =
-      days <= 0 ? 'Today'
-      : days === 1 ? 'Yesterday'
-      : new Date(entry.at).toLocaleDateString('en', days < 7 ? { weekday: 'long' } : { day: 'numeric', month: 'long' });
+    const day = dayLabel(entry.at, now);
     const last = groups.at(-1);
     if (last?.day === day) last.entries.push(entry);
     else groups.push({ day, entries: [entry] });

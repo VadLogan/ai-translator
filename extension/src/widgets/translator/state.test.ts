@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { answered, applyEdits, badge, cleanCheck, countFixes, showsUnderlines, visibleEdits, withoutEdit, grammarCount, hasEnoughWords, isChecking, isMistyped, detectedLang, hidden, isMenuOpen, menuLanguages, menuShortcuts, pairTarget, reducer } from './state';
+import { answered, applyEdits, badge, followEdit, cleanCheck, countFixes, showsUnderlines, visibleEdits, withoutEdit, grammarCount, hasEnoughWords, isChecking, isMistyped, detectedLang, hidden, isMenuOpen, menuLanguages, menuShortcuts, pairTarget, reducer } from './state';
 import type { EditableSelection } from '../../content/selection';
 import { findLanguage } from '../../core/languages';
 
@@ -225,4 +225,14 @@ it('counts words for the background check, CJK included', () => {
   expect(hasEnoughWords('hello there , !')).toBe(false);
   expect(hasEnoughWords('hello there friend')).toBe(true);
   expect(hasEnoughWords('我今天去学校')).toBe(true);
+});
+
+it('followEdit keeps the shown edit across a newer fix, else the one nearest it', () => {
+  const edit = (start: number, original: string, replacement: string) => ({ start, end: start + original.length, original, replacement, kind: 'error' as const, reason: '' });
+  const shown = edit(10, 'teh', 'the');
+  const newer = [edit(0, 'i', 'I'), edit(4, 'teh', 'the'), edit(14, 'teh', 'the'), edit(30, 'recieve', 'receive')];
+  expect(followEdit(shown, newer)).toBe(2); // same edit, nearest its old start
+  expect(followEdit(edit(28, 'gone', 'x'), newer)).toBe(3); // gone: the nearest one
+  expect(followEdit(shown, [])).toBe(-1);
+  expect(followEdit(undefined, newer)).toBe(0);
 });

@@ -3,8 +3,8 @@ import type { ReactNode } from 'react';
 import { GrammarPanel, type GrammarView } from '../components/GrammarPanel';
 import { Recording } from '../components/Recording';
 import { findLanguage } from '../core/languages';
-import optionsMeta from '../popups/options/OptionsPage.stories';
-import { OptionsPage } from '../popups/options/OptionsPage';
+import settingsMeta from '../popups/settings/SettingsPage.stories';
+import { SettingsPage } from '../popups/settings/SettingsPage';
 import { HISTORY, noop } from '../popups/toolbar/fixtures';
 import { PopupFrame } from '../popups/toolbar/Popup';
 import historyMeta from '../popups/toolbar/screens/History.stories';
@@ -143,9 +143,9 @@ const HistoryVoice = () => (
 );
 
 const OptionsMic = () => (
-  <Block title="OptionsPage.tsx — Microphone card (one grant for the offscreen recorder; picked out on options.html#mic)">
+  <Block title="SettingsPage.tsx — Microphone card (one grant for the offscreen recorder; picked out on options.html#mic)">
     <div className="w-[680px] overflow-hidden rounded-xl ring-1 ring-tm-subtle">
-      <OptionsPage {...optionsMeta.args} account={{ email: 'you@example.com' }} mic="prompt" micRequested />
+      <SettingsPage {...settingsMeta.args} mic="prompt" micRequested />
     </div>
   </Block>
 );

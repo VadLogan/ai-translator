@@ -167,7 +167,7 @@ export const GrammarNative = story({
   ignored: [0],
 });
 
-/** What is fixed so far, shown while the rest loads: a spinner and "Checking the rest…" in the title. */
+/** What is fixed so far, shown while the rest loads: a spinner and "Checking the rest…" in the title, the count a skeleton. */
 export const GrammarUpdating = story({
   kind: 'grammar',
   lang: 'en',

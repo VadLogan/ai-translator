@@ -16,7 +16,10 @@ popups/toolbar/         the toolbar popup
   ToolbarPopup.tsx      container: composes hooks, picks the screen
   hooks/                useTranslation, useHistory, useActiveSite, usePinned, useDictation, useGrammarFix
   screens/              Home, History, Languages, entries (HistoryRow, HistoryCard); stories beside each
-popups/options/         OptionsApp (container) + OptionsPage (presentational)
+popups/settings/        the settings page (options.html)
+  SettingsApp.tsx       container: composes hooks
+  hooks/                useAccount, useSettings, useDisabledFields, useMicPermission, useShortcuts, useHash, useVocabulary
+  SettingsPage.tsx AddLanguage.tsx Vocabulary.tsx   presentational, story beside the page
 content/                DOM domain logic shared by the widget and the popup's Insert: selection, replace, insert
 core/                   pure logic shared by the surfaces, each file with its test: languages, layout, sites,
                         fixEdits (fix helpers), pcm, liveTranscript, liveLanguage, sentenceFixes (voice input)

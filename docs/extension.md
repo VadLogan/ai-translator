@@ -43,7 +43,7 @@ flowchart TB
 | **Background worker** | `src/entrypoints/background.ts` | The only API caller; access token + refresh; `url` from `sender.tab`; aborts in-flight requests by id; sign-in; settings pull/save; drives the recorder; forwards level ticks | `host_permissions` exempt it from page CORS and mixed content; `chrome.identity` only works here; a page can't forge `sender` |
 | **Content script** | `src/entrypoints/content.ts` (`<all_urls>`, `allFrames`, `document_idle`) | Mounts the widget; answers the popup's `insert` | Needs the page DOM |
 | **Toolbar popup** | `src/entrypoints/popup/` → `popups/toolbar/ToolbarPopup.tsx` | Standalone translator, history, pins, site switch, dictation, Insert | `action.default_popup` |
-| **Options page** | `src/entrypoints/options/` → `popups/options/` | Sign-in, favorites, disabled sites, turned-off fields, mic permission (`#mic`) | The only context that can show the mic permission prompt for the extension |
+| **Settings page** (options) | `src/entrypoints/options/` → `popups/settings/` | Sign-in, your languages, disabled sites, turned-off fields, mic permission (`#mic`), shortcuts | The only context that can show the mic permission prompt for the extension |
 | **Offscreen document** | `src/entrypoints/offscreen/` | `getUserMedia`, MediaRecorder file, PCM tap, Realtime socket, silence/60 s stop | Worker has no `getUserMedia`; a content script would ask every site for the mic |
 
 The worker is killed between events: nothing is kept in memory across requests except the
@@ -98,7 +98,8 @@ extension/
     popups/
       toolbar/                  ToolbarPopup (container), hooks/ (useTranslation, useHistory, useActiveSite,
                                 usePinned, useDictation, useGrammarFix), screens/ (Home, History, Languages, entries)
-      options/                  OptionsApp (container), OptionsPage (presentational), useMicPermission
+      settings/                 SettingsApp (container), hooks/ (useAccount, useSettings, useDisabledFields,
+                                useMicPermission, useShortcuts, useHash), SettingsPage + AddLanguage (presentational)
     demo/                       Storybook demo story
 ```
 
@@ -234,11 +235,14 @@ another" versions in memory), `useHistory`, `useActiveSite` (per-site switch wri
 (pin toggles, search, A–Z), `History` (day groups, pair filter tabs, Starred, single Undo). The popup
 has no tab `url` (worker sends none), so its history entries have an empty `site`.
 
-### 7.4 Options page (`popups/options/`)
+### 7.4 Settings page (`popups/settings/`, served as `options.html`)
 
-Account (Google / Facebook), favorite languages, disabled sites (one hostname per line, pasted urls
-reduced to hostnames), turned-off fields with "Turn back on", Microphone card (`#mic` deep link opened
-by the worker on `mic-blocked`).
+Sidebar of `#section` anchors, then: Account (Google / Facebook); your languages as chips (remove, or
+"Add a language" search; saved on every change, menu order = list order, at least one kept); disabled
+sites (one hostname per line, pasted urls reduced to hostnames, explicit Save); turned-off fields with
+"Turn back on"; Microphone (`#mic` deep link opened by the worker on `mic-blocked`); Shortcuts: the
+popup key from `commands._execute_action` (Chrome-owned, so "Change" opens `chrome://extensions/shortcuts`),
+plus the fixed ⌘ ↵ and menu digits 1–9 shown as text.
 
 ### 7.5 Voice pipeline (extension specifics)
 

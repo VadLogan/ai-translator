@@ -31,6 +31,7 @@ export function ToolbarPopup() {
     onError: translation.fail,
     onPreview: translation.previewDictation,
     onText: (text, lang) => {
+      grammar.endRun();
       const next = translation.dictated(text, lang);
       if (next === 'grammar') grammar.start(text, true, dictation.fixer);
       else if (next === 'pick') setScreen({ pick: 'into' });
@@ -40,6 +41,7 @@ export function ToolbarPopup() {
   const home = () => (history.dropUndo(), setScreen('home'));
   const restore = (entry: HistoryEntry) => {
     home();
+    grammar.endRun();
     translation.restore(entry);
   };
 

@@ -6,9 +6,9 @@
     "semantic_hash": "5cd31cd6f33b4507444048e090387d33"
   },
   "CLAUDE.md": {
-    "mtime": 1791197438.6535919,
-    "seen": 1791197449.428957,
-    "ast_hash": "6996413dcdd6c9bf0441fa7edbd3b66b",
+    "mtime": 1791190668.552397,
+    "seen": 1791190673.9619682,
+    "ast_hash": "f7f50f288a02fb7952203851b415f2f4",
     "semantic_hash": ""
   },
   ".claude/settings.json": {
@@ -174,9 +174,9 @@
     "semantic_hash": "993d0686793d619efae245bcfa20faea"
   },
   "extension/wxt.config.ts": {
-    "mtime": 1791194796.233053,
-    "seen": 1791197449.428693,
-    "ast_hash": "5181ecd07ecdea29d558fc1494dc7a11",
+    "mtime": 1790866241.8159115,
+    "seen": 1791189353.732244,
+    "ast_hash": "4cfada7de63b8af487604056a7264677",
     "semantic_hash": ""
   },
   "shared/contract.ts": {
@@ -390,9 +390,9 @@
     "semantic_hash": ""
   },
   "extension/src/entrypoints/options/main.tsx": {
-    "mtime": 1791194796.2100418,
-    "seen": 1791197449.427831,
-    "ast_hash": "0242d3c775c5c3c04ce7a5ccf496dfb7",
+    "mtime": 1790866241.7897117,
+    "seen": 1791189353.732212,
+    "ast_hash": "9e969f8d7d8f46ef88af66b2c4af417f",
     "semantic_hash": ""
   },
   "api/src/controllers/fix-grammar.ts": {
@@ -660,15 +660,15 @@
     "semantic_hash": ""
   },
   "extension/src/settings/history.test.ts": {
-    "mtime": 1791194796.2202332,
-    "seen": 1791197449.428185,
+    "mtime": 1791189313.0045164,
+    "seen": 1791189353.732225,
     "ast_hash": "2a60b4cf0edc72ab88258619d02c7f07",
     "semantic_hash": ""
   },
   "extension/src/settings/history.ts": {
-    "mtime": 1791194796.2232087,
-    "seen": 1791197449.428185,
-    "ast_hash": "1077a07e5dd59d72d3687776073594c6",
+    "mtime": 1791189313.003627,
+    "seen": 1791189353.7322261,
+    "ast_hash": "c14cc9308dbcfce3a7f9fcff485b8dcb",
     "semantic_hash": ""
   },
   "extension/src/entrypoints/popup/index.html": {
@@ -785,6 +785,24 @@
     "ast_hash": "ca4fe0a313c712d29eb21d0881bef63a",
     "semantic_hash": ""
   },
+  "extension/src/popups/options/OptionsApp.tsx": {
+    "mtime": 1790866241.7931888,
+    "seen": 1791189353.732214,
+    "ast_hash": "0130553ee3944acf95ff23f7a0306e9f",
+    "semantic_hash": ""
+  },
+  "extension/src/popups/options/OptionsPage.stories.tsx": {
+    "mtime": 1790866241.7936442,
+    "seen": 1791189353.732215,
+    "ast_hash": "45c2a2e44684706087297a43419f6148",
+    "semantic_hash": ""
+  },
+  "extension/src/popups/options/OptionsPage.tsx": {
+    "mtime": 1790866241.7944114,
+    "seen": 1791189353.732215,
+    "ast_hash": "0f13897c3163904cd8af8d673df8eb7a",
+    "semantic_hash": ""
+  },
   "extension/src/popups/toolbar/Popup.tsx": {
     "mtime": 1790866241.7951853,
     "seen": 1791189353.7322161,
@@ -792,8 +810,8 @@
     "semantic_hash": ""
   },
   "extension/src/popups/toolbar/ToolbarPopup.tsx": {
-    "mtime": 1791194796.2136683,
-    "seen": 1791197449.4279108,
+    "mtime": 1791190636.6573026,
+    "seen": 1791190673.960638,
     "ast_hash": "a2eb521d937ad480b931e838e9f468ae",
     "semantic_hash": ""
   },
@@ -870,9 +888,9 @@
     "semantic_hash": ""
   },
   "extension/src/widgets/translator/TranslatorWidget.stories.tsx": {
-    "mtime": 1791197438.652808,
-    "seen": 1791197449.428242,
-    "ast_hash": "3f5461c2b623eae88252a68f286e97ef",
+    "mtime": 1790936497.3137686,
+    "seen": 1791189353.732228,
+    "ast_hash": "c57449c5b9cd46c0004fa5956036b8af",
     "semantic_hash": ""
   },
   "extension/src/widgets/translator/TranslatorWidget.tsx": {
@@ -912,9 +930,9 @@
     "semantic_hash": ""
   },
   "extension/src/widgets/translator/hooks/useTranslatorFlow.ts": {
-    "mtime": 1791197393.1013987,
-    "seen": 1791197449.428434,
-    "ast_hash": "b4edf6c0577ec8a8d16d4d820bfca30b",
+    "mtime": 1791190616.2201092,
+    "seen": 1791190673.961298,
+    "ast_hash": "81d3d5bc77d566325a65c58857815ea8",
     "semantic_hash": ""
   },
   "extension/src/widgets/translator/mount.ts": {
@@ -966,15 +984,15 @@
     "semantic_hash": ""
   },
   "extension/src/widgets/translator/state.test.ts": {
-    "mtime": 1791197371.9210188,
-    "seen": 1791197449.428632,
-    "ast_hash": "9597368e8d179084c079e88f418f6af4",
+    "mtime": 1790866241.8132448,
+    "seen": 1791189353.732241,
+    "ast_hash": "4c764f9bfb0997c08c3adfd78e89492d",
     "semantic_hash": ""
   },
   "extension/src/widgets/translator/state.ts": {
-    "mtime": 1791197371.9215038,
-    "seen": 1791197449.428633,
-    "ast_hash": "3991de17b4c03ae35385267e256d2162",
+    "mtime": 1790866241.8138463,
+    "seen": 1791189353.732241,
+    "ast_hash": "d8c4c925790f5fc6be7a929571d13841",
     "semantic_hash": ""
   },
   "extension/src/widgets/translator/view.test.ts": {
@@ -990,9 +1008,9 @@
     "semantic_hash": ""
   },
   ".claude/rules/extension-ui.md": {
-    "mtime": 1791194807.043485,
-    "seen": 1791197449.428759,
-    "ast_hash": "9277e936005123daee3e44da41b984bd",
+    "mtime": 1790866241.7175577,
+    "seen": 1791189353.732248,
+    "ast_hash": "9dda72031a41a1783a47c7978c229a27",
     "semantic_hash": ""
   },
   "extension/src/popups/toolbar/hooks/usePinned.ts": {
@@ -1038,8 +1056,8 @@
     "semantic_hash": ""
   },
   "extension/src/widgets/translator/hooks/useUnderlines.ts": {
-    "mtime": 1791194796.229826,
-    "seen": 1791197449.428434,
+    "mtime": 1790946966.5777504,
+    "seen": 1791189353.732234,
     "ast_hash": "d868598abef375a3d2767c750233d3a8",
     "semantic_hash": ""
   },
@@ -1110,9 +1128,9 @@
     "semantic_hash": ""
   },
   "extension/src/components/GrammarPanel.tsx": {
-    "mtime": 1791197417.5107274,
-    "seen": 1791197449.4272552,
-    "ast_hash": "a96ffbebb5115c7e5a9c6b8effead7db",
+    "mtime": 1790940651.3652496,
+    "seen": 1791189353.732191,
+    "ast_hash": "bb24564cba2160d2e3b126325e38164d",
     "semantic_hash": ""
   },
   "extension/src/components/Recording.tsx": {
@@ -1139,6 +1157,12 @@
     "ast_hash": "0a0975b5d4000ccae4da95806792877c",
     "semantic_hash": ""
   },
+  "extension/src/popups/options/useMicPermission.ts": {
+    "mtime": 1790866241.7948546,
+    "seen": 1791189353.7322161,
+    "ast_hash": "72efe0db52881e6d318a03e5251246f7",
+    "semantic_hash": ""
+  },
   "extension/src/popups/toolbar/hooks/useDictation.ts": {
     "mtime": 1790866241.7972243,
     "seen": 1791189353.732219,
@@ -1146,8 +1170,8 @@
     "semantic_hash": ""
   },
   "extension/src/popups/toolbar/hooks/useGrammarFix.ts": {
-    "mtime": 1791194796.2170248,
-    "seen": 1791197449.427972,
+    "mtime": 1791190636.6568766,
+    "seen": 1791190673.9607098,
     "ast_hash": "c3daede0d1e0c15f6cb19c68106f0e12",
     "semantic_hash": ""
   },
@@ -1224,9 +1248,9 @@
     "semantic_hash": ""
   },
   "extension/src/demo/Session1.stories.tsx": {
-    "mtime": 1791194796.2067251,
-    "seen": 1791197449.427779,
-    "ast_hash": "1e39476bd78166667315440c95c7e55b",
+    "mtime": 1790866241.7870119,
+    "seen": 1791189353.73221,
+    "ast_hash": "305c77e8d1bad3aa08c31417ac0aad2c",
     "semantic_hash": ""
   },
   ".claude/skills/demo/SKILL.md": {
@@ -1290,93 +1314,15 @@
     "semantic_hash": ""
   },
   "docs/extension.md": {
-    "mtime": 1791194796.2003593,
-    "seen": 1791197449.428996,
-    "ast_hash": "d23bad6c1eca2b92b40558fddbd748d4",
+    "mtime": 1790866241.766009,
+    "seen": 1791189353.732258,
+    "ast_hash": "53bc815ed454ae0da206cfb24ad7638a",
     "semantic_hash": ""
   },
   "docs/frontend.md": {
     "mtime": 1790866241.76668,
     "seen": 1791189353.732258,
     "ast_hash": "d70f9639cfb335bc3ca16afa20647b9f",
-    "semantic_hash": ""
-  },
-  "extension/src/popups/settings/AddLanguage.tsx": {
-    "mtime": 1791192749.252329,
-    "seen": 1791197449.427884,
-    "ast_hash": "dbcad75ce9076914fe9b8c80d8adb3b9",
-    "semantic_hash": ""
-  },
-  "extension/src/popups/settings/SettingsApp.tsx": {
-    "mtime": 1791194639.861155,
-    "seen": 1791197449.427885,
-    "ast_hash": "ee2b83c4555da302e94bb2d56554b45a",
-    "semantic_hash": ""
-  },
-  "extension/src/popups/settings/SettingsPage.stories.tsx": {
-    "mtime": 1791194639.8615022,
-    "seen": 1791197449.427885,
-    "ast_hash": "921a7a6b747162aded1d2147c2baff2f",
-    "semantic_hash": ""
-  },
-  "extension/src/popups/settings/SettingsPage.tsx": {
-    "mtime": 1791194639.8606048,
-    "seen": 1791197449.427886,
-    "ast_hash": "bdb35caa05f905810eaa40467fbf357b",
-    "semantic_hash": ""
-  },
-  "extension/src/popups/settings/Vocabulary.tsx": {
-    "mtime": 1791194771.2138293,
-    "seen": 1791197449.427886,
-    "ast_hash": "baba26c5a3fde5fca03fdf1b8316a335",
-    "semantic_hash": ""
-  },
-  "extension/src/popups/settings/hooks/useAccount.ts": {
-    "mtime": 1791192700.5389686,
-    "seen": 1791197449.4278872,
-    "ast_hash": "4bcb0f2a486ac0a767dff95f67dcd1a0",
-    "semantic_hash": ""
-  },
-  "extension/src/popups/settings/hooks/useDisabledFields.ts": {
-    "mtime": 1791192700.863083,
-    "seen": 1791197449.4278882,
-    "ast_hash": "c95e3ef43ea15c109b9c8579620f6dfd",
-    "semantic_hash": ""
-  },
-  "extension/src/popups/settings/hooks/useHash.ts": {
-    "mtime": 1791192701.1814754,
-    "seen": 1791197449.4278882,
-    "ast_hash": "4aa6c3319ceecb27e1668b379e93d817",
-    "semantic_hash": ""
-  },
-  "extension/src/popups/settings/hooks/useMicPermission.ts": {
-    "mtime": 1791194796.2103436,
-    "seen": 1791197449.4278889,
-    "ast_hash": "72efe0db52881e6d318a03e5251246f7",
-    "semantic_hash": ""
-  },
-  "extension/src/popups/settings/hooks/useSettings.ts": {
-    "mtime": 1791192700.704595,
-    "seen": 1791197449.4278889,
-    "ast_hash": "2dfe039d15c1d3a7c5558de4475ed1af",
-    "semantic_hash": ""
-  },
-  "extension/src/popups/settings/hooks/useShortcuts.ts": {
-    "mtime": 1791192701.0216224,
-    "seen": 1791197449.4278898,
-    "ast_hash": "5b224c026dfcc1dadd811682cf9768b2",
-    "semantic_hash": ""
-  },
-  "extension/src/popups/settings/hooks/useVocabulary.ts": {
-    "mtime": 1791194593.3895028,
-    "seen": 1791197449.4278898,
-    "ast_hash": "fec7411c9487ddc6eee6a7a2972fa690",
-    "semantic_hash": ""
-  },
-  "extension/src/settings/vocabulary.ts": {
-    "mtime": 1791194593.2315094,
-    "seen": 1791197449.428221,
-    "ast_hash": "f3f8292b67879ff600107f23ef866f91",
     "semantic_hash": ""
   }
 }

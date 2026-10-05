@@ -13,7 +13,7 @@ import { pinnedLanguages } from '../../../settings/pinned';
 import { storageSettings } from '../../../settings/storage-settings';
 import { replaceSelection } from '../../../content/replace';
 import { caretIn, fieldKey, fieldLabel, getEditableSelection, getFieldAnchor, getFocusedField, getPageSelection, getSelectionAnchor, isSelectionUnchanged, offsetIn, partOf, plainText, wholeField, type EditableSelection, type WritableSelection } from '../../../content/selection';
-import { answered, applyEdits, cleanCheck, countFixes, visibleEdits, withoutEdit, withoutFixEdit, detectedLang, hasEnoughWords, hidden, isMenuOpen, isVerdict, menuShortcuts, pairTarget, reducer, type Check, type Screen, type Verdict } from '../state';
+import { answered, applyEdits, cleanCheck, countFixes, editKey, followEdit, visibleEdits, withoutEdit, withoutFixEdit, detectedLang, hasEnoughWords, hidden, isMenuOpen, isVerdict, menuShortcuts, pairTarget, reducer, type Check, type Screen, type Verdict } from '../state';
 import { toCheck, toDetection, type ViewActions, type WidgetCallbacks } from '../view';
 import { carryOver, cleanFix, isBeingTyped, mergeFixes, splitChunks, splitSentences } from '../chunks';
 import { chunkRequests } from './chunkRequests';
@@ -67,6 +67,9 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
   const gate = useSiteGate(() => close());
   // True while the panel writes one edit into the field: that input is ours and must not close the panel.
   const writingEdit = useRef(false);
+  // One history entry per run of grammar fixes on a field: each Replace rewrites it, so it ends as the final text.
+  // `field`: the whole field's run, which the user's own edits in between don't end; a selection's run ends on any.
+  const fixRun = useRef<{ element: HTMLElement; field: boolean; text: string; result: string; at: number } | null>(null);
   const underlines = useUnderlines(latest, { open: openSuggestion, close: closeSuggestion });
 
   const show = (screen: Screen) => dispatch({ type: 'show', screen });
@@ -210,12 +213,25 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
   }
 
   /** Into the popup's History. Best effort: an orphaned script or full storage must not break the flow. */
-  function remember(entry: DistributiveOmit<HistoryEntry, 'site' | 'at'>, selection: EditableSelection | null = null): void {
+  function remember(entry: DistributiveOmit<HistoryEntry, 'site' | 'at'>, selection: EditableSelection | null = null, at = Date.now()): void {
     const text = plainText(selection, entry.text);
     const result = plainText(selection, entry.result);
     // While a dictation is open, what it produces (its translation, its inserted fix) is marked as spoken.
     const voice = latest.current.dictation ? { voice: true as const } : {};
-    void historyStore.add({ ...entry, text, result, site: location.hostname, at: Date.now(), ...voice }).catch(() => {});
+    void historyStore.add({ ...entry, text, result, site: location.hostname, at, ...voice }).catch(() => {});
+  }
+
+  /**
+   * A fix written into the field. On the same field it extends the run's entry -- typing or undo in
+   * between is an intermediate change, not a new text -- until the field is emptied (sent) or
+   * another field is fixed. A selection's fix extends it only when it continues the last one's text.
+   */
+  function rememberFix(selection: EditableSelection, field: boolean, before: string, after: string): void {
+    const last = fixRun.current;
+    const same = last && last.element === selection.element && last.field === field && (field || last.result === before);
+    const { text, at } = same ? last : { text: before, at: Date.now() };
+    fixRun.current = { element: selection.element, field, text, result: after, at };
+    remember({ kind: 'grammar', text, result: after }, selection, at);
   }
 
   /** The API rejected us: sign in, then resume what was interrupted -- a translation or the grammar check. */
@@ -496,14 +512,19 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
       // Re-select: a paste or autocomplete changes the text with no keyup to refresh it. Only then:
       // a 'select' resets the screen, and this may run before a just-shown panel has rendered.
       if (now.selection.text !== field.text) dispatch({ type: 'select', selection: field, anchor: getFieldAnchor(field), field: true });
-    } else if (screen.kind === 'grammar' && screen.field && (!screen.fix || screen.loading) && !screen.hover && now.selection?.text === field.text) {
-      // A click's skeleton or earlier fix, waiting on the last paragraphs: each answer shows the latest.
-      const left = visibleEdits(latest.current, status.fix).length;
-      const index = Math.max(0, Math.min(screen.index, left - 1));
-      if (verdict) showVerdict(field.text, verdict);
+    } else if (screen.kind === 'grammar' && screen.field && (!screen.fix || screen.loading) && now.selection?.text === field.text) {
+      // A skeleton or an earlier fix (clicked or hovered), waiting on the last paragraphs: each answer
+      // shows the latest, still on the edit the user was reading.
+      const state = latest.current;
+      const shown = screen.fix ? visibleEdits(state, screen.fix)[screen.index] : undefined;
+      const edits = visibleEdits(state, status.fix);
+      const index = Math.max(0, followEdit(shown, edits));
+      // A hover panel sits on its underline: once that edit is gone, back to the icon and the new underlines.
+      if (screen.hover && (!shown || !edits.some((edit) => editKey(edit) === editKey(shown)))) show({ kind: 'icon', field: true });
+      else if (verdict) showVerdict(field.text, verdict);
       else if (error) showCheckError(error);
       else if (status.fixedAll) show({ ...screen, fix: status.fix, index, loading: false });
-      else if (left) show({ ...screen, fix: status.fix, index, loading: true });
+      else if (edits.length) show({ ...screen, fix: status.fix, index, loading: true });
     }
   }
 
@@ -568,6 +589,7 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     const { selection, screen } = latest.current;
     const field = wholeField(selection?.element ?? null);
     if (!field) return scheduleCheck();
+    endFixRunIfEmptied(field);
     const wasChecking = pendingCheck.text !== undefined && pendingCheck.text !== field.text;
     if (wasChecking) pendingCheck.abort();
     if (pendingFix.text !== undefined && pendingFix.text !== field.text) pendingFix.abort();
@@ -589,6 +611,11 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     scheduleCheck();
   }
 
+  /** An emptied field (a chat composer after send, or cleared by hand) holds a new text from here on. */
+  function endFixRunIfEmptied(field: WritableSelection): void {
+    if (!field.text.trim() && fixRun.current?.element === field.element) fixRun.current = null;
+  }
+
   /**
    * The field's DOM changed with no input event: the page wrote it (a chat clearing its composer on
    * send). Re-read it, so the badge never describes text that is gone, then treat it as an edit.
@@ -598,11 +625,12 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     if (writingEdit.current || screen.kind !== 'icon' || !screen.field || !selection) return;
     const field = wholeField(selection.element);
     if (!field || field.text === selection.text) return;
+    endFixRunIfEmptied(field);
     dispatch({ type: 'select', selection: field, anchor: getFieldAnchor(field), field: true });
     onInput();
   }
 
-  function apply(text: string, selection = latest.current.selection): void {
+  function apply(text: string, selection = latest.current.selection, field = false): void {
     if (!selection || selection.kind === 'page') return;
     if (!isSelectionUnchanged(selection)) return fail('The text changed. Try again.', 'close');
     const wholeText = wholeField(selection.element)?.text;
@@ -612,7 +640,7 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     // the icon shows ✓. After close(), to overwrite the skeleton check onInput wrote. A part of the
     // field leaves the rest unchecked, so that one is asked as usual.
     if (selection.text === wholeText) dispatch({ type: 'checked', check: cleanCheck(text) });
-    remember({ kind: 'grammar', text: selection.text, result: text }, selection);
+    rememberFix(selection, field, selection.text, text);
   }
 
   /**
@@ -627,7 +655,12 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     const index = visibleEdits(state).findIndex((e) => e.start === edit.start && e.end === edit.end);
     if (index < 0) return;
     dispatch({ type: 'moved', anchor: { x: line.left - 6, top: line.top, bottom: line.bottom } });
-    show({ kind: 'grammar', fix: check.fix, index, field: true, base: 0, hover: true });
+    // Still fixing some paragraphs: it joins publish's refresh, like a clicked panel. Not on a
+    // settled check (an applied fix, a Replace's rebase): publish leaves those alone, so it would spin for good.
+    const field = state.selection && state.selection.kind !== 'page' && isChunked(state.selection) ? state.selection : null;
+    const status = field && fieldStatus(field.element, field.text);
+    const loading = !!status && !status.fixedAll && !settled(check, status);
+    show({ kind: 'grammar', fix: check.fix, index, field: true, base: 0, hover: true, loading });
   }
 
   function closeSuggestion(): void {
@@ -660,7 +693,7 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     } finally {
       writingEdit.current = false;
     }
-    remember({ kind: 'grammar', text: edit.original, result: edit.replacement }, selection);
+    rememberFix(selection, screen.field, selection.text, applyEdits(selection.text, [edit]));
     const fix = withoutFixEdit(screen.fix, edit);
     const nextCheck = screen.field && check?.fix ? withoutEdit(check, edit) : check;
     const length = selection.text.length + edit.replacement.length - (edit.end - edit.start);
@@ -696,7 +729,7 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     if (!screen.field) return apply(applyEdits(selection.text, visibleEdits(state, screen.fix)));
     const field = wholeField(selection.element);
     if (!field || field.text !== state.check?.text) return fail('The text changed. Try again.', 'close');
-    apply(applyEdits(field.text, visibleEdits(state, screen.fix)), field);
+    apply(applyEdits(field.text, visibleEdits(state, screen.fix)), field, true);
   }
 
   /** The panel's ‹ › and a click on a highlight. */
@@ -843,9 +876,10 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
       if (id !== generation.current || screen.kind !== 'grammar' || !screen.dictated || !said) return; // closed
       const rebased = said.text === text ? fix : carryOver(said.text, { text, fix });
       if (!rebased) return loading ? undefined : show({ ...screen, loading: false });
-      const left = visibleEdits(latest.current, rebased).length;
-      if (loading && !left) return; // nothing to show yet: the skeleton stays
-      show({ ...screen, fix: rebased, index: Math.max(0, Math.min(screen.index, left - 1)), loading });
+      const edits = visibleEdits(latest.current, rebased);
+      if (loading && !edits.length) return; // nothing to show yet: the skeleton stays
+      const shown = screen.fix ? visibleEdits(latest.current, screen.fix)[screen.index] : undefined;
+      show({ ...screen, fix: rebased, index: Math.max(0, followEdit(shown, edits)), loading });
     };
     const answer = await dictationFix.finish(text, (fix) => update(fix, true));
     if (id !== generation.current) return;
@@ -889,7 +923,7 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     close();
   }
 
-  /** Esc, the layout card's F, the grammar panel's ↵ and the menu's digits. Captured and swallowed, or the field would get the keystroke too. */
+  /** Esc, the layout card's F, the grammar panel's ↵ / ⌘ ↵ and the menu's digits. Captured and swallowed, or the field would get the keystroke too. */
   function onKeyDown(event: KeyboardEvent): void {
     const { key } = event;
     if (key === 'Enter' && latest.current.screen.kind === 'recording') {
@@ -917,7 +951,7 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     if (edit && key === 'Enter' && !(screen.kind === 'grammar' && screen.hover && !underlines.isOnCard())) {
       event.preventDefault();
       event.stopPropagation();
-      return replaceEdit(edit);
+      return event.metaKey || event.ctrlKey ? replaceAll() : replaceEdit(edit);
     }
     // Menu shortcut badges: "1".."9" pick the pair's target, then the favorites.
     const code = /^[1-9]$/.test(key) && isMenuOpen(latest.current) ? menuShortcuts(latest.current)[Number(key) - 1] : undefined;

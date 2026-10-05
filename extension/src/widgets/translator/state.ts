@@ -186,6 +186,22 @@ export function withoutEdit(check: Check, edit: FixEdit): Check {
   return { text: applyEdits(check.text, [edit]), errors: fix.edits.length, fix };
 }
 
+/**
+ * Where the shown edit went in a newer fix of the same text: the same edit (`editKey`) nearest its
+ * old start, else whichever edit is nearest that start. -1 = no edits left.
+ */
+export function followEdit(shown: FixEdit | undefined, edits: FixEdit[]): number {
+  if (!edits.length) return -1;
+  if (!shown) return 0;
+  const same = edits.some((edit) => editKey(edit) === editKey(shown));
+  let best = -1;
+  edits.forEach((edit, i) => {
+    if (same && editKey(edit) !== editKey(shown)) return;
+    if (best < 0 || Math.abs(edit.start - shown.start) < Math.abs(edits[best]!.start - shown.start)) best = i;
+  });
+  return best;
+}
+
 /** The edits of `fix` (the check's by default) the user hasn't ignored in this field. */
 export function visibleEdits({ selection, check, ignored }: State, fix = check?.fix): FixEdit[] {
   const edits = fix?.edits ?? [];

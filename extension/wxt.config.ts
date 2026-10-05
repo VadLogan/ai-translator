@@ -30,6 +30,8 @@ export default defineConfig({
     ],
     // default_popup is added by WXT from src/entrypoints/popup/.
     action: { default_title: 'AI Translator' },
+    // The popup's key; the settings page shows it and links to chrome://extensions/shortcuts to change it.
+    commands: { _execute_action: { suggested_key: { default: 'Ctrl+Shift+L', mac: 'Command+Shift+L' } } },
   },
   // Pinned so a dev build always points at the same reload socket; WXT otherwise
   // takes the first free port in 3000-3010, which other projects may already hold.

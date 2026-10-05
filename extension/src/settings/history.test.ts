@@ -25,6 +25,12 @@ describe('withEntry', () => {
     expect(next).toHaveLength(HISTORY_LIMIT);
     expect(next[0]).toMatchObject({ to: 'fr' });
   });
+
+  it('replaces an entry with the same at', () => {
+    const next = withEntry([grammar(NOW), entry('de', NOW - 1)], { ...grammar(NOW), result: 'final' });
+    expect(next).toHaveLength(2);
+    expect(next[0]).toMatchObject({ result: 'final' });
+  });
 });
 
 describe('topPairs', () => {

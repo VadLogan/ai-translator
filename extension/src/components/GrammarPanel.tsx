@@ -48,7 +48,12 @@ export function GrammarPanel({ view }: { view: GrammarView }) {
         {/* What is fixed so far stays readable while the rest loads. */}
         <Text variant="label">{loading ? 'Checking grammar…' : view.loading ? 'Checking the rest…' : count ? 'Grammar fixed' : 'Nothing to fix'}</Text>
         <span className="grow" />
-        {count > 0 && <Text variant="meta" className="pr-1.5">{count === 1 ? '1 change' : `${count} changes`}{view.loading && ' so far'}</Text>}
+        {/* A newer fix is still coming: the count would change under the user, so it shows as loading. */}
+        {view.loading ? (
+          <Skeleton aria-label="Counting changes" className="mr-1.5 h-3 w-16 rounded-full" />
+        ) : (
+          count > 0 && <Text variant="meta" className="pr-1.5">{count === 1 ? '1 change' : `${count} changes`}</Text>
+        )}
       </div>
       {loading ? (
         <div aria-busy className="mx-1 flex flex-col gap-2 rounded-2xl bg-tm-subtle px-3 py-3.5">
@@ -93,7 +98,7 @@ export function GrammarPanel({ view }: { view: GrammarView }) {
                 Replace <Kbd tone="onAccent">↵</Kbd>
               </PillButton>
               <PillButton size="md" onPress={view.onIgnore}>Ignore</PillButton>
-              {count > 1 && <PillButton size="md" onPress={view.onReplaceAll}>Replace all · {count}</PillButton>}
+              {count > 1 && <PillButton size="md" onPress={view.onReplaceAll}>Replace all · {count} <Kbd>⌘ ↵</Kbd></PillButton>}
             </div>
           </div>
         </>

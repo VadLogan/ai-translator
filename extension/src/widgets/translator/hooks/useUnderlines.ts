@@ -44,10 +44,10 @@ export function useUnderlines(latest: { current: State }, { open, close }: { ope
       onPointer(x: number, y: number, overWidget: boolean): void {
         const { screen } = latest.current;
         const showing = screen.kind === 'grammar' && screen.hover && screen.fix ? visibleEdits(latest.current, screen.fix)[screen.index] ?? null : null;
-        onCard.current = overWidget && !!showing;
         const mark = overWidget ? undefined : marksRef.current.find(({ rects }) => rects.some((r) => x >= r.left && x <= r.right && y >= r.top && y <= r.bottom + 2));
         const hit = mark?.edit;
-        if (onCard.current || (hit && showing && sameEdit(hit, showing))) {
+        onCard.current = !!showing && (overWidget || (!!hit && sameEdit(hit, showing)));
+        if (onCard.current) {
           cancelOpen();
           return cancelClose();
         }
@@ -57,6 +57,7 @@ export function useUnderlines(latest: { current: State }, { open, close }: { ope
           cancelOpen();
           const timer = setTimeout(() => {
             opening.current = null;
+            onCard.current = true; // the pointer is on the mark it opens; a still pointer sends no move to say so
             open(hit, mark!.rects[0]!);
           }, OPEN_DELAY);
           opening.current = { edit: hit, timer };
@@ -70,7 +71,7 @@ export function useUnderlines(latest: { current: State }, { open, close }: { ope
         }, CLOSE_DELAY);
       },
       relayout: () => setTick((t) => t + 1),
-      /** The card's ↵ only counts while the pointer is on it, so an Enter typed in the field stays the field's. */
+      /** The card's ↵ only counts while the pointer is on the card or its underline, so an Enter typed in the field stays the field's. */
       isOnCard: () => onCard.current,
     };
   });
