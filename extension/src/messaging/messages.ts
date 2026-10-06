@@ -1,5 +1,5 @@
 import { browser } from 'wxt/browser';
-import type { ApiErrorCode, CheckOk, DetectOk, FixGrammarOk, RewriteOk, RewriteStyle, Settings, TranscribeOk, TranslateOk } from '../../../shared/contract';
+import type { ApiErrorCode, CheckOk, DetectOk, ExplainOk, FixGrammarOk, SummarizeOk, RewriteOk, RewriteStyle, Settings, TranscribeOk, TranslateOk } from '../../../shared/contract';
 import type { ProviderId } from '../auth/providers';
 
 export type Message =
@@ -13,6 +13,9 @@ export type Message =
   | { type: 'check'; text: string; id: string }
   | { type: 'cancel'; id: string }
   | { type: 'rewrite'; text: string; style: RewriteStyle }
+  /** Meeting transcripts: a highlight explained in its line, and the whole dialog's key points. */
+  | { type: 'explain'; text: string; context: string; targetLang: string }
+  | { type: 'summarize'; lines: { speaker: string; text: string }[]; targetLang: string }
   /** Voice input: the offscreen recorder starts; `voice-stop` ends it and transcribes; `voice-cancel` drops it. */
   | { type: 'voice-start' }
   /** `lang`: already detected on the live text, so the worker skips its own /detect. */
@@ -37,6 +40,8 @@ export interface ResponseMap {
   check: CheckOk;
   cancel: void;
   rewrite: RewriteOk;
+  explain: ExplainOk;
+  summarize: SummarizeOk;
   'voice-start': void;
   'voice-stop': TranscribeOk;
   'voice-cancel': void;

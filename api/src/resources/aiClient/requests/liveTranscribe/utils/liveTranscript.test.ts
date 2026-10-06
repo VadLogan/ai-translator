@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { applyEvent, emptyTranscript, isComplete, liveText } from './liveTranscript';
+import { applyEvent, emptyTranscript, isComplete, liveText } from './liveTranscript.ts';
 
 const run = (events: Parameters<typeof applyEvent>[1][]) => events.reduce(applyEvent, emptyTranscript());
 

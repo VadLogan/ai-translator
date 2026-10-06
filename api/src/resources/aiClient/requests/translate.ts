@@ -1,12 +1,15 @@
 import type { TranslateBody, TranslateOk } from '../../../../../shared/contract.ts';
+import { mask } from '../../../utils/exceptions.ts';
 import { MODEL, client } from '../client.ts';
 
 /** Translation only: TranslateBody in, TranslateOk out. Logging and saving live in the route (app.ts). */
 export async function translate(translateBody: TranslateBody): Promise<TranslateOk> {
+  // Brands and code are hidden outright; names and terms stay visible, so the sentence around them still inflects.
+  const masked = mask(translateBody.text, translateBody.exceptions, ['Brand', 'Code']);
   const response = await client.responses.create({
     model: MODEL,
     instructions: AGENT_INSTRUCTION,
-    input: createInput(translateBody),
+    input: createInput({ ...translateBody, text: masked.text }),
       text: {
       format: {
         type: "json_schema",
@@ -32,8 +35,10 @@ export async function translate(translateBody: TranslateBody): Promise<Translate
     },
   })
   const { usage } = response;
+  const result = JSON.parse(response.output_text) as TranslateOk;
   return {
-    ...(JSON.parse(response.output_text) as TranslateOk),
+    ...result,
+    text: masked.restore(result.text),
     // response.model, not the requested one: the provider resolves an alias to a dated snapshot.
     model: response.model,
     ...(usage && {
@@ -57,7 +62,7 @@ Rules:
 - Preserve the original meaning and tone.
 - Do not translate word-for-word if that makes the result unnatural.
 - Keep names, URLs, numbers, emojis, and placeholders unchanged.
-- Tokens like {{1}}, {{2}} stand for @mentions and links: keep each one exactly once and unchanged, placed where the sentence needs it.
+- Tokens like {{1}}, {{2}} stand for @mentions, links and brands the user keeps as written: keep each one exactly once and unchanged, placed where the sentence needs it.
 - Preserve formatting and line breaks.
 
 Validation:
@@ -72,10 +77,12 @@ ignore it if the text is plainly in another language.
 Return the detected source language as a language code such as "en", "pl", "de", or "ua".
 `
 
-function createInput({targetLang, sourceLang, text}: TranslateBody): string {
+function createInput({targetLang, sourceLang, text, exceptions = []}: TranslateBody): string {
+  const names = exceptions.filter((x) => x.kind === 'Name').map((x) => x.term);
+  const terms = exceptions.filter((x) => x.kind === 'Term').map((x) => x.term);
   return  `
 ${sourceLang ? `Source language: ${sourceLang}\n` : ''}Target language: ${targetLang}
-
+${names.length ? `People's names (keep the person, transliterate only into another script): ${names.join(', ')}\n` : ''}${terms.length ? `Terms to keep untranslated: ${terms.join(', ')}\n` : ''}
 Text:
 ${text}
 `

@@ -1,4 +1,5 @@
 import { storage } from 'wxt/utils/storage';
+import type { VocabException } from '../../../shared/contract';
 
 /** A word or phrase the user is learning, with where they met it. */
 export interface VocabWord {
@@ -16,14 +17,7 @@ export interface VocabWord {
   examples: string[];
 }
 
-export const EXCEPTION_KINDS = ['Brand', 'Name', 'Term', 'Code'] as const;
-
-/** A name, brand or term kept exactly as written; `replaces` are wrong forms rewritten to it. */
-export interface VocabException {
-  term: string;
-  kind: (typeof EXCEPTION_KINDS)[number];
-  replaces: string[];
-}
+export { EXCEPTION_KINDS, type VocabException } from '../../../shared/contract';
 
 // Local to this browser for now, like disabled fields: not part of the synced Settings.
 const words = storage.defineItem<VocabWord[]>('local:vocabularyWords', { fallback: [] });
@@ -32,6 +26,11 @@ const exceptions = storage.defineItem<VocabException[]>('local:vocabularyExcepti
 export const vocabulary = {
   words: () => words.getValue(),
   exceptions: () => exceptions.getValue(),
+  /** The same word in the same language replaces its older entry. */
+  async addWord(word: VocabWord): Promise<void> {
+    const list = (await words.getValue()).filter((w) => !(w.word === word.word && w.lang === word.lang));
+    await words.setValue([word, ...list]);
+  },
   async removeWord(word: VocabWord): Promise<void> {
     await words.setValue((await words.getValue()).filter((w) => !(w.word === word.word && w.lang === word.lang)));
   },

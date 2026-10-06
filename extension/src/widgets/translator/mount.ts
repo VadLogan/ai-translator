@@ -22,10 +22,13 @@ export function mountTranslator({ isInvalid }: { isInvalid: () => boolean }): ()
   const container = document.createElement('div');
   shadow.append(style, container);
 
-  // Keep focus and the text selection in the page's input while clicking the widget.
-  shadow.addEventListener('mousedown', (event) => event.preventDefault());
-  // Don't let the page treat clicks on the widget as "outside clicks".
-  for (const type of ['mousedown', 'mouseup', 'click', 'pointerdown', 'pointerup']) {
+  // Keep focus and the text selection in the page's input while clicking the widget -- except on
+  // the widget's own text fields (the exception form), which need the click to focus.
+  shadow.addEventListener('mousedown', (event) => {
+    if (!(event.target instanceof HTMLInputElement && event.target.type === 'text')) event.preventDefault();
+  });
+  // Don't let the page treat clicks on the widget as "outside clicks", or typing in it as its shortcuts.
+  for (const type of ['mousedown', 'mouseup', 'click', 'pointerdown', 'pointerup', 'keydown', 'keyup', 'keypress']) {
     host.addEventListener(type, (event) => event.stopPropagation());
   }
 

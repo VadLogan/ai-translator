@@ -3,6 +3,7 @@ import type { Anchor } from '../../content/selection';
 import { GrammarPanel } from '../../components/GrammarPanel';
 import { Recording } from '../../components/Recording';
 import { DictationBar } from './panels/DictationBar';
+import { ExceptionPanel } from './panels/ExceptionPanel';
 import { LanguagesPanel } from './panels/LanguagesPanel';
 import { LayoutPanel } from './panels/LayoutPanel';
 import { BusyPanel, ErrorPanel, NotTextPanel, SignInPanel } from './panels/notices';
@@ -55,9 +56,9 @@ function Panel({ anchor, view, callbacks }: { anchor: Anchor; view: WidgetView; 
     <div
       ref={ref}
       role="dialog"
-      aria-label={view.kind === 'grammar' ? 'Grammar fixed' : view.kind === 'layout' ? 'Wrong keyboard layout' : view.kind === 'notText' ? "Doesn't look like text" : view.kind === 'recording' ? 'Voice input' : 'Translate selection'}
+      aria-label={view.kind === 'grammar' ? 'Grammar fixed' : view.kind === 'layout' ? 'Wrong keyboard layout' : view.kind === 'notText' ? "Doesn't look like text" : view.kind === 'recording' ? 'Voice input' : view.kind === 'exception' ? 'Add to Exceptions' : 'Translate selection'}
       className={`fixed max-h-[420px] motion-safe:animate-tm-appear overflow-auto rounded-2xl bg-tm-surface p-1.5 shadow-tm-pop ${
-        view.kind === 'grammar' || view.kind === 'recording' || (view.kind === 'languages' && view.translation) ? 'w-[340px]' : view.kind === 'layout' || view.kind === 'notText' ? 'w-[279px]' : 'min-w-[200px] max-w-[280px]'
+        view.kind === 'grammar' || view.kind === 'recording' || view.kind === 'exception' || (view.kind === 'languages' && view.translation) ? 'w-[340px]' : view.kind === 'layout' || view.kind === 'notText' ? 'w-[279px]' : 'min-w-[200px] max-w-[280px]'
       }`}
     >
       <PanelBody view={view} callbacks={callbacks} />
@@ -84,6 +85,8 @@ function PanelBody({ view, callbacks }: { view: WidgetView; callbacks: WidgetCal
       return <LayoutPanel view={view} onFixLayout={callbacks.onFixLayout} />;
     case 'notText':
       return <NotTextPanel />;
+    case 'exception':
+      return <ExceptionPanel view={view} />;
     case 'signIn':
       return <SignInPanel view={view} onOpenSettings={callbacks.onOpenSettings} />;
     case 'error':

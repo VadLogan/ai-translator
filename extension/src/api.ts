@@ -1,4 +1,8 @@
 import type {
+  ExplainBody,
+  ExplainOk,
+  SummarizeBody,
+  SummarizeOk,
   ApiErrorCode,
   CheckBody,
   CheckOk,
@@ -51,13 +55,29 @@ export const check = (body: CheckBody, accessToken: string | null, signal?: Abor
 export const rewrite = (body: RewriteBody, accessToken: string | null, baseUrl = BASE_URL) =>
   call<RewriteOk>('/rewrite', { method: 'POST', body }, accessToken, baseUrl);
 
+/** A highlighted word or phrase of a meeting line, explained in the user's language (Explain and "Add to vocabulary"). */
+export const explain = (body: ExplainBody, accessToken: string | null, baseUrl = BASE_URL) =>
+  call<ExplainOk>('/explain', { method: 'POST', body }, accessToken, baseUrl);
+
+/** A meeting's key points from its whole dialog. */
+export const summarize = (body: SummarizeBody, accessToken: string | null, baseUrl = BASE_URL) =>
+  call<SummarizeOk>('/summarize', { method: 'POST', body }, accessToken, baseUrl);
+
 /** Voice input: multipart `audio` (+ `url`) in, what was said and its language out. */
 export const transcribe = (form: FormData, accessToken: string | null, baseUrl = BASE_URL) =>
   call<TranscribeOk>('/transcribe', { method: 'POST', body: form }, accessToken, baseUrl);
 
-/** A short-lived secret for a live (Realtime) transcription session; the recorder streams the mic with it. */
+/** A short-lived ticket for the live-dictation socket (`voiceSocketUrl`), which the recorder streams the mic to. */
 export const voiceSession = (accessToken: string | null, baseUrl = BASE_URL) =>
   call<VoiceSessionOk>('/voice-session', { method: 'POST' }, accessToken, baseUrl);
+
+/** The API's live-dictation socket, a sibling function of the API's: `…/functions/v1/voice?ticket=…`, ws(s). */
+export const voiceSocketUrl = (ticket: string, baseUrl = BASE_URL): string => {
+  const url = new URL(baseUrl.replace(/\/api\/?$/, '/voice'));
+  url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
+  url.searchParams.set('ticket', ticket);
+  return url.toString();
+};
 
 /** The dev stats: how long one dictation ran. */
 export const reportDictation = (body: DictationBody, accessToken: string | null, baseUrl = BASE_URL) =>

@@ -19,7 +19,7 @@ export async function checkController(c: Context<AppEnv>) {
 
   log.info(`→ ${new Date().toISOString()}`, body);
   try {
-    const { verdict, ...result } = await grammarQuality(body.text, c.req.raw.signal); // the client cancels checks for text it edited
+    const { verdict, ...result } = await grammarQuality(body, c.req.raw.signal); // the client cancels checks for text it edited
     log.info(`← ${ms()}ms`, { verdict, ...result });
     if (verdict) return fail(c, 422, verdict, GUARD_MESSAGES[verdict]);
     return c.json(result);

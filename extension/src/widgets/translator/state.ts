@@ -24,13 +24,15 @@ export type Screen =
    * flight; publish swaps in the latest as they answer.
    */
   /** `dictated`: the fix is of `State.dictation.text`, held in the widget, not of text in the field. */
-  | { kind: 'grammar'; fix: FixGrammarOk | null; index: number; base: number; field: boolean; hover?: boolean; loading?: boolean; dictated?: boolean }
+  | { kind: 'grammar'; fix: FixGrammarOk | null; index: number; base: number; field: boolean; hover?: boolean; loading?: boolean; dictated?: boolean; rechecking?: boolean }
   /** Voice input into the field: listening (`level` 0..1, `ms` and the live `text` from the recorder), then `transcribing` once stopped. */
   | { kind: 'recording'; transcribing?: boolean; level?: number; ms?: number; text?: string }
   /** The guard found a wrong keyboard layout: the local re-type is all that is offered. */
   | { kind: 'layout' }
   /** The guard found random keystrokes: a notice. Nothing else is offered until the text changes. */
   | { kind: 'notText' }
+  /** The menu's "Add to Exceptions": a form for the selected word. */
+  | { kind: 'exception' }
   /** `targetLang`: the translation to resume after signing in; absent = re-run the grammar check. */
   | { kind: 'signIn'; targetLang?: string }
   /** `back` is where the Back item leads: the menu, or nowhere when retrying can't help. */
@@ -219,6 +221,12 @@ export function showsUnderlines(state: State): boolean {
   if (!onField || !selection || selection.kind === 'page' || selection.element?.localName === 'input') return false;
   return !!check?.fix && check.text === selection.text && visibleEdits(state).length > 0;
 }
+
+/** A word or a short name, not a sentence: what "Add to Exceptions" is offered for. */
+export const isShortTerm = (text: string): boolean => {
+  const term = text.trim();
+  return term.length > 0 && term.length <= 60 && term.split(/\s+/).length <= 4;
+};
 
 /** A check that found nothing to fix: text the user just applied from a fix is clean by construction, no request needed. */
 export const cleanCheck = (text: string): Check => ({ text, errors: 0 });

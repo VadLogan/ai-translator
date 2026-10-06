@@ -11,6 +11,19 @@ export interface TranslateBody {
   sourceLang?: string;
   /** Page the extension was used on. The background worker fills it from the sender tab. */
   url?: string;
+  /** The user's exceptions that occur in `text`. Brand / Code are hidden from the model; Name / Term are a prompt hint. */
+  exceptions?: VocabException[];
+}
+
+export const EXCEPTION_KINDS = ['Brand', 'Name', 'Term', 'Code'] as const;
+export type ExceptionKind = (typeof EXCEPTION_KINDS)[number];
+export const MAX_EXCEPTIONS = 50;
+
+/** A name, brand or term kept exactly as written; `replaces` are wrong forms rewritten to it. */
+export interface VocabException {
+  term: string;
+  kind: ExceptionKind;
+  replaces: string[];
 }
 
 export interface TranslateOk {
@@ -27,6 +40,8 @@ export interface DetectBody {
   text: string;
   /** Page the extension was used on. The background worker fills it from the sender tab. */
   url?: string;
+  /** The user's exceptions that occur in `text`, hidden from the model (fix, check, rewrite; detect ignores them). */
+  exceptions?: VocabException[];
 }
 
 export interface DetectOk {
@@ -50,13 +65,23 @@ export interface TranscribeOk {
   model?: string;
 }
 
-/** A short-lived client secret for a live (Realtime) transcription session: the extension streams audio to OpenAI with it. */
+/** POST /voice-session: a pass for the live-dictation socket (`…/functions/v1/voice?ticket=…`). Never a provider secret. */
 export interface VoiceSessionOk {
-  secret: string;
-  /** When the secret stops opening new sessions, in seconds since epoch. */
+  ticket: string;
+  /** When the ticket stops opening sockets, in seconds since epoch. */
   expiresAt: number;
-  model: string;
 }
+
+/** Client → API on the live-dictation socket: base64 PCM16 (24 kHz mono) frames, then `commit` on Stop. */
+export type VoiceClientEvent = { type: 'audio'; audio: string } | { type: 'commit' };
+
+/**
+ * API → client on the live-dictation socket. `ready`: audio can flow (earlier frames are buffered
+ * anyway). `text`: everything heard so far. `done`: the final transcript, after `commit`, with the
+ * model that made it (dev stats, like other responses). `error`: the session failed; fall back to
+ * POST /transcribe.
+ */
+export type VoiceServerEvent = { type: 'ready' } | { type: 'text'; text: string } | { type: 'done'; text: string; model: string } | { type: 'error'; message: string };
 
 /** The dev stats' dictation: how long one recording ran (mic start to Stop) and how many words its transcript has. */
 export interface DictationBody {
@@ -132,6 +157,43 @@ export interface RewriteOk {
   model?: string;
 }
 
+/** Explain a highlighted word or phrase as it is used in its line: Explain and "Add to vocabulary". */
+export interface ExplainBody {
+  /** The highlight, at most MAX_EXPLAIN_LENGTH. */
+  text: string;
+  /** The line it was highlighted in. */
+  context: string;
+  /** The language to explain in (the user's). */
+  targetLang: string;
+  url?: string;
+}
+
+export interface ExplainOk {
+  /** One or two sentences in targetLang: what the highlight means in that line. */
+  meaning: string;
+  /** Two short example sentences in the highlight's own language. */
+  examples: string[];
+  /** The highlight's language. */
+  lang: string;
+  usage?: TokenUsage;
+  model?: string;
+}
+
+/** The whole dialog of a meeting, to pull out what matters. */
+export interface SummarizeBody {
+  lines: { speaker: string; text: string }[];
+  /** The language to write the points in (the user's). */
+  targetLang: string;
+  url?: string;
+}
+
+export interface SummarizeOk {
+  /** 3-7 key points, decisions and follow-ups, in targetLang. */
+  points: string[];
+  usage?: TokenUsage;
+  model?: string;
+}
+
 export interface TokenUsage {
   inputTokens: number;
   outputTokens: number;
@@ -180,6 +242,11 @@ export const MAX_TEXT_LENGTH = 5000;
 export const MAX_FAVORITE_LANGUAGES = 20;
 export const MAX_DISABLED_SITES = 100;
 export const MAX_URL_LENGTH = 2048;
+/** A highlight to explain: a word or a short phrase. */
+export const MAX_EXPLAIN_LENGTH = 200;
+/** A meeting sent to /summarize: lines and their characters in total. */
+export const MAX_SUMMARY_LINES = 400;
+export const MAX_SUMMARY_CHARS = 40_000;
 /** One dictation: 60 s of webm/opus is ~0.5 MB. */
 export const MAX_AUDIO_BYTES = 5 * 1024 * 1024;
 /** Longer than any recording can run (the recorder stops itself at 60 s), so a bad report can't skew the stats. */

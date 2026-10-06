@@ -8,6 +8,9 @@ import { profilesRepository } from './repositories/profiles.ts';
 import { fixGrammar } from './resources/aiClient/requests/fix-grammar/fix-grammar.ts';
 import { correctionsRepository } from './repositories/corrections.ts';
 import { rewrite } from './resources/aiClient/requests/rewrite.ts';
+import { verifyTicket } from './utils/voiceTicket.ts';
+import { explain } from './resources/aiClient/requests/explain.ts';
+import { summarize } from './resources/aiClient/requests/summarize.ts';
 import { rewritesRepository } from './repositories/rewrites.ts';
 import { validateGuard } from './resources/aiClient/requests/validateGuard.ts';
 import { grammarQuality } from './resources/aiClient/requests/grammarQuality.ts';
@@ -24,6 +27,8 @@ vi.mock('./resources/aiClient/requests/detect.ts', () => ({ detectLang: vi.fn(as
 vi.mock('./resources/aiClient/requests/fix-grammar/fix-grammar.ts', () => ({ fixGrammar: vi.fn(async ({ text }) => ({ text: `fixed: ${text}`, html: `fixed: ${text}`, edits: [] })) }));
 vi.mock('./resources/aiClient/requests/validateGuard.ts', () => ({ validateGuard: vi.fn(async () => null), GUARD_MESSAGES: { mistyped: 'mistyped', gibberish: 'gibberish' } }));
 vi.mock('./resources/aiClient/requests/grammarQuality.ts', () => ({ grammarQuality: vi.fn(async () => ({ errors: 2, verdict: null })) }));
+vi.mock('./resources/aiClient/requests/explain.ts', () => ({ explain: vi.fn(async ({ text }) => ({ meaning: `means ${text}`, examples: ['a', 'b'], lang: 'en' })) }));
+vi.mock('./resources/aiClient/requests/summarize.ts', () => ({ summarize: vi.fn(async ({ lines }) => ({ points: [`${lines.length} lines`] })) }));
 vi.mock('./resources/aiClient/requests/rewrite.ts', () => ({ rewrite: vi.fn(async ({ text, style }) => ({ text: `[${style}] ${text}` })) }));
 vi.mock('./resources/aiClient/requests/transcribe.ts', () => ({ transcribe: vi.fn(async () => ({ text: 'hello there', model: 'm' })) }));
 vi.mock('./resources/aiClient/requests/voiceSession.ts', () => ({ voiceSession: vi.fn(async () => ({ secret: 'ek_test', expiresAt: 1, model: 'm' })) }));
@@ -145,6 +150,8 @@ describe('POST /translate', () => {
     ['too long', { text: 'x'.repeat(5001), targetLang: 'de' }],
     ['non-string url', { text: 'Hello', targetLang: 'de', url: 42 }],
     ['oversized url', { text: 'Hello', targetLang: 'de', url: `https://e.com/${'x'.repeat(2048)}` }],
+    ['unknown exception kind', { text: 'Hello', targetLang: 'de', exceptions: [{ term: 'Jira', kind: 'Product' }] }],
+    ['blank exception term', { text: 'Hello', targetLang: 'de', exceptions: [{ term: ' ', kind: 'Brand' }] }],
   ])('rejects %s with 400', async (_name, body) => {
     const res = await post(body);
     expect(res.status).toBe(400);
@@ -558,19 +565,24 @@ describe('POST /voice-session', () => {
   const mint = (authorization: string | null = `Bearer ${userToken()}`) =>
     app.request('/api/voice-session', { method: 'POST', headers: authorization ? { authorization } : {} });
 
-  it('returns a client secret for a live transcription session', async () => {
-    const res = await mint();
+  it('returns a ticket for the voice socket, signed for the user, and no provider secret', async () => {
+    process.env.VOICE_TICKET_SECRET = 'test-secret';
+    const sub = crypto.randomUUID();
+    const res = await mint(`Bearer ${userToken(sub)}`);
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ secret: 'ek_test', expiresAt: 1, model: 'm' });
+    const body = (await res.json()) as { ticket: string; expiresAt: number };
+    expect(Object.keys(body).sort()).toEqual(['expiresAt', 'ticket']);
+    expect(await verifyTicket(body.ticket)).toBe(sub);
+    expect(voiceSession).not.toHaveBeenCalled();
   });
 
   it('401s without a token', async () => {
     expect((await mint(null)).status).toBe(401);
-    expect(voiceSession).not.toHaveBeenCalled();
   });
 
-  it('502s when the provider fails', async () => {
-    vi.mocked(voiceSession).mockRejectedValueOnce(new Error('boom'));
+  it('502s when live voice input is not configured', async () => {
+    delete process.env.VOICE_TICKET_SECRET;
+    vi.spyOn(console, 'error').mockImplementationOnce(() => {});
     expect((await mint()).status).toBe(502);
   });
 });
@@ -620,5 +632,86 @@ describe('POST /stats/dictation', () => {
   it.each([[{}], [{ seconds: 0 }], [{ seconds: -1 }], [{ seconds: 601 }], [{ seconds: '5' }], [{ seconds: 5, words: 1.5 }], [{ seconds: 5, words: -1 }], [{ seconds: 5, words: 10_001 }], [{ seconds: 5, model: 7 }], [{ seconds: 5, model: 'x'.repeat(65) }], [{ seconds: 5, model: 'a b' }]])('400s on %j', async (body) => {
     expect((await report(body)).status).toBe(400);
     expect(wordStatsRepository.addDictation).not.toHaveBeenCalled();
+  });
+});
+
+describe('POST /explain', () => {
+  const post = (body: unknown, authorization: string | null = `Bearer ${userToken()}`) =>
+    app.request('/api/explain', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', ...(authorization ? { authorization } : {}) },
+      body: JSON.stringify(body),
+    });
+
+  it('explains the highlight in its line', async () => {
+    const res = await post({ text: ' touch base ', context: "Let's touch base on Friday.", targetLang: 'uk' });
+
+    expect(res.status).toBe(200);
+    await expect(res.json()).resolves.toEqual({ meaning: 'means touch base', examples: ['a', 'b'], lang: 'en' });
+    expect(explain).toHaveBeenLastCalledWith({ text: 'touch base', context: "Let's touch base on Friday.", targetLang: 'uk' });
+  });
+
+  it('401s without a user token', async () => {
+    expect((await post({ text: 'x', context: '', targetLang: 'en' }, null)).status).toBe(401);
+  });
+
+  it.each([
+    [{ context: 'line', targetLang: 'en' }],
+    [{ text: 'x'.repeat(201), context: 'line', targetLang: 'en' }],
+    [{ text: 'word', targetLang: 'en' }],
+    [{ text: 'word', context: 'line', targetLang: 'not a language' }],
+  ])('400s %j', async (body) => {
+    const res = await post(body);
+
+    expect(res.status).toBe(400);
+    await expect(res.json()).resolves.toMatchObject({ error: { code: 'invalid-input' } });
+  });
+
+  it('502s when the provider fails', async () => {
+    vi.mocked(explain).mockRejectedValueOnce(new Error('provider down'));
+    vi.spyOn(console, 'error').mockImplementationOnce(() => {});
+
+    expect((await post({ text: 'word', context: 'line', targetLang: 'en' })).status).toBe(502);
+  });
+});
+
+describe('POST /summarize', () => {
+  const post = (body: unknown, authorization: string | null = `Bearer ${userToken()}`) =>
+    app.request('/api/summarize', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', ...(authorization ? { authorization } : {}) },
+      body: JSON.stringify(body),
+    });
+
+  it('summarizes the dialog, dropping empty lines', async () => {
+    const lines = [{ speaker: 'Speaker 1', text: 'Friday?' }, { speaker: 'You', text: '  ' }, { speaker: 'You', text: 'Yes.' }];
+    const res = await post({ lines, targetLang: 'en' });
+
+    expect(res.status).toBe(200);
+    await expect(res.json()).resolves.toEqual({ points: ['2 lines'] });
+  });
+
+  it('401s without a user token', async () => {
+    expect((await post({ lines: [{ speaker: 'You', text: 'Hi' }], targetLang: 'en' }, null)).status).toBe(401);
+  });
+
+  it.each([
+    [{ lines: [], targetLang: 'en' }],
+    [{ lines: [{ speaker: 'You' }], targetLang: 'en' }],
+    [{ lines: [{ speaker: 'You', text: 'x'.repeat(40_001) }], targetLang: 'en' }],
+    [{ lines: Array.from({ length: 401 }, () => ({ speaker: 'You', text: 'x' })), targetLang: 'en' }],
+    [{ lines: [{ speaker: 'You', text: 'Hi' }] }],
+  ])('400s an invalid body (%#)', async (body) => {
+    const res = await post(body);
+
+    expect(res.status).toBe(400);
+    expect(summarize).not.toHaveBeenCalledWith(body);
+  });
+
+  it('502s when the provider fails', async () => {
+    vi.mocked(summarize).mockRejectedValueOnce(new Error('provider down'));
+    vi.spyOn(console, 'error').mockImplementationOnce(() => {});
+
+    expect((await post({ lines: [{ speaker: 'You', text: 'Hi' }], targetLang: 'en' })).status).toBe(502);
   });
 });

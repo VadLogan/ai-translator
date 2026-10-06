@@ -5,24 +5,26 @@ pieces. Behavior lives in hooks; markup lives in components that take props and 
 
 ```
 entrypoints/            WXT only: createRoot / defineContentScript, nothing else
-components/             reusable, presentational: buttons, icons, inputs, typography, menu, list, CountBadge, GrammarPanel, Recording, theme.css, color-scheme
+components/             reusable, presentational: buttons, icons, inputs, typography, menu, list, CountBadge, GrammarPanel, Recording, Transcript, theme.css, color-scheme
 widgets/translator/     the in-page widget
   mount.ts              the closed shadow host
   Translator.tsx        container: useTranslatorFlow → toView → <TranslatorWidget>
   hooks/                useTranslatorFlow (the flow), usePageEvents (listener table), useSiteGate, requestSlot
   state.ts view.ts position.ts   pure, each with its test
   TranslatorWidget.tsx Trigger.tsx panels/   presentational, stories beside them
+widgets/meeting/        the meeting card: useMeeting (demoFeed plays the transcript; actions are real), state.ts view.ts tested, MeetingPanel + story
 popups/toolbar/         the toolbar popup
   ToolbarPopup.tsx      container: composes hooks, picks the screen
-  hooks/                useTranslation, useHistory, useActiveSite, usePinned, useDictation, useGrammarFix
-  screens/              Home, History, Languages, entries (HistoryRow, HistoryCard); stories beside each
+  hooks/                useTranslation, useHistory, useActiveSite, usePinned, useDictation, useGrammarFix, useMeetings, useMeetingDetail
+  screens/              Home, History (Texts | Meetings tabs), Meetings, MeetingDetail, Languages, entries (HistoryRow, HistoryCard); stories beside each
 popups/settings/        the settings page (options.html)
   SettingsApp.tsx       container: composes hooks
   hooks/                useAccount, useSettings, useDisabledFields, useMicPermission, useShortcuts, useHash, useVocabulary
   SettingsPage.tsx AddLanguage.tsx Vocabulary.tsx   presentational, story beside the page
 content/                DOM domain logic shared by the widget and the popup's Insert: selection, replace, insert
 core/                   pure logic shared by the surfaces, each file with its test: languages, layout, sites,
-                        fixEdits (fix helpers), pcm, liveTranscript, liveLanguage, sentenceFixes (voice input)
+                        fixEdits (fix helpers), pcm, liveLanguage, sentenceFixes (voice input),
+                        transcript (meeting transcripts: highlight, results, checks; transcriptActions(deps))
 entrypoints/offscreen/  the one mic recorder (not UI): driven by the worker, never imported by a surface
 ```
 
@@ -39,4 +41,4 @@ entrypoints/offscreen/  the one mic recorder (not UI): driven by the worker, nev
 ## Constraints that outrank tidiness
 
 - The widget's page listeners are **subscribed once** (`usePageEvents`), and every handler reads state through the `latest` ref. Don't make them depend on render state: re-subscribing loses events in Teams/CKEditor.
-- `preventDefault` on `mousedown` inside the shadow root (`mount.ts`) keeps focus in the page's field. Keep it.
+- `preventDefault` on `mousedown` inside the shadow root (`mount.ts`) keeps focus in the page's field. Keep it. Only the widget's own text inputs are exempt (they need the click to focus), and the host stops key events so typing in them never reaches the page.

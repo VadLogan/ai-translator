@@ -1,6 +1,7 @@
 import { useEffect, useReducer, useRef, useState } from 'react';
 import { browser } from 'wxt/browser';
 import type { CheckOk, FixEdit, FixGrammarOk } from '../../../../../shared/contract';
+import { sentenceAt, spliceFix } from '../../../core/fixEdits';
 import { isProviderId } from '../../../auth/providers';
 import { switchLayout } from '../../../core/layout';
 import { findLanguage, type Language } from '../../../core/languages';
@@ -11,6 +12,7 @@ import { sentenceFixes } from '../../../core/sentenceFixes';
 import { historyStore, intoLanguages, pairFor, topPairs, type HistoryEntry } from '../../../settings/history';
 import { pinnedLanguages } from '../../../settings/pinned';
 import { storageSettings } from '../../../settings/storage-settings';
+import { vocabulary, type VocabException } from '../../../settings/vocabulary';
 import { replaceSelection } from '../../../content/replace';
 import { caretIn, fieldKey, fieldLabel, getEditableSelection, getFieldAnchor, getFocusedField, getPageSelection, getSelectionAnchor, isSelectionUnchanged, offsetIn, partOf, plainText, wholeField, type EditableSelection, type WritableSelection } from '../../../content/selection';
 import { answered, applyEdits, cleanCheck, countFixes, editKey, followEdit, visibleEdits, withoutEdit, withoutFixEdit, detectedLang, hasEnoughWords, hidden, isMenuOpen, isVerdict, menuShortcuts, pairTarget, reducer, type Check, type Screen, type Verdict } from '../state';
@@ -243,6 +245,20 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     if (targetLang) return void translate(targetLang);
     dispatch({ type: 'checked', check: null }); // the failed check is stale now: ask again
     fixGrammar();
+  }
+
+  /** Saves the exception; with `fix`, also writes it over the selection (its wrong form). */
+  async function saveException(entry: VocabException, fix: boolean): Promise<void> {
+    const { selection } = latest.current;
+    await vocabulary.addException(entry);
+    if (!fix || !selection || selection.kind === 'page') return close();
+    if (!isSelectionUnchanged(selection)) return fail('The text changed. Select it again.');
+    replaceSelection(selection, entry.term);
+    close();
+    setTimeout(() => {
+      refresh();
+      scheduleCheck();
+    }, 0);
   }
 
   /** Re-types the selection on the other keyboard layout. No API call, no translation. */
@@ -732,6 +748,47 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     apply(applyEdits(field.text, visibleEdits(state, screen.fix)), field, true);
   }
 
+  /**
+   * The panel's ↻: the user doesn't trust the shown edit, so its sentence is asked again, alone and
+   * past every cache, and its new edits replace the old ones in that sentence only (`spliceFix`). On a
+   * multi-line field the paragraph's cached fix takes the splice too, so the next round keeps it.
+   */
+  async function recheckSentence(): Promise<void> {
+    const state = latest.current;
+    const { screen, selection } = state;
+    if (screen.kind !== 'grammar' || !screen.fix || screen.rechecking || !selection) return;
+    const source = screen.dictated ? state.dictation?.text : selection.text;
+    const shown = visibleEdits(state, screen.fix)[screen.index];
+    if (source === undefined || !shown) return;
+    const sentence = sentenceAt(source, shown.start, shown.end);
+    show({ ...screen, rechecking: true });
+    // Its text passed the guard already: this panel holds its fix.
+    const answer = await sendMessage({ type: 'fix-grammar', text: sentence.text, id: crypto.randomUUID(), guarded: true });
+    const now = latest.current;
+    const nowSource = screen.dictated ? now.dictation?.text : now.selection?.text;
+    if (now.screen.kind !== 'grammar' || !now.screen.rechecking || !now.screen.fix || nowSource !== source) return; // closed or edited meanwhile
+    if (!answer.ok) {
+      if (answer.error.code === 'unauthenticated') return show({ kind: 'signIn' });
+      return fail(answer.error.message, 'close');
+    }
+    let fix = spliceFix(source, now.screen.fix, sentence, answer.data);
+    const element = now.selection?.element;
+    const field = screen.field && element ? wholeField(element) : null;
+    if (field && element && field.text === source && isChunked(field)) {
+      const paragraph = fieldStatus(element, source).paragraphs.find(({ chunk }) => chunk.start <= sentence.start && sentence.start < chunk.start + chunk.text.length);
+      if (paragraph) {
+        const { chunk } = paragraph;
+        const own = paragraph.fix ?? paragraph.carried ?? cleanFix(chunk.text);
+        fixes.set(element, chunk.text, spliceFix(chunk.text, own, { start: sentence.start - chunk.start, text: sentence.text }, answer.data));
+        fix = fieldStatus(element, source).fix;
+      }
+    }
+    if (!screen.dictated && now.check?.text === source) dispatch({ type: 'checked', check: { ...now.check, fix, errors: countFixes(fix) } });
+    const edits = visibleEdits(latest.current, fix);
+    const first = edits.findIndex((e) => e.start >= sentence.start);
+    show({ ...now.screen, fix, index: first >= 0 ? first : Math.max(0, Math.min(now.screen.index, edits.length - 1)), rechecking: false });
+  }
+
   /** The panel's ‹ › and a click on a highlight. */
   function step(index: number): void {
     const { screen } = latest.current;
@@ -940,6 +997,8 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
       return close();
     }
     const { screen } = latest.current;
+    // The exception form's own typing: no shortcuts (mount.ts keeps it from the page too).
+    if (screen.kind === 'exception') return;
     if (screen.kind === 'layout' && key === 'f') {
       event.preventDefault();
       event.stopPropagation();
@@ -947,11 +1006,21 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     }
     // A skeleton or clean panel has nothing to apply, so Enter stays the field's (in Teams, Enter
     // sends); a hover-opened panel takes it only while the pointer is on it.
-    const edit = screen.kind === 'grammar' && screen.fix ? visibleEdits(latest.current, screen.fix)[screen.index] : undefined;
-    if (edit && key === 'Enter' && !(screen.kind === 'grammar' && screen.hover && !underlines.isOnCard())) {
+    const edits = screen.kind === 'grammar' && screen.fix ? visibleEdits(latest.current, screen.fix) : [];
+    const edit = screen.kind === 'grammar' ? edits[screen.index] : undefined;
+    const ours = edit && !(screen.kind === 'grammar' && screen.hover && !underlines.isOnCard());
+    if (ours && key === 'Enter') {
       event.preventDefault();
       event.stopPropagation();
       return event.metaKey || event.ctrlKey ? replaceAll() : replaceEdit(edit);
+    }
+    // ← / → step between the edits; the caret stays put. With a modifier they stay the field's (word jump, selecting).
+    const by = key === 'ArrowLeft' ? -1 : key === 'ArrowRight' ? 1 : 0;
+    if (ours && by && screen.kind === 'grammar' && !(event.shiftKey || event.altKey || event.metaKey || event.ctrlKey)) {
+      event.preventDefault();
+      event.stopPropagation();
+      const index = screen.index + by;
+      return void (index >= 0 && index < edits.length && step(index));
     }
     // Menu shortcut badges: "1".."9" pick the pair's target, then the favorites.
     const code = /^[1-9]$/.test(key) && isMenuOpen(latest.current) ? menuShortcuts(latest.current)[Number(key) - 1] : undefined;
@@ -1000,8 +1069,10 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     onIgnoreEdit: ignoreEdit,
     onReplaceAll: replaceAll,
     onStep: step,
+    onRecheck: () => void recheckSentence(),
     onStopDictation: () => void stopDictation(),
     onInsertDictation: insertDictation,
+    onSaveException: (entry, fix) => void saveException(entry, fix),
   };
 
   const callbacks: WidgetCallbacks = {
@@ -1009,6 +1080,7 @@ export function useTranslatorFlow({ host, mount, isInvalid }: FlowOptions) {
     onLanguagePick: (code) => void translate(code),
     onFixLayout: fixLayout,
     onFixGrammar: openGrammar,
+    onAddException: () => show({ kind: 'exception' }),
     onOpenSettings: () => {
       close();
       void sendMessage({ type: 'open-options' });

@@ -18,13 +18,13 @@ would be others. Everything here applies to all of them. Extension specifics liv
 | **Auth session**: running OAuth (PKCE) against Supabase Auth, storing tokens, refreshing on demand | The API only verifies tokens |
 | **Settings cache** and the default for empty favorites (from OS/browser languages) | The server cannot see the device's languages |
 | **Local-only data**: history, stars, pinned languages, turned-off fields/sites per device | Product decision: not synced |
-| **Microphone**: capture, PCM encoding, live Realtime socket, fallback upload | Audio never transits the API in the live path |
+| **Microphone**: capture, PCM encoding, streaming to the API's live socket, fallback upload | The API holds the provider session; the client never names a provider |
 | **Local re-typing** of wrong-layout text (`switchLayout`) | A key-position map: free, instant, can't hallucinate |
 | **Supplying context**: `url` (where the feature was used) | Analytics on the API side |
 
 | A client must never | Because |
 | --- | --- |
-| Hold a provider key or call a provider directly (except the Realtime socket with an API-minted secret) | Anything shipped in a client is public |
+| Hold a provider key, call a provider directly, or parse a provider's events | Anything shipped in a client is public, and only the API knows which AI system does the work |
 | Compute grammar offsets itself or trust anything but the API's `edits` | The server diff is the contract |
 | Send text the guard already rejected | It will 422 again and spend the user's rate limit |
 
@@ -124,17 +124,16 @@ A 422 from any guarded call (or the check's verdict) replaces the normal UI:
 sequenceDiagram
   participant C as Client
   participant A as API
-  participant O as OpenAI Realtime
   C->>C: start mic (PCM 24 kHz + compressed file)
   C->>A: POST /voice-session
-  A-->>C: {secret (120 s), model}
-  C->>O: wss …/realtime?intent=transcription (secret)
-  C->>O: input_audio_buffer.append (buffered audio first)
-  O-->>C: transcription deltas → live text
+  A-->>C: {ticket (60 s)}
+  C->>A: ws …/functions/v1/voice?ticket=…
+  C->>A: {type:'audio'} frames (buffered audio first)
+  A-->>C: {type:'text'} → live text
   Note over C: at ≥4 words: POST /detect once (live language)<br/>if en: POST /fix-grammar per ended sentence (2 in flight)
-  C->>O: input_audio_buffer.commit (on Stop / 3 s silence / 60 s)
-  O-->>C: completed transcript (wait ≤ 3 s)
-  alt live failed (mint, socket, timeout)
+  C->>A: {type:'commit'} (on Stop / 3 s silence / 60 s)
+  A-->>C: {type:'done', text, model} (wait ≤ 3 s)
+  alt live failed (ticket, socket, error, timeout)
     C->>A: POST /transcribe (multipart audio)
     A-->>C: {text, lang}
   end
@@ -151,7 +150,26 @@ Recording rules: stop at 60 s; stop after 3 s of silence (level < 0.08); live fa
 upload silently; Cancel releases the mic. Optional: `POST /stats/dictation {seconds, words, model}` after
 Stop (dev telemetry, fire-and-forget).
 
-### 3.5 Auth
+### 3.5 Meeting transcript
+
+A transcript is lines of `{speaker, t, text}`; one speaker is the user. Its purposes: learning the
+other speakers' words, and seeing the user's own mistakes. Any client:
+- **Other speakers' lines**: the user highlights a word or several (`words()` cuts a line with
+  `Intl.Segmenter`; a highlight is a range of pieces, so it maps back to the exact substring), then:
+  - Translate → `POST /translate` into the user's language;
+  - Explain → `POST /explain {text: highlight, context: line, targetLang}`;
+  - Add to vocabulary → the same `/explain`, then the answer is stored as a vocabulary word (undoable).
+- **The user's lines**: `POST /check` once per line (live, as each line commits), shown as a count;
+  "Show fixes" → `POST /fix-grammar` with `guarded: true` (the check passed the guard), shown under
+  the original. One result card per line; a new action on the line replaces it, a late answer for a
+  closed card is dropped.
+- **Summary**: the whole dialog as `{speaker name, text}[]` → `POST /summarize` → key points in the
+  user's language.
+- Keep what was fetched (counts, fixes, summary) with the saved meeting, so reopening asks nothing again.
+
+There is no meeting audio pipeline yet: the extension's transcript is a scripted demo.
+
+### 3.6 Auth
 
 PKCE against Supabase Auth (`/auth/v1/authorize?provider=…&code_challenge=…&apikey=…` →
 redirect with `code` → `POST /auth/v1/token?grant_type=pkce`). Store `{accessToken, refreshToken,
@@ -159,7 +177,7 @@ expiresAt}`; **refresh on demand** 60 s before expiry (`grant_type=refresh_token
 a failed refresh = signed out. The client needs a redirect URL registered in
 `[auth] additional_redirect_urls` and the Supabase publishable (anon) key.
 
-### 3.6 Settings
+### 3.7 Settings
 
 - Server is the source of truth (`GET/PUT /settings`); the client keeps a cache for instant/offline reads.
 - Save order: **API first, then cache**. Last write wins. PUT sends the **whole** `Settings`.
@@ -182,10 +200,12 @@ to **reuse as a package** (or that could be moved behind the API). Paths are und
 | `widgets/translator/hooks/chunkRequests.ts` | Per-field request cache + bounded concurrency + cancel |
 | `widgets/translator/hooks/requestSlot.ts` | One-in-flight request with stale-answer detection |
 | `core/sentenceFixes.ts`, `core/liveLanguage.ts` | Fix-while-speaking and detect-while-speaking for dictation |
-| `core/liveTranscript.ts`, `core/pcm.ts` | Realtime event → text assembly; Float32 → PCM16 base64 |
+| `core/pcm.ts` | Float32 → PCM16 base64 (the live socket's audio frames) |
 | `core/sites.ts` | `isSiteDisabled` (subdomain match), `parseSites` |
 | `settings/history.ts` (pure parts) | `topPairs`, `pairFor`, `defaultPair`, `orient`, `intoLanguages`, `pinFirst`, `usedLately`, `byDay` |
 | `widgets/translator/state.ts`, `view.ts` | Widget state machine (reducer) and state → view mapping |
+| `core/transcript.ts` | Meeting transcript: highlight → substring, result cards and checks (reducer), line view, `transcriptActions(deps)` (senders passed in) |
+| `settings/meetings.ts` (pure parts) | `withMeeting`, `transcriptText`, `speakersLabel`, `durationLabel`, `whenLabel` |
 
 Some of these are **policy** that arguably belongs to the API so every client behaves the same:
 the "usual pair" suggestion, the paragraph/sentence chunking thresholds, and the "only fix paragraphs
@@ -203,6 +223,9 @@ on the edit loop's latency.
 | History | device only, last 200 | `{text, result, site, at, starred?, voice?} & ({kind?:'translation', from?, to} \| {kind:'grammar'})` |
 | Pinned languages | device only | `string[]` |
 | Turned-off fields | device only | `{site, key, label}[]` |
+| Exceptions | device only | `{term, kind: 'Brand'\|'Name'\|'Term'\|'Code', replaces: string[]}[]` |
+| Vocabulary words | device only | `{word, lang, meaning, at, source, context, hit?, examples[]}[]` |
+| Meetings | device only, last 100 | `{at, site, seconds, speakers, last, cast?, lines?: {speaker, t, text, errors?, fix?}[], summary?}` — text only, never audio |
 
 History is the input to pair suggestions and "used lately". Moving it server-side would make those
 consistent across devices and clients — today a second client starts with no pairs.
@@ -213,7 +236,7 @@ consistent across devices and clients — today a second client starts with no p
 
 - **Latency budget**: `/check` ~0.3–0.9 s, `/fix-grammar` ~1.7–2.2 s (priority tier), detect is a guard + a classification. Prefetch and caching exist to hide these.
 - **Cost**: every typing pause with ended sentences = one `/check` per sentence; paragraphs with errors add one fix each. The 60/min/user rate limit is shared by all features of a user.
-- **Privacy**: text and page url are sent and logged by the API; audio goes to OpenAI directly (live) or via the API (fallback) and is not stored.
+- **Privacy**: text and page url are sent and logged by the API; audio goes through the API (the live socket or the fallback upload) and is not stored.
 - **Offline / signed out**: settings come from cache; every feature needs the API and a session (except the local layout re-type).
 
 ---

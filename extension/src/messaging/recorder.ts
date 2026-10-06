@@ -1,10 +1,10 @@
 /**
- * Worker ↔ offscreen recorder. `live` hands it the minted Realtime secret (`secret`) and the model
- * that session transcribes with (`model`), sent once the API answers, after `start`. Separate from `Message`: only the worker sends these. `owner` (on
+ * Worker ↔ offscreen recorder. `live` hands it the API's live-dictation socket (`socket`, the url
+ * with its ticket), sent once the API answers, after `start`. Separate from `Message`: only the worker sends these. `owner` (on
  * `start`): the tab frame that is dictating, echoed on every `VoiceLevel` so the worker can forward
  * it there without remembering anything; absent = the toolbar popup.
  */
-export type RecorderMessage = { target: 'offscreen'; type: 'start' | 'stop' | 'cancel' | 'live'; owner?: VoiceOwner; secret?: string; model?: string };
+export type RecorderMessage = { target: 'offscreen'; type: 'start' | 'stop' | 'cancel' | 'live'; owner?: VoiceOwner; socket?: string };
 
 export type VoiceOwner = { tabId: number; frameId: number };
 

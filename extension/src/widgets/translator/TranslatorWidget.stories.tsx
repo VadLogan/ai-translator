@@ -20,7 +20,7 @@ const meta = {
   args: {
     // Pretend a line of text was selected here; the widget positions itself against it.
     anchor: { x: 240, top: 160, bottom: 180 },
-    callbacks: { onIconClick: noop, onLanguagePick: noop, onFixLayout: noop, onFixGrammar: noop, onOpenSettings: noop, onDisableField: noop, onDictate: noop },
+    callbacks: { onIconClick: noop, onLanguagePick: noop, onFixLayout: noop, onFixGrammar: noop, onAddException: noop, onOpenSettings: noop, onDisableField: noop, onDictate: noop },
   },
   // The story's `dark` follows the toolbar's theme switch, so both themes are one click apart.
   render: (args, { globals }) => <TranslatorWidget {...args} dark={globals['theme'] === 'dark'} />,
@@ -145,6 +145,23 @@ export const Grammar = story({
   ...grammar,
 });
 
+/** With exceptions: `kubectl` kept as written (dotted underline, tooltip), and `jira → Jira` corrected to the exception's spelling. */
+export const GrammarExceptions = story({
+  kind: 'grammar',
+  lang: 'en',
+  html: `${fix('I ran', 'i run')} kubectl in ${fix('Jira', 'jira')} yesterday.`,
+  edits: [
+    { kind: 'error', original: 'i run', replacement: 'I ran', reason: '"Yesterday" takes the past simple.' },
+    { kind: 'error', original: 'jira', replacement: 'Jira', reason: '' },
+  ],
+  index: 1,
+  exceptions: [
+    { term: 'kubectl', kind: 'Code', replaces: [] },
+    { term: 'Jira', kind: 'Brand', replaces: ['jira'] },
+  ],
+  ...grammar,
+});
+
 /** An English dictation: the same panel on the dictated text, then its transcript (collapsed) and Insert / Copy. */
 export const GrammarDictation = story({
   kind: 'grammar',
@@ -188,6 +205,9 @@ export const GrammarChecking = story({ kind: 'grammar', edits: [], index: 0, ...
 export const Layout = story({ kind: 'layout', typed: 'Ghbdsn', fixed: 'Привіт', from: 'en', to: 'uk', onClose: noop });
 
 export const NotText = story({ kind: 'notText' });
+
+/** The menu's "Add to Exceptions"; edit the word to see the replaced form and "Fix it in this text too". */
+export const Exception = story({ kind: 'exception', selected: 'Apfel', canFix: true, onSave: noop, onCancel: noop });
 
 /** The field icon over a textarea with its underlines. */
 export const FieldUnderlines: Story = {

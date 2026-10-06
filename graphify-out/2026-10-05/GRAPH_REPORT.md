@@ -1,38 +1,38 @@
 # Graph Report - ai-translator-ext  (2026-10-05)
 
 ## Corpus Check
-- 214 files · ~106,246 words
+- 229 files · ~113,353 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 9 file(s) not represented in the graph (top: (none) 5, .example 2, .css 1)
 
 ## Summary
-- 1298 nodes · 3310 edges · 64 communities (53 shown, 11 thin omitted)
-- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 184 edges (avg confidence: 0.9)
+- 1376 nodes · 3601 edges · 74 communities (63 shown, 11 thin omitted)
+- Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 186 edges (avg confidence: 0.9)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `08910734`
+- Built from commit: `d5842e39`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - background.ts
 - TranslatorWidget.stories.tsx
-- check.ts
+- useTranslatorFlow.ts
 - graphify skill (SKILL.md)
-- fix-grammar/fix-grammar.ts
+- selection.ts
 - useTranslatorFlow
-- Translator.tsx
-- dev-gateway.ts
+- fail
+- dev-jwt.ts
 - contract.ts
-- app.test.ts
+- client.ts
 - scripts
 - extension/package.json
-- OptionsPage.stories.tsx
+- SettingsApp.tsx
 - compilerOptions
 - Session1.stories.tsx
 - ToolbarPopup.tsx
-- TranslatorWidget.tsx
+- Trigger.tsx
 - devDependencies
 - icons.tsx
 - compilerOptions
@@ -46,52 +46,62 @@
 - dependencies
 - Home.stories.tsx
 - ref_src_health_ts
-- usePageEvents
-- AI Translator: system overview
+- Home.tsx
+- SettingsPageProps
+- app.test.ts
+- 4. Client-side product logic (portable)
 - controllers/detect.ts
-- useTranslatorFlow.ts
-- Frontend (client as an abstract unit)
 - AI Translator API README
 - History.stories.tsx
 - extension_src_ui_theme
 - ref_ui_theme_css_inline
-- Home.tsx
-- LanguagesPanel.tsx
 - react
+- TranslatorWidget.tsx
+- History.tsx
 - ref_vitest
 - WidgetCallbacks
-- inputs.tsx
-- languages.ts
 - controllers/rewrite.ts
+- messages.ts
+- oauth.ts
 - Demo
 - Extension Release
-- CLAUDE.md
-- wordStats.ts
-- API architecture rules
-- OptionsApp.tsx
-- RequestSlot
 - app.ts
-- controllers/translate.ts
-- Languages
-- toEdits.ts
-- diff.ts
+- Frontend (client as an abstract unit)
+- API architecture rules
+- 4. Messaging protocol
+- useActiveSite.ts
+- fix-grammar/fix-grammar.ts
+- Chrome extension
+- usePageEvents
+- visibleEdits
+- SettingsPage.stories.tsx
+- CLAUDE.md
+- replace.ts
+- VocabException
+- chunkRequests.test.ts
+- SettingsPage.tsx
+- AI Translator: system overview
 - API
-- 3. Core flows (platform-agnostic)
-- transcriptions.test.ts
-- fromSegments.ts
+- switchLayout
+- controllers/transcribe.ts
+- utils/exceptions.ts
+- Languages.stories.tsx
+- 7.1 In-page widget (`widgets/translator/`)
+- @storybook/react-vite
 - inventory.sh
+- useSiteGate
 
 ## God Nodes (most connected - your core abstractions)
-1. `useTranslatorFlow()` - 101 edges
-2. `react` - 33 edges
-3. `sendMessage()` - 29 edges
+1. `useTranslatorFlow()` - 104 edges
+2. `react` - 43 edges
+3. `sendMessage()` - 31 edges
 4. `scopedLogger()` - 25 edges
 5. `fail()` - 25 edges
 6. `wholeField()` - 23 edges
 7. `4. Client-side product logic (portable)` - 23 edges
-8. `HomeProps` - 21 edges
-9. `requestId()` - 20 edges
-10. `findLanguage()` - 20 edges
+8. `Icon()` - 21 edges
+9. `HomeProps` - 21 edges
+10. `requestId()` - 20 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `5. Findings worth acting on before separating` --references--> `scopedLogger()`  [INFERRED]
@@ -100,10 +110,10 @@
   docs/extension.md → extension/src/content/selection.ts
 - `1. Responsibilities` --references--> `switchLayout()`  [INFERRED]
   docs/api.md → extension/src/core/layout.ts
-- `3. Write `extension/src/demo/Session<N>.stories.tsx`` --references--> `PopupFrame()`  [INFERRED]
-  .claude/skills/demo/SKILL.md → extension/src/popups/toolbar/Popup.tsx
 - `Constraints that outrank tidiness` --references--> `usePageEvents()`  [INFERRED]
   .claude/rules/extension-ui.md → extension/src/widgets/translator/hooks/usePageEvents.ts
+- `3.6 Settings` --references--> `Settings`  [INFERRED]
+  docs/frontend.md → shared/contract.ts
 
 ## Import Cycles
 - None detected.
@@ -116,47 +126,47 @@
 - **graphify graph refresh mechanisms** — _claude_skills_graphify_references_add_watch_watch, _claude_skills_graphify_references_hooks_post_commit_hook, _claude_skills_graphify_references_update_incremental_update [INFERRED 0.85]
 - **Extension toolbar icon set (16/32/48/128)** — extension_public_icon_16_icon, extension_public_icon_32_icon, extension_public_icon_48_icon, extension_public_icon_128_icon [INFERRED 0.95]
 
-## Communities (64 total, 11 thin omitted)
+## Communities (74 total, 11 thin omitted)
 
 ### Community 0 - "background.ts"
-Cohesion: 0.09
-Nodes (50): RFC-7636, 4.1 UI → worker (`messaging/messages.ts`), 4.2 Worker ↔ offscreen recorder (`messaging/recorder.ts`), 4.3 Popup → content script, 4. Messaging protocol, ApiError, call(), check() (+42 more)
+Cohesion: 0.20
+Nodes (22): ApiError, call(), check(), detect(), fixGrammar(), getSettings(), reportDictation(), rewrite() (+14 more)
 
 ### Community 1 - "TranslatorWidget.stories.tsx"
 Cohesion: 0.04
-Nodes (43): Busy, DictationTranslated, Error, estimate, FieldIcon, FieldIconChecking, FieldIconClean, FieldIconError (+35 more)
+Nodes (46): Busy, DictationTranslated, Error, estimate, Exception, FAVORITES, FieldIcon, FieldIconChecking (+38 more)
 
-### Community 2 - "check.ts"
-Cohesion: 0.21
-Nodes (11): guardText, COUNTS, grammarQuality(), GUARD_MESSAGES, GuardVerdict, toVerdict(), validateGuard(), verdictQuestion (+3 more)
+### Community 2 - "useTranslatorFlow.ts"
+Cohesion: 0.10
+Nodes (49): isProviderId(), Badge, EditableSelection, applyEdits(), findLanguage(), extension_src_core_languages_language, pairFor(), extension_src_widgets_translator_chunks_cleanfix (+41 more)
 
 ### Community 3 - "graphify skill (SKILL.md)"
 Cohesion: 0.06
 Nodes (44): .claude/CLAUDE.md (project instructions), Understood-as prompt rule, graphify reference: add URL and watch, graphify add URL ingest, graphify --watch auto-rebuild, graphify reference: exports and benchmark, Token reduction benchmark, FalkorDB export (+36 more)
 
-### Community 4 - "fix-grammar/fix-grammar.ts"
-Cohesion: 0.27
-Nodes (17): checkController(), detectController(), fixGrammarController(), rewriteController(), dictationController(), transcribeController(), translateController(), voiceSessionController() (+9 more)
+### Community 4 - "selection.ts"
+Cohesion: 0.15
+Nodes (26): caretIn(), InsertMessage, caretIn(), deepActiveElement(), EXCLUDED_INPUT_MODES, fieldKey(), fieldLabel(), findContentEditableHost() (+18 more)
 
 ### Community 5 - "useTranslatorFlow"
-Cohesion: 0.06
-Nodes (94): 7.2 DOM layer (`content/`), isProviderId(), caretIn(), insertIntoFocusedField(), InsertMessage, bareLink(), dispatchInput(), isLink() (+86 more)
+Cohesion: 0.12
+Nodes (54): Rules, replaceSelection(), getFieldAnchor(), isSelectionUnchanged(), partOf(), wholeField(), sendMessage(), useTranslatorFlow() (+46 more)
 
-### Community 6 - "Translator.tsx"
-Cohesion: 0.09
-Nodes (25): 1. Collect two inputs, 2. Route each fact to one home, 3. Edit, 4. Verify and report, Common mistakes, Update project docs, darkQuery(), followColorScheme() (+17 more)
+### Community 6 - "fail"
+Cohesion: 0.22
+Nodes (14): voiceSessionController(), requireUser(), userIdFrom(), validate(), hits, isRateLimited(), rateLimit, voiceSession() (+6 more)
 
-### Community 7 - "dev-gateway.ts"
-Cohesion: 0.06
+### Community 7 - "dev-jwt.ts"
+Cohesion: 0.05
 Nodes (40): devToken(), gateway, token(), ASYMMETRIC, base64url(), decodeJson(), DEV_JWT_SECRET, hmacKey() (+32 more)
 
 ### Community 8 - "contract.ts"
-Cohesion: 0.14
-Nodes (22): parseDetectBody(), parseDictationBody(), parseFixGrammarBody(), parseRewriteBody(), parseSettings(), parseTranscribeBody(), parseTranslateBody(), validate() (+14 more)
+Cohesion: 0.15
+Nodes (22): isForm(), parseDetectBody(), parseExceptions(), parseFixGrammarBody(), parseRewriteBody(), parseTranslateBody(), DictationBody, EXCEPTION_KINDS (+14 more)
 
-### Community 9 - "app.test.ts"
+### Community 9 - "client.ts"
 Cohesion: 0.17
-Nodes (15): jwt(), userToken(), TranscriptionRecord, transcriptionsRepository, client, LIVE_TRANSCRIBE_MODEL, TRANSCRIBE_MODEL, typeSafeClient (+7 more)
+Nodes (16): checkController(), client, LIVE_TRANSCRIBE_MODEL, TRANSCRIBE_MODEL, typeSafeClient, DICTATION_PROMPT, COUNTS, grammarQuality() (+8 more)
 
 ### Community 10 - "scripts"
 Cohesion: 0.11
@@ -166,9 +176,9 @@ Nodes (17): devDependencies, supabase, name, private, scripts, build, compile, d
 Cohesion: 0.12
 Nodes (16): description, typescript, vitest, name, private, type, version, flag-icons (+8 more)
 
-### Community 12 - "OptionsPage.stories.tsx"
-Cohesion: 0.12
-Nodes (13): ProviderId, PROVIDERS, Failed, Loading, meta, MicRequested, Saved, Saving (+5 more)
+### Community 12 - "SettingsApp.tsx"
+Cohesion: 0.29
+Nodes (9): useAccount(), useDisabledFields(), subscribe(), useHash(), useMicPermission(), useShortcuts(), useVocabulary(), SettingsApp() (+1 more)
 
 ### Community 13 - "compilerOptions"
 Cohesion: 0.14
@@ -176,23 +186,23 @@ Nodes (13): compilerOptions, allowImportingTsExtensions, erasableSyntaxOnly, mod
 
 ### Community 14 - "Session1.stories.tsx"
 Cohesion: 0.07
-Nodes (15): CALLBACKS, DICTATION, DictationGrammar, DictationTranslation, GRAMMAR, HistoryVoiceSign, meta, OptionsMicrophone (+7 more)
+Nodes (16): CALLBACKS, DICTATION, DictationGrammar, DictationTranslation, FAVORITES, GRAMMAR, HistoryVoiceSign, meta (+8 more)
 
 ### Community 15 - "ToolbarPopup.tsx"
 Cohesion: 0.06
-Nodes (41): 7.3 Toolbar popup (`popups/toolbar/`), 4. Client-side product logic (portable), liveLanguage(), isVoiceLevel(), useDictation(), editKey(), useGrammarFix(), useHistory() (+33 more)
+Nodes (40): 7.3 Toolbar popup (`popups/toolbar/`), liveLanguage(), isVoiceLevel(), useActiveSite(), useDictation(), editKey(), useGrammarFix(), useHistory() (+32 more)
 
-### Community 16 - "TranslatorWidget.tsx"
-Cohesion: 0.17
-Nodes (19): Anchor, BusyPanel(), ErrorPanel(), NotTextPanel(), SignInPanel(), Mark, Underlines(), clamp() (+11 more)
+### Community 16 - "Trigger.tsx"
+Cohesion: 0.25
+Nodes (12): CountBadge(), Anchor, clamp(), cornerStyle(), ICON_SIZE, iconStyle(), panelPosition(), Size (+4 more)
 
 ### Community 17 - "devDependencies"
 Cohesion: 0.17
 Nodes (12): devDependencies, happy-dom, storybook, @storybook/react-vite, tailwindcss, @tailwindcss/vite, @types/react, @types/react-dom (+4 more)
 
 ### Community 18 - "icons.tsx"
-Cohesion: 0.05
-Nodes (41): BrandMark(), fixed(), ICON_NAMES, LANG_FLAG, PATHS, Brand, Flags, Interface (+33 more)
+Cohesion: 0.06
+Nodes (35): BrandMark(), fixed(), LANG_FLAG, PATHS, ref_flag_icons_flags_4x3_arab_svg_raw, ref_flag_icons_flags_4x3_bg_svg_raw, ref_flag_icons_flags_4x3_cn_svg_raw, ref_flag_icons_flags_4x3_cz_svg_raw (+27 more)
 
 ### Community 19 - "compilerOptions"
 Cohesion: 0.29
@@ -222,128 +232,168 @@ Nodes (6): dependencies, flag-icons, @heroui/react, @heroui/styles, react, react
 Cohesion: 0.14
 Nodes (13): Busy, Default, DictatedGrammar, Empty, Error, Listening, meta, OnePair (+5 more)
 
-### Community 31 - "AI Translator: system overview"
-Cohesion: 0.22
-Nodes (6): 1. What the product does, 2. System map, 3. Responsibility split (target state), 4. Repository layout, 5. Findings worth acting on before separating, AI Translator: system overview
+### Community 30 - "Home.tsx"
+Cohesion: 0.13
+Nodes (18): ICON_SIZE, ICON_TONE, IconButton(), IconButtonProps, Kbd(), KBD_TONE, PILL_SIZE, PILL_VARIANT (+10 more)
 
-### Community 32 - "controllers/detect.ts"
-Cohesion: 0.18
-Nodes (12): env(), get(), CorrectionRecord, correctionsRepository, DetectionRecord, detectionsRepository, profilesRepository, rows (+4 more)
+### Community 31 - "SettingsPageProps"
+Cohesion: 0.14
+Nodes (5): MicState, AccountSection(), FieldsSection(), SettingsPageProps, SitesSection()
 
-### Community 33 - "useTranslatorFlow.ts"
-Cohesion: 0.06
-Nodes (76): 3.2 Grammar (badge → underlines → panel), EditableSelection, plainText(), applyEdits(), Chunk, cleanFix(), escapeHtml(), isFinished() (+68 more)
+### Community 32 - "app.test.ts"
+Cohesion: 0.13
+Nodes (16): jwt(), userToken(), translateController(), request, toRow(), TranslationRecord, translationsRepository, Counter (+8 more)
 
-### Community 34 - "Frontend (client as an abstract unit)"
-Cohesion: 0.25
-Nodes (8): 2. Contract usage, 5. Client-owned data, 6. Non-functional expectations, 7. Surfaces a client may implement, 8. What a new client needs (and what is in the way), Call wrapper rules (see `extension/src/api.ts` for a reference implementation), Error code → UI, Frontend (client as an abstract unit)
+### Community 33 - "4. Client-side product logic (portable)"
+Cohesion: 0.17
+Nodes (20): 3.2 Grammar (badge → underlines → panel), 4. Client-side product logic (portable), Chunk, cleanFix(), escapeHtml(), isFinished(), mergeFixes(), withoutFixEdit() (+12 more)
+
+### Community 34 - "controllers/detect.ts"
+Cohesion: 0.80
+Nodes (3): DetectionRecord, detectionsRepository, DetectBody
 
 ### Community 35 - "AI Translator API README"
 Cohesion: 0.10
 Nodes (21): AI Translator API README, POST /detect, deno.json + devDependencies dual lists, API error shape {error:{message,code}}, GET /health, Per-user in-memory rate limit (60/min), GET/PUT /settings, POST /translate (+13 more)
 
 ### Community 36 - "History.stories.tsx"
-Cohesion: 0.13
-Nodes (16): WidgetDictationTranslation(), WidgetRecording(), HISTORY, LATELY, noop(), now, PopupFrame(), Default (+8 more)
+Cohesion: 0.18
+Nodes (10): WidgetDictationTranslation(), WidgetRecording(), HISTORY, noop(), now, Default, Empty, meta (+2 more)
 
-### Community 39 - "Home.tsx"
-Cohesion: 0.13
-Nodes (21): ICON_SIZE, ICON_TONE, IconButton(), IconButtonProps, Kbd(), KBD_TONE, PILL_SIZE, PILL_VARIANT (+13 more)
+### Community 39 - "react"
+Cohesion: 0.17
+Nodes (15): CHIP_TONE, LanguageCard(), Meter(), RemovableChip(), SearchField(), Segmented(), Select(), StatusChip() (+7 more)
 
-### Community 40 - "LanguagesPanel.tsx"
-Cohesion: 0.15
-Nodes (15): Badge, CountBadge(), Flag(), IconName, Divider(), Item(), Section(), Status() (+7 more)
+### Community 40 - "TranslatorWidget.tsx"
+Cohesion: 0.10
+Nodes (30): PillButton(), fixedText(), GrammarPanel(), GrammarView, keptWords(), IconName, Divider(), Item() (+22 more)
 
-### Community 41 - "react"
-Cohesion: 0.16
-Nodes (17): Icon(), SearchField(), Group(), Row(), SubHeader(), Colours, meta, Scale (+9 more)
+### Community 41 - "History.tsx"
+Cohesion: 0.12
+Nodes (18): Icon(), Group(), Row(), SubHeader(), Colours, meta, Scale, TONES (+10 more)
 
 ### Community 42 - "ref_vitest"
-Cohesion: 0.12
-Nodes (12): request, toRow(), request, toRow(), request, toRow(), request, toRow() (+4 more)
+Cohesion: 0.07
+Nodes (25): request, toRow(), request, toRow(), request, toRow(), create, diff() (+17 more)
 
-### Community 44 - "inputs.tsx"
-Cohesion: 0.14
-Nodes (16): CHIP_TONE, LanguageCard(), Meter(), RemovableChip(), Segmented(), Select(), StatusChip(), Controls (+8 more)
+### Community 44 - "controllers/rewrite.ts"
+Cohesion: 0.40
+Nodes (7): rewriteController(), RewriteRecord, rewritesRepository, rewrite(), STYLE, RewriteBody, RewriteOk
 
-### Community 45 - "languages.ts"
+### Community 45 - "messages.ts"
+Cohesion: 0.20
+Nodes (15): 5. Endpoints, Errors, Route details, Summary, Validation (`middleware/body.ts`), 4.1 UI → worker (`messaging/messages.ts`), ProviderId, Account (+7 more)
+
+### Community 46 - "oauth.ts"
 Cohesion: 0.26
-Nodes (9): browserLanguages(), findLanguage(), nativeName(), searchLanguages(), FAVORITES, settingsItem, FAVORITES, LANGUAGES (+1 more)
-
-### Community 46 - "controllers/rewrite.ts"
-Cohesion: 0.39
-Nodes (6): RewriteRecord, rewritesRepository, MODEL, rewrite(), STYLE, RewriteBody
+Nodes (12): RFC-7636, base64url(), challengeFor(), createVerifier(), getAccessToken(), isExpired(), signIn(), store() (+4 more)
 
 ### Community 47 - "Demo"
-Cohesion: 0.29
-Nodes (6): 1. Collect the session's changes, 2. Pick the next file, 3. Write `extension/src/demo/Session<N>.stories.tsx`, 4. Build, 5. Show, Demo
+Cohesion: 0.33
+Nodes (5): 1. Collect the session's changes, 2. Pick the next file, 4. Build, 5. Show, Demo
 
 ### Community 48 - "Extension Release"
 Cohesion: 0.22
 Nodes (8): 1. Find the baseline, 2. Understand the differences, 3. Propose the bump, 4. Update the description, 5. Write the changes, 6. Report, Extension Release, Where things live (WXT project)
 
-### Community 49 - "CLAUDE.md"
-Cohesion: 0.18
-Nodes (9): Typed background-worker messaging protocol, Closed shadow-root translator widget, Extension is frontend only, Layered API architecture, Paste-first selection replacement, Constraints that outrank tidiness, Extension UI (`extension/src/`), Rules (+1 more)
+### Community 49 - "app.ts"
+Cohesion: 0.13
+Nodes (15): app, getSettings(), putSettings(), statsController(), env(), get(), parseDictationBody(), parseSettings() (+7 more)
 
-### Community 50 - "wordStats.ts"
-Cohesion: 0.22
-Nodes (5): statsController(), Counter, ModelUse, WordStats, wordStatsRepository
+### Community 50 - "Frontend (client as an abstract unit)"
+Cohesion: 0.14
+Nodes (14): 2. Contract usage, 3.1 Translate, 3.3 Wrong keyboard layout / gibberish, 3.4 Voice input, 3.5 Auth, 3.6 Settings, 3. Core flows (platform-agnostic), 5. Client-owned data (+6 more)
 
 ### Community 51 - "API architecture rules"
 Cohesion: 0.18
 Nodes (19): API architecture rules, Connection layer (db.ts), Controller layer, A controller owns its own response, Entrypoint layer (index.ts, server.ts, health.ts), Erasable TypeScript constraint, Error body {error:{message, code}} synced with shared/contract.ts, http.ts shared helpers (fail, waitUntil, requestId, benchmark, AppEnv) (+11 more)
 
-### Community 52 - "OptionsApp.tsx"
-Cohesion: 0.07
-Nodes (32): 8. Data model (`supabase/migrations/`), 1. Runtime contexts, 2. Manifest, 3. Source layout, 5. Browser / Web APIs used, 6. Storage (`chrome.storage.local`), 7.1 In-page widget (`widgets/translator/`), 7.4 Options page (`popups/options/`) (+24 more)
-
-### Community 54 - "app.ts"
-Cohesion: 0.21
-Nodes (12): app, getSettings(), putSettings(), requireUser(), userIdFrom(), hits, isRateLimited(), rateLimit (+4 more)
-
-### Community 55 - "controllers/translate.ts"
+### Community 52 - "4. Messaging protocol"
 Cohesion: 0.50
-Nodes (5): TranslationRecord, translationsRepository, createInput(), translate(), TranslateBody
+Nodes (4): 4.2 Worker ↔ offscreen recorder (`messaging/recorder.ts`), 4.3 Popup → content script, 4. Messaging protocol, stop()
 
-### Community 56 - "Languages"
-Cohesion: 0.40
-Nodes (3): ago(), Languages(), LanguagesProps
-
-### Community 57 - "toEdits.ts"
-Cohesion: 0.32
-Nodes (7): ModelEdit, overlaps(), Span, toEdits(), Route details, Marked, FixKind
-
-### Community 58 - "diff.ts"
-Cohesion: 0.31
-Nodes (6): diff(), editSegments(), edits(), tokenize(), 11. Client-facing coupling to remove when separating, 1. Responsibilities of any client
-
-### Community 59 - "API"
+### Community 53 - "useActiveSite.ts"
 Cohesion: 0.17
-Nodes (12): 10. Testing, 1. Responsibilities, 2. Runtime and deployment, 4. External services, 5. Endpoints, 6. Authentication and authorisation, 7. Cross-cutting, 9. Configuration (+4 more)
+Nodes (12): 2. Manifest, isSiteDisabled(), parseSites(), useSettings(), activeTab(), Tab, DisabledField, disabledFields (+4 more)
 
-### Community 60 - "3. Core flows (platform-agnostic)"
+### Community 54 - "fix-grammar/fix-grammar.ts"
+Cohesion: 0.18
+Nodes (16): fixGrammarController(), dictationController(), guardText, CorrectionRecord, correctionsRepository, fixGrammar(), applyEdits(), validateGuard() (+8 more)
+
+### Community 55 - "Chrome extension"
+Cohesion: 0.22
+Nodes (9): 1. Runtime contexts, 3. Source layout, 5. Browser / Web APIs used, 6. Storage (`chrome.storage.local`), 8. Development, testing, release, 9. What is extension-only (would not carry to another client), Chrome extension, Dependency rules (+1 more)
+
+### Community 57 - "visibleEdits"
+Cohesion: 0.30
+Nodes (10): 7.2 DOM layer (`content/`), inside(), rangeAt(), rangeRects(), textControlRects(), fixDictation(), measure(), useUnderlines() (+2 more)
+
+### Community 58 - "SettingsPage.stories.tsx"
+Cohesion: 0.14
+Nodes (12): PROVIDERS, SettingsPage(), Loading, meta, MicBlocked, MicRequested, NothingTurnedOff, Saved (+4 more)
+
+### Community 59 - "CLAUDE.md"
+Cohesion: 0.20
+Nodes (8): Typed background-worker messaging protocol, Closed shadow-root translator widget, Extension is frontend only, Layered API architecture, Paste-first selection replacement, Constraints that outrank tidiness, Extension UI (`extension/src/`), AI Translator playground page
+
+### Community 60 - "replace.ts"
+Cohesion: 0.47
+Nodes (8): bareLink(), dispatchInput(), isLink(), replaceInContentEditable(), replaceInTextControl(), tryInsertText(), tryPaste(), withAtoms()
+
+### Community 61 - "VocabException"
+Cohesion: 0.06
+Nodes (34): 1. Collect two inputs, 2. Route each fact to one home, 3. Edit, 4. Verify and report, Common mistakes, Update project docs, darkQuery(), followColorScheme() (+26 more)
+
+### Community 62 - "chunkRequests.test.ts"
+Cohesion: 0.24
+Nodes (7): Response, ChunkRequests, drop(), pump(), use(), isVerdict(), Verdict
+
+### Community 63 - "SettingsPage.tsx"
+Cohesion: 0.12
+Nodes (18): Flag(), ICON_NAMES, Brand, Flags, Interface, meta, browserLanguages(), extension_src_core_languages_languages (+10 more)
+
+### Community 64 - "AI Translator: system overview"
+Cohesion: 0.22
+Nodes (6): 1. What the product does, 2. System map, 3. Responsibility split (target state), 4. Repository layout, 5. Findings worth acting on before separating, AI Translator: system overview
+
+### Community 65 - "API"
+Cohesion: 0.25
+Nodes (8): 10. Testing, 1. Responsibilities, 2. Runtime and deployment, 4. External services, 6. Authentication and authorisation, 7. Cross-cutting, 9. Configuration, API
+
+### Community 66 - "switchLayout"
 Cohesion: 0.33
-Nodes (6): 3.1 Translate, 3.3 Wrong keyboard layout / gibberish, 3.4 Voice input, 3.5 Auth, 3.6 Settings, 3. Core flows (platform-agnostic)
+Nodes (6): isCyrillic(), layoutLanguages(), RUSSIAN_ONLY, switchLayout(), toCyrillic, toLatin
 
-### Community 66 - "fromSegments.ts"
-Cohesion: 0.48
-Nodes (3): Segment, escapeHtml(), fromSegments()
+### Community 67 - "controllers/transcribe.ts"
+Cohesion: 0.26
+Nodes (11): detectController(), transcribeController(), audio, toRow(), TranscriptionRecord, transcriptionsRepository, detectLang(), transcribe() (+3 more)
+
+### Community 68 - "utils/exceptions.ts"
+Cohesion: 0.40
+Nodes (6): ExceptionKind, ExceptionHit, exceptionOf(), findExceptions(), SIMILAR, similarity()
+
+### Community 69 - "Languages.stories.tsx"
+Cohesion: 0.25
+Nodes (7): 3. Write `extension/src/demo/Session<N>.stories.tsx`, LATELY, PopupFrame(), From, Into, meta, Story
+
+### Community 70 - "7.1 In-page widget (`widgets/translator/`)"
+Cohesion: 0.29
+Nodes (6): 8. Data model (`supabase/migrations/`), 7.1 In-page widget (`widgets/translator/`), 7.4 Settings page (`popups/settings/`, served as `options.html`), 7.5 Voice pipeline (extension specifics), 7. UI surfaces, grammar()
 
 ## Knowledge Gaps
-- **339 isolated node(s):** `hono`, `openai`, `postgres`, `@typesafe-ai/sdk`, `DEV_JWT_SECRET` (+334 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 477 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **348 isolated node(s):** `hono`, `openai`, `postgres`, `@typesafe-ai/sdk`, `DEV_JWT_SECRET` (+343 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 495 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **11 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `API` connect `API` to `diff.ts`, `fix-grammar/fix-grammar.ts`, `OptionsApp.tsx`, `AI Translator: system overview`?**
-  _High betweenness centrality (0.107) - this node is a cross-community bridge._
-- **Why does `react` connect `react` to `useTranslatorFlow.ts`, `TranslatorWidget.stories.tsx`, `History.stories.tsx`, `useTranslatorFlow`, `Translator.tsx`, `Home.tsx`, `LanguagesPanel.tsx`, `extension/package.json`, `inputs.tsx`, `Session1.stories.tsx`, `ToolbarPopup.tsx`, `TranslatorWidget.tsx`, `icons.tsx`, `OptionsApp.tsx`, `usePageEvents`?**
-  _High betweenness centrality (0.100) - this node is a cross-community bridge._
-- **Why does `API architecture rules` connect `API architecture rules` to `CLAUDE.md`, `graphify skill (SKILL.md)`, `AI Translator: system overview`?**
-  _High betweenness centrality (0.094) - this node is a cross-community bridge._
+- **Why does `API architecture rules` connect `API architecture rules` to `AI Translator: system overview`, `CLAUDE.md`, `graphify skill (SKILL.md)`?**
+  _High betweenness centrality (0.131) - this node is a cross-community bridge._
+- **Why does `API` connect `API` to `AI Translator: system overview`, `7.1 In-page widget (`widgets/translator/`)`, `fail`, `ref_vitest`, `messages.ts`?**
+  _High betweenness centrality (0.120) - this node is a cross-community bridge._
+- **Why does `react` connect `react` to `TranslatorWidget.stories.tsx`, `useTranslatorFlow.ts`, `extension/package.json`, `SettingsApp.tsx`, `Session1.stories.tsx`, `ToolbarPopup.tsx`, `Trigger.tsx`, `icons.tsx`, `Home.tsx`, `4. Client-side product logic (portable)`, `TranslatorWidget.tsx`, `History.tsx`, `messages.ts`, `useActiveSite.ts`, `usePageEvents`, `visibleEdits`, `VocabException`, `SettingsPage.tsx`, `Languages.stories.tsx`?**
+  _High betweenness centrality (0.095) - this node is a cross-community bridge._
 - **Are the 19 inferred relationships involving `useTranslatorFlow()` (e.g. with `7.1 In-page widget (`widgets/translator/`)` and `closeSuggestion()`) actually correct?**
   _`useTranslatorFlow()` has 19 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 2 inferred relationships involving `sendMessage()` (e.g. with `Rules` and `Dependency rules`) actually correct?**
@@ -351,4 +401,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Are the 2 inferred relationships involving `scopedLogger()` (e.g. with `3. Internal architecture` and `5. Findings worth acting on before separating`) actually correct?**
   _`scopedLogger()` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `hono`, `openai`, `postgres` to the rest of the system?**
-  _339 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _348 weakly-connected nodes found - possible documentation gaps or missing edges._

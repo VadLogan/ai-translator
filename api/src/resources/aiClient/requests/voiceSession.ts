@@ -1,4 +1,3 @@
-import type { VoiceSessionOk } from '../../../../../shared/contract.ts';
 import { LIVE_TRANSCRIBE_MODEL, client } from '../client.ts';
 import { DICTATION_PROMPT } from './dictationPrompt.ts';
 
@@ -6,11 +5,12 @@ import { DICTATION_PROMPT } from './dictationPrompt.ts';
 const SECRET_SECONDS = 120;
 
 /**
- * A client secret for one live transcription session: 24 kHz PCM in, text deltas out while the
- * user speaks (gpt-live-transcribe: the first words ~1.2 s in). No turn detection -- the live models
- * refuse it; the extension commits the audio on Stop, so a dictation is one transcript item.
+ * The provider's secret for one live transcription session: 24 kHz PCM in, text deltas out while
+ * the user speaks (gpt-live-transcribe: the first words ~1.2 s in). Only the API uses it --
+ * `liveTranscribe.ts` opens the socket with it; it never reaches a client. No turn detection: the
+ * live models refuse it, and the client commits the audio on Stop, so a dictation is one item.
  */
-export async function voiceSession(): Promise<VoiceSessionOk> {
+export async function voiceSession(): Promise<{ secret: string; expiresAt: number; model: string }> {
   const response = await client.realtime.clientSecrets.create({
     expires_after: { anchor: 'created_at', seconds: SECRET_SECONDS },
     session: {

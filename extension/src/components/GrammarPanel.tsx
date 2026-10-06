@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Skeleton, Spinner } from '@heroui/react';
-import type { FixKind } from '../../../shared/contract';
+import type { FixKind, VocabException } from '../../../shared/contract';
+import { exceptionOf, findExceptions } from '../../../shared/exceptions';
 import { IconButton, Kbd, PillButton } from './buttons';
 import { Icon } from './icons';
 import { Divider } from './menu';
@@ -21,10 +22,15 @@ export interface GrammarView {
   edits: readonly { kind: FixKind; original: string; replacement: string; reason: string }[];
   index: number;
   ignored: readonly number[];
+  /** The user's exceptions: the words they kept get a dotted underline, and an edit to one's spelling says so. */
+  exceptions?: readonly VocabException[];
   onReplace: () => void;
   onIgnore: () => void;
   onReplaceAll: () => void;
   onStep: (index: number) => void;
+  /** Asks the shown edit's sentence again, on its own and past every cached answer; `rechecking` while it runs. */
+  onRecheck?: () => void;
+  rechecking?: boolean;
 }
 
 /**
@@ -35,6 +41,7 @@ export function GrammarPanel({ view }: { view: GrammarView }) {
   const loading = view.html === undefined;
   const count = view.edits.length;
   const edit = view.edits[view.index];
+  const kept = edit && exceptionOf(edit, view.exceptions);
   return (
     <>
       <div className="flex h-10 items-center gap-2 pl-2.5 pr-1">
@@ -63,7 +70,7 @@ export function GrammarPanel({ view }: { view: GrammarView }) {
         </div>
       ) : count > 0 && (
         <p lang={view.lang} className="mx-1 my-0 rounded-2xl bg-tm-subtle px-3 py-2.5 tm-body leading-relaxed">
-          {fixedText(view.html!, view.index, view.ignored, view.onStep)}
+          {fixedText(view.html!, view.index, view.ignored, view.onStep, view.exceptions)}
         </p>
       )}
       {edit && (
@@ -71,10 +78,20 @@ export function GrammarPanel({ view }: { view: GrammarView }) {
           <div className="pt-1.5"><Divider /></div>
           <div className="flex flex-col gap-2 px-2 pb-1 pt-2">
             <div className="flex items-center gap-1.5">
-              <span className={`size-2 rounded-full ${edit.kind === 'native' ? 'bg-tm-accent' : 'bg-tm-danger-ink'}`} />
-              <span className={`grow tm-label ${edit.kind === 'native' ? 'text-tm-accent-text' : 'text-tm-danger-ink'}`}>
-                {edit.kind === 'native' ? 'Sounds more native' : 'Grammar'}
+              <span className={`size-2 rounded-full ${kept ? 'bg-tm-success' : edit.kind === 'native' ? 'bg-tm-accent' : 'bg-tm-danger-ink'}`} />
+              <span className={`grow tm-label ${kept ? 'text-tm-secondary' : edit.kind === 'native' ? 'text-tm-accent-text' : 'text-tm-danger-ink'}`}>
+                {kept ? 'From your exceptions' : edit.kind === 'native' ? 'Sounds more native' : 'Grammar'}
               </span>
+              {view.onRecheck &&
+                (view.rechecking ? (
+                  <span aria-label="Re-checking this sentence" className="flex size-7 items-center justify-center">
+                    <Spinner size="sm" className="text-tm-accent" />
+                  </span>
+                ) : (
+                  <IconButton aria-label="Re-check this sentence" size={28} isDisabled={view.loading} onPress={view.onRecheck}>
+                    <Icon name="retry" size={14} />
+                  </IconButton>
+                ))}
               {count > 1 && (
                 <>
                   <Text variant="meta" className="pr-1">{view.index + 1} of {count}</Text>
@@ -92,7 +109,11 @@ export function GrammarPanel({ view }: { view: GrammarView }) {
               <Icon name="forward" size={12} strokeWidth={2.2} className="text-tm-placeholder" />
               <span className="font-semibold">{edit.replacement.trim() || '(remove)'}</span>
             </div>
-            {edit.reason && <Text variant="helper">{edit.reason}</Text>}
+            {kept ? (
+              <Text variant="helper">Spelled as in your exceptions · {kept.kind}</Text>
+            ) : (
+              edit.reason && <Text variant="helper">{edit.reason}</Text>
+            )}
             <div className="flex gap-1.5 pt-1">
               <PillButton variant="primary" size="md" onPress={view.onReplace}>
                 Replace <Kbd tone="onAccent">↵</Kbd>
@@ -110,14 +131,21 @@ export function GrammarPanel({ view }: { view: GrammarView }) {
 /**
  * `FixGrammarOk.html` as React nodes: text stays text, each `span.fix` a highlight -- the shown edit
  * strong, the others soft, an ignored one back to its original text. Clicking a highlight shows that
- * edit. Parsed rather than injected, so nothing but text reaches the page.
+ * edit. Parsed rather than injected, so nothing but text reaches the page. A word kept by an
+ * exception gets a dotted underline (`keptWords`).
  */
-function fixedText(html: string, index: number, ignored: readonly number[], onStep: (index: number) => void): ReactNode[] {
+function fixedText(
+  html: string,
+  index: number,
+  ignored: readonly number[],
+  onStep: (index: number) => void,
+  exceptions: readonly VocabException[] = [],
+): ReactNode[] {
   const body = new DOMParser().parseFromString(html, 'text/html').body;
   let span = -1;
   let shown = -1;
   return [...body.childNodes].map((node, key) => {
-    if (!(node instanceof Element) || !node.classList.contains('fix')) return node.textContent;
+    if (!(node instanceof Element) || !node.classList.contains('fix')) return keptWords(node.textContent ?? '', exceptions, key);
     span++;
     if (ignored.includes(span)) return node.getAttribute('data-original') ?? '';
     const at = ++shown;
@@ -131,4 +159,22 @@ function fixedText(html: string, index: number, ignored: readonly number[], onSt
       </span>
     );
   });
+}
+
+/** Text with each exception it holds under a dotted green underline, its kind in the tooltip. */
+function keptWords(text: string, exceptions: readonly VocabException[], key: number): ReactNode {
+  const hits = findExceptions(text, exceptions).filter((hit) => !hit.wrong);
+  if (!hits.length) return text;
+  const nodes: ReactNode[] = [];
+  let at = 0;
+  for (const { start, end, kind } of hits) {
+    nodes.push(
+      text.slice(at, start),
+      <span key={start} title={`From your exceptions · ${kind}`} className="underline decoration-tm-success decoration-dotted decoration-2 underline-offset-[3px]">
+        {text.slice(start, end)}
+      </span>,
+    );
+    at = end;
+  }
+  return <span key={key}>{nodes}{text.slice(at)}</span>;
 }

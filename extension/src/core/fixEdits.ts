@@ -51,5 +51,44 @@ export function mergeFixes(text: string, parts: { chunk: Chunk; fix: FixGrammarO
   return merged;
 }
 
+/**
+ * The sentence (trimmed, with where it starts) holding `text`'s `start..end`: what the panel's
+ * re-check asks on its own. Widened to whole sentences when the range crosses one's end.
+ */
+export function sentenceAt(text: string, start: number, end = start): Chunk {
+  let from = 0;
+  let to = text.length;
+  for (const { index, segment } of new Intl.Segmenter(undefined, { granularity: 'sentence' }).segment(text)) {
+    if (index <= start) from = index;
+    if (index + segment.length >= end) {
+      to = index + segment.length;
+      break;
+    }
+  }
+  const piece = text.slice(from, to);
+  const lead = piece.length - piece.trimStart().length;
+  return { start: from + lead, text: piece.trim() };
+}
+
+/**
+ * `fix` (made for `text`) with the edits inside `part` swapped for `partFix`'s (made for `part.text`
+ * alone): the re-checked sentence's new answer, the rest of the fix untouched. `text` and `html` rebuilt
+ * the way the API builds them.
+ */
+export function spliceFix(text: string, fix: FixGrammarOk, part: Chunk, partFix: FixGrammarOk): FixGrammarOk {
+  const end = part.start + part.text.length;
+  const edits = [
+    ...fix.edits.filter((e) => e.end <= part.start || e.start >= end),
+    ...partFix.edits.map((e) => ({ ...e, start: e.start + part.start, end: e.end + part.start })),
+  ].sort((a, b) => a.start - b.start);
+  let html = '';
+  let at = 0;
+  for (const { start, end: to, original, replacement } of edits) {
+    html += `${escapeHtml(text.slice(at, start))}<span class="fix" data-original="${escapeHtml(original)}">${escapeHtml(replacement)}</span>`;
+    at = to;
+  }
+  return { ...fix, text: applyEdits(text, edits), html: html + escapeHtml(text.slice(at)), edits };
+}
+
 // The API's escaping (api/.../fix-grammar/utils/escapeHtml.ts), so merged html reads the same.
 export const escapeHtml = (s: string) => s.replace(/[&<>"']/g, (ch) => `&#${ch.charCodeAt(0)};`);

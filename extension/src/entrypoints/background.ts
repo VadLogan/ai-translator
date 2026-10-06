@@ -1,11 +1,25 @@
 import { browser, type Browser } from 'wxt/browser';
 import { defineBackground } from 'wxt/utils/define-background';
-import { ApiError, check, detect, fixGrammar, getSettings, rewrite, reportDictation, saveSettings, transcribe, translate, voiceSession } from '../api';
+import { ApiError, check, detect, explain, fixGrammar, summarize, voiceSocketUrl, getSettings, rewrite, reportDictation, saveSettings, transcribe, translate, voiceSession } from '../api';
 import { getAccessToken, signIn, signOut } from '../auth/oauth';
 import { storageSession } from '../auth/session';
 import { isMessage, type Account, type Message, type Response } from '../messaging/messages';
 import { isVoiceLevel, type RecorderMessage, type RecorderReply, type VoiceOwner } from '../messaging/recorder';
 import { storageSettings } from '../settings/storage-settings';
+import { vocabulary } from '../settings/vocabulary';
+import { MAX_EXCEPTIONS } from '../../../shared/contract';
+import { findExceptions } from '../../../shared/exceptions';
+
+/**
+ * The user's exceptions that occur in the text (near misses included, the API's own matcher), for
+ * the API to hide from the model. Only these are sent, so the rest of the list stays here.
+ */
+async function exceptionsIn(text: string) {
+  const list = await vocabulary.exceptions();
+  const terms = new Set(findExceptions(text, list).map((hit) => hit.term));
+  const found = list.filter((x) => terms.has(x.term)).slice(0, MAX_EXCEPTIONS);
+  return found.length ? { exceptions: found } : {};
+}
 
 export default defineBackground(() => {
   // In-flight grammar checks, fixes and field translations by the content script's id. The fetch lives here, so only the worker can abort it.
@@ -20,6 +34,7 @@ export default defineBackground(() => {
           // compromised page can't forge where the extension was used. Only a tab has one: the
           // toolbar popup and the options page are not a site, so they send no url.
           const controller = new AbortController();
+          const exceptions = await exceptionsIn(message.text);
           if (message.id) checks.set(message.id, controller);
           try {
             return {
@@ -31,6 +46,7 @@ export default defineBackground(() => {
                     targetLang: message.targetLang,
                     ...(message.sourceLang ? { sourceLang: message.sourceLang } : {}),
                     url: sender.tab?.url,
+                    ...exceptions,
                   },
                   token,
                   controller.signal,
@@ -51,7 +67,7 @@ export default defineBackground(() => {
         case 'check': {
           const controller = new AbortController();
           checks.set(message.id, controller);
-          const body = { text: message.text, url: sender.tab?.url };
+          const body = { text: message.text, url: sender.tab?.url, ...(await exceptionsIn(message.text)) };
           try {
             return {
               ok: true,
@@ -68,13 +84,22 @@ export default defineBackground(() => {
         case 'cancel':
           checks.get(message.id)?.abort(); // unknown id: already answered, nothing to stop
           return { ok: true, data: undefined };
-        case 'rewrite':
+        case 'explain':
+          return {
+            ok: true,
+            data: await asUser((token) => explain({ text: message.text, context: message.context, targetLang: message.targetLang, url: sender.tab?.url }, token)),
+          };
+        case 'summarize':
+          return { ok: true, data: await asUser((token) => summarize({ lines: message.lines, targetLang: message.targetLang, url: sender.tab?.url }, token)) };
+        case 'rewrite': {
+          const exceptions = await exceptionsIn(message.text);
           return {
             ok: true,
             data: await asUser((token) =>
-              rewrite({ text: message.text, style: message.style, url: sender.tab?.url }, token),
+              rewrite({ text: message.text, style: message.style, url: sender.tab?.url, ...exceptions }, token),
             ),
           };
+        }
         case 'voice-start': {
           await ensureRecorder();
           // The recorder's level messages are forwarded to the dictating frame; the popup hears them itself.
@@ -86,10 +111,10 @@ export default defineBackground(() => {
             return { ok: false, error: { message: 'Allow the microphone in the tab that just opened, then try again.', code: 'mic-blocked' } };
           }
           if (error) return { ok: false, error: { message: 'Could not start the microphone.' } };
-          // Live text: the secret is minted while the recorder already listens (it buffers). A
+          // Live text: the socket's ticket is asked while the recorder already listens (it buffers). A
           // failure is silent -- Stop then sends the file to /transcribe.
           void asUser(voiceSession)
-            .then(({ secret, model }) => record('live', owner, secret, model))
+            .then(({ ticket }) => record('live', owner, voiceSocketUrl(ticket)))
             .catch(() => {});
           return { ok: true, data: undefined };
         }
@@ -214,8 +239,8 @@ async function ensureRecorder(): Promise<void> {
   });
 }
 
-const record = (type: RecorderMessage['type'], owner?: VoiceOwner, secret?: string, model?: string): Promise<RecorderReply> =>
-  browser.runtime.sendMessage({ target: 'offscreen', type, ...(owner ? { owner } : {}), ...(secret ? { secret } : {}), ...(model ? { model } : {}) } satisfies RecorderMessage);
+const record = (type: RecorderMessage['type'], owner?: VoiceOwner, socket?: string): Promise<RecorderReply> =>
+  browser.runtime.sendMessage({ target: 'offscreen', type, ...(owner ? { owner } : {}), ...(socket ? { socket } : {}) } satisfies RecorderMessage);
 
 const accountFrom = ({ email }: { email?: string }): Account => (email ? { email } : {});
 

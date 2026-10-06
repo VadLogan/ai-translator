@@ -4,7 +4,7 @@ Layered, outermost first. **Each layer may only call the one below it.**
 
 | Layer | Files | Owns | Must not |
 | --- | --- | --- | --- |
-| entrypoint | `src/index.ts`, `src/health.ts`, `src/server.ts` | which runtime we are on | anything else |
+| entrypoint | `src/index.ts`, `src/voice.ts`, `dev/health.ts`, `src/server.ts` | which runtime we are on (`voice.ts` / `server.ts`: also the WebSocket upgrade) | anything else |
 | wiring | `src/app.ts` | CORS, the route table, `notFound` | branch on runtime, do work |
 | middleware | `src/middleware/*` | `requireUser` (401), `rateLimit` (429), `validate(parse…)` (400), `guardText` (422) | touch the DB or a provider -- except `guardText`, the one middleware that calls an AI request (`validateGuard`) |
 | controller | `src/controllers/*` | the whole per-route body: which request, which repository, which messages, and its own response | build SQL, call OpenAI directly |
@@ -16,10 +16,10 @@ Layered, outermost first. **Each layer may only call the one below it.**
 
 ```
 api/
-  src/                  everything that ships (the edge bundle starts at src/index.ts and src/health.ts)
+  src/                  everything the api function ships (its edge bundle starts at src/index.ts)
     index.ts            edge entry: Deno.serve(app.fetch)
-    health.ts           edge entry: public liveness probe, its own function
-    server.ts           local Node entry: serves dev/dev-gateway.ts
+    voice.ts            edge entry: the live-dictation WebSocket (Deno.upgradeWebSocket → controllers/voiceStream.ts)
+    server.ts           local Node entry: serves dev/dev-gateway.ts, and takes the voice upgrade with `ws`
     app.ts              route table
     env.ts              env() — Deno.env deployed, process.env under Node/vitest
     middleware/         guards
@@ -30,15 +30,19 @@ api/
       logger.ts         Logger interface, consoleLogger, scopedLogger(tag, id)
       aiClient/
         client.ts       the OpenAI client and MODEL, read once
-        requests/       one file per provider call (translate, detect, rewrite, validateGuard, grammarQuality)
+        requests/       one file per provider call (translate, detect, rewrite, explain, summarize, validateGuard, grammarQuality,
+                        voiceSession, liveTranscribe = the provider's live socket)
           <name>/       a folder only when the call has its own helpers (fix-grammar/utils/*)
     utils/http.ts       fail(), waitUntil(), requestId(), benchmark(), AppEnv
-  dev/                  local-only, never deployed: dev-gateway.ts, dev-jwt.ts, dev-token.ts
+    utils/voiceTicket.ts  the live-dictation socket's signed ticket (VOICE_TICKET_SECRET)
+  dev/                  dev-gateway.ts, dev-jwt.ts, dev-token.ts (local only, never deployed)
+                        health.ts (edge entry: the public liveness probe, deployed as its own function)
 ```
 
-`dev/` is for things that exist *only* to run locally. `server.ts` imports from it; nothing under
-`src/` besides `server.ts` may. A deployed entrypoint (`health.ts`) is not dev code even though it is
-tiny — it lives in `src/`, where `[functions.health]` in `supabase/config.toml` points.
+`dev/` is for things that exist *only* to run locally, plus `health.ts`. `server.ts` imports from it;
+nothing under `src/` besides `server.ts` may. `health.ts` is the one deployed file in `dev/`:
+`[functions.health]` in `supabase/config.toml` points at it, and it imports `checkDb` from
+`src/resources/db.ts`. Nothing else in `dev/` may be deployed or imported by a deployed file.
 
 `utils/http.ts` is the one thing every layer shares. `resources/logger.ts` is the log sink behind the
 `Logger` interface; only it names `console`.
@@ -101,7 +105,7 @@ tiny — it lives in `src/`, where `[functions.health]` in `supabase/config.toml
 | a runtime difference | an entrypoint or `dev/dev-gateway.ts` |
 | a local-only tool | `dev/`, plus an `npm` script and a `tsconfig.json` `include` entry |
 | a dev-only counter (no table) | a file-backed repository like `repositories/wordStats.ts` (path via `env()`, read once); the controller wraps the write in a try/catch so it never fails the request -- the deployed edge has no writable disk, so it counts nothing there |
-| a client secret for a provider the extension talks to directly | an AI request that mints it (`requests/voiceSession.ts`, short `expires_after`), a controller that never logs the secret |
+| a streaming connection to a provider (live dictation) | **never handed to a client**: an AI request opens the provider socket (`requests/liveTranscribe.ts`), a controller relays it in our own events (`controllers/voiceStream.ts`, runtime-agnostic over a `SocketLike`), an entrypoint does the WebSocket upgrade (`voice.ts` edge, `server.ts` local); the client's pass is a signed ticket (`utils/voiceTicket.ts`), since a browser WebSocket carries no Authorization header |
 
 ## Constraints that outrank tidiness
 

@@ -2,6 +2,7 @@ import type { Context } from 'hono';
 import type { FixGrammarBody } from '../../../shared/contract.ts';
 import { benchmark, fail, requestId, waitUntil, type AppEnv } from '../utils/http.ts';
 import { scopedLogger } from '../resources/logger.ts';
+import { mask } from '../utils/exceptions.ts';
 import { fixGrammar } from '../resources/aiClient/requests/fix-grammar/fix-grammar.ts';
 import { GUARD_MESSAGES, validateGuard } from '../resources/aiClient/requests/validateGuard.ts';
 import { correctionsRepository, type CorrectionRecord } from '../repositories/corrections.ts';
@@ -34,7 +35,7 @@ export async function fixGrammarController(c: Context<AppEnv>) {
     c.req.raw.signal.addEventListener('abort', () => fixing.abort(), { once: true });
     const guard = body.guarded
       ? null
-      : validateGuard(body.text, c.req.raw.signal)
+      : validateGuard(mask(body.text, body.exceptions).text, c.req.raw.signal)
           .then((verdict) => (verdict && fixing.abort(), verdict))
           .catch((error) => (log.error('guard failed, letting the text through', error), null));
     const [verdict, result] = await Promise.all([guard, fixGrammar(body, fixing.signal).catch((error) => error as Error)]);

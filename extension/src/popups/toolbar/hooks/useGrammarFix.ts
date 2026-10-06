@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import type { FixEdit, FixGrammarOk } from '../../../../../shared/contract';
 import type { GrammarView } from '../../../components/GrammarPanel';
-import { applyEdits, withoutFixEdit } from '../../../core/fixEdits';
+import { applyEdits, sentenceAt, spliceFix, withoutFixEdit } from '../../../core/fixEdits';
 import { sendMessage } from '../../../messaging/messages';
 import type { HistoryEntry } from '../../../settings/history';
+import { useExceptions } from '../../../settings/useExceptions';
 import type { sentenceFixes } from '../../../core/sentenceFixes';
 
 const editKey = (edit: FixEdit) => `${edit.original}→${edit.replacement}`;
@@ -20,8 +21,9 @@ export function useGrammarFix({ text, setText, remember, onError }: {
 }) {
   // `text`: what the fix was made for. `fix` null = loading.
   // `voice`: the text was dictated, so what is applied is marked as spoken in history.
-  const [state, setState] = useState<{ text: string; fix: FixGrammarOk | null; index: number; ignored: string[]; voice?: boolean } | null>(null);
+  const [state, setState] = useState<{ text: string; fix: FixGrammarOk | null; index: number; ignored: string[]; voice?: boolean; rechecking?: boolean } | null>(null);
   const request = useRef('');
+  const exceptions = useExceptions();
   // One history entry per run of fixes: each Replace rewrites it, so it ends as the final text.
   // Typing in between is an intermediate change; the run ends on a new text (emptied, dictated, restored: `endRun`).
   const run = useRef<{ text: string; at: number } | null>(null);
@@ -61,6 +63,7 @@ export function useGrammarFix({ text, setText, remember, onError }: {
 
   const view: GrammarView | null = current && {
     html: fix?.html,
+    exceptions,
     edits: edits.map(({ kind, original, replacement, reason }) => ({ kind, original, replacement, reason })),
     index: current.index,
     ignored: fix ? fix.edits.flatMap((e, i) => (edits.includes(e) ? [] : [i])) : [],
@@ -79,15 +82,39 @@ export function useGrammarFix({ text, setText, remember, onError }: {
       setState(null);
     },
     onStep: (index) => setState({ ...current, index }),
+    rechecking: !!current.rechecking,
+    // ↻: the shown edit's sentence asked again on its own; its new edits replace that sentence's only.
+    onRecheck: async () => {
+      if (!fix || !edit || current.rechecking) return;
+      const sentence = sentenceAt(text, edit.start, edit.end);
+      setState({ ...current, rechecking: true });
+      const answer = await sendMessage({ type: 'fix-grammar', text: sentence.text, id: crypto.randomUUID(), guarded: true });
+      setState((now) => {
+        if (!now || now.text !== text || now.fix !== fix) return now; // edited or restarted meanwhile
+        if (!answer.ok) return { ...now, rechecking: false };
+        const next = spliceFix(text, fix, sentence, answer.data);
+        const left = next.edits.filter((e) => !now.ignored.includes(editKey(e)));
+        const first = left.findIndex((e) => e.start >= sentence.start);
+        return { ...now, fix: next, index: first >= 0 ? first : Math.max(0, Math.min(now.index, left.length - 1)), rechecking: false };
+      });
+      if (!answer.ok) onError(answer.error.message);
+    },
   };
 
-  // ↵ replaces the shown edit and ⌘/Ctrl ↵ all of them, as in the widget -- except in the textarea,
-  // where ↵ is a new line and ⌘ ↵ translates.
+  // ↵ replaces the shown edit and ⌘/Ctrl ↵ all of them, ← / → step between them, as in the widget --
+  // except in the textarea, where ↵ is a new line, ⌘ ↵ translates and the arrows move the caret.
   const keys = useRef(view);
   keys.current = edit ? view : null;
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key !== 'Enter' || !keys.current || document.activeElement instanceof HTMLTextAreaElement) return;
+      if (!keys.current || document.activeElement instanceof HTMLTextAreaElement) return;
+      const by = event.key === 'ArrowLeft' ? -1 : event.key === 'ArrowRight' ? 1 : 0;
+      if (by && !(event.shiftKey || event.altKey || event.metaKey || event.ctrlKey)) {
+        const index = keys.current.index + by;
+        if (index >= 0 && index < keys.current.edits.length) keys.current.onStep(index);
+        return event.preventDefault();
+      }
+      if (event.key !== 'Enter') return;
       event.preventDefault();
       if (event.metaKey || event.ctrlKey) keys.current.onReplaceAll();
       else keys.current.onReplace();

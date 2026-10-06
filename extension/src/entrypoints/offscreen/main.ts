@@ -1,5 +1,5 @@
 import { browser } from 'wxt/browser';
-import { applyEvent, emptyTranscript, isComplete, liveText, type LiveTranscript } from '../../core/liveTranscript';
+import type { VoiceClientEvent, VoiceServerEvent } from '../../../../shared/contract';
 import { toPcm16Base64 } from '../../core/pcm';
 import type { RecorderMessage, RecorderReply, VoiceLevel, VoiceOwner } from '../../messaging/recorder';
 
@@ -10,8 +10,8 @@ import type { RecorderMessage, RecorderReply, VoiceLevel, VoiceOwner } from '../
  * page (`options.html#mic`); without it getUserMedia rejects at once and we answer `mic-blocked`.
  *
  * Two things run off one mic: the file (MediaRecorder), which POST /transcribe takes when all else
- * fails, and the live session -- 24 kHz PCM streamed to OpenAI's Realtime API with the secret the
- * worker mints (`live`), whose text deltas ride the level ticks so the user reads along. Audio
+ * fails, and the live session -- 24 kHz PCM streamed to the API's live-dictation socket (the url
+ * and ticket come from the worker's `live`), whose text rides the level ticks so the user reads along. Audio
  * from before the socket opens is buffered, so the first words aren't lost.
  */
 
@@ -24,18 +24,19 @@ const LEVEL_GAIN = 10;
 // last sound, ends the dictation (the UIs press Stop). Raise the level if room noise keeps it going.
 const SILENCE_LEVEL = 0.08;
 const SILENCE_MS = 3000;
-const REALTIME_URL = 'wss://api.openai.com/v1/realtime?intent=transcription';
 // After Stop: how long a still-connecting socket may take to open, then the final transcript to land (~0.8 s typical).
 const OPEN_WAIT_MS = 1500;
 const FINISH_WAIT_MS = 3000;
 
 interface Live {
   socket: WebSocket | null;
-  /** The model the session transcribes with, from the worker's `live`. */
-  model?: string;
   /** PCM frames recorded before the socket opened. */
   pending: string[];
-  transcript: LiveTranscript;
+  /** Everything heard so far. */
+  text: string;
+  /** The final transcript and the model that made it, once the API answers the commit. */
+  done?: { text: string; model: string };
+  failed: boolean;
 }
 
 let recording: { recorder: MediaRecorder; chunks: Blob[]; stopped: Promise<void>; timer: number; tap: () => void; live: Live; started: number } | null = null;
@@ -66,7 +67,7 @@ async function handle(message: RecorderMessage): Promise<RecorderReply> {
       recorder.ondataavailable = (event) => chunks.push(event.data);
       const stopped = new Promise<void>((resolve) => (recorder.onstop = () => resolve()));
       recorder.start();
-      const live: Live = { socket: null, pending: [], transcript: emptyTranscript() };
+      const live: Live = { socket: null, pending: [], text: '', failed: false };
       const stopTap = tap(stream, message.owner, live);
       const timer = window.setTimeout(() => {
         stopTap(); // the bars, the clock and the stream stop with it
@@ -77,14 +78,20 @@ async function handle(message: RecorderMessage): Promise<RecorderReply> {
     }
     case 'live': {
       // A Stop that came first already took the file: nothing left to stream.
-      if (!recording || recording.live.socket || !message.secret) return {};
+      if (!recording || recording.live.socket || !message.socket) return {};
       const { live } = recording;
-      const socket = new WebSocket(REALTIME_URL, ['realtime', `openai-insecure-api-key.${message.secret}`]);
+      const socket = new WebSocket(message.socket);
       live.socket = socket;
-      live.model = message.model;
       socket.onopen = () => live.pending.splice(0).forEach((audio) => append(socket, audio));
-      socket.onmessage = (event) => (live.transcript = applyEvent(live.transcript, JSON.parse(event.data)));
-      socket.onerror = () => (live.transcript = { ...live.transcript, failed: true });
+      socket.onmessage = (event) => {
+        const answer = JSON.parse(event.data) as VoiceServerEvent;
+        if (answer.type === 'text') live.text = answer.text;
+        if (answer.type === 'done') live.done = { text: answer.text, model: answer.model };
+        if (answer.type === 'error') live.failed = true;
+      };
+      // Closed before its answer (a refused ticket, the session ended): Stop falls back to the file.
+      socket.onclose = () => (live.failed ||= !live.done);
+      socket.onerror = () => (live.failed = true);
       return {};
     }
     case 'stop': {
@@ -98,7 +105,7 @@ async function handle(message: RecorderMessage): Promise<RecorderReply> {
       const text = await finish(live);
       release();
       // A data: url, because runtime messages are JSON and a Blob would not survive them.
-      return { audio: await dataUrl(new Blob(chunks, { type: recorder.mimeType })), seconds, ...(text ? { text, model: live.model } : {}) };
+      return { audio: await dataUrl(new Blob(chunks, { type: recorder.mimeType })), seconds, ...(text ? { text, model: live.done?.model } : {}) };
     }
     case 'cancel':
       release();
@@ -111,10 +118,10 @@ async function finish(live: Live): Promise<string | undefined> {
   const { socket } = live;
   if (!socket || !(await opened(socket))) return undefined;
   live.pending.splice(0).forEach((audio) => append(socket, audio));
-  socket.send(JSON.stringify({ type: 'input_audio_buffer.commit' }));
+  send(socket, { type: 'commit' });
   const deadline = Date.now() + FINISH_WAIT_MS;
-  while (Date.now() < deadline && !live.transcript.failed && !isComplete(live.transcript)) await sleep(50);
-  return isComplete(live.transcript) ? liveText(live.transcript) || undefined : undefined;
+  while (Date.now() < deadline && !live.failed && !live.done) await sleep(50);
+  return live.done?.text || undefined;
 }
 
 async function opened(socket: WebSocket): Promise<boolean> {
@@ -123,7 +130,8 @@ async function opened(socket: WebSocket): Promise<boolean> {
   return socket.readyState === WebSocket.OPEN;
 }
 
-const append = (socket: WebSocket, audio: string) => socket.send(JSON.stringify({ type: 'input_audio_buffer.append', audio }));
+const send = (socket: WebSocket, event: VoiceClientEvent) => socket.send(JSON.stringify(event));
+const append = (socket: WebSocket, audio: string) => send(socket, { type: 'audio', audio });
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -139,7 +147,7 @@ function release() {
 }
 
 /**
- * Taps the mic at 24 kHz (the Realtime API's rate; the browser resamples): every frame goes to the
+ * Taps the mic at 24 kHz (the live-dictation socket's rate; the browser resamples): every frame goes to the
  * live session (or its buffer), and every tick sends the loudness (RMS, scaled 0..1), the elapsed
  * time and the live text so far. Stopped by the returned function.
  */
@@ -155,7 +163,7 @@ function tap(stream: MediaStream, owner: VoiceOwner | undefined, live: Live): ()
   processor.onaudioprocess = (event) => {
     const audio = toPcm16Base64(event.inputBuffer.getChannelData(0));
     if (live.socket?.readyState === WebSocket.OPEN) append(live.socket, audio);
-    else if (!live.transcript.failed) live.pending.push(audio); // bounded by MAX_SECONDS
+    else if (!live.failed) live.pending.push(audio); // bounded by MAX_SECONDS
   };
   source.connect(processor);
   processor.connect(context.destination); // a processor only runs when connected; it writes silence
@@ -168,7 +176,7 @@ function tap(stream: MediaStream, owner: VoiceOwner | undefined, live: Live): ()
     const loudness = Math.min(1, rms * LEVEL_GAIN);
     const now = Date.now();
     if (loudness >= SILENCE_LEVEL) lastSound = now;
-    const text = liveText(live.transcript);
+    const { text } = live;
     const silent = now - lastSound >= SILENCE_MS;
     const level: VoiceLevel = { type: 'voice-level', level: loudness, ms: now - started, ...(text ? { text } : {}), ...(silent ? { silent } : {}), ...(owner ? { owner } : {}) };
     browser.runtime.sendMessage(level).catch(() => {}); // nobody listening: the popup closed

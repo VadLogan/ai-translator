@@ -20,7 +20,7 @@ type Story = StoryObj<typeof meta>;
 
 const H6 = 'mb-2 text-xs font-bold uppercase tracking-wide text-tm-accent';
 
-const CALLBACKS: WidgetCallbacks = { onIconClick: noop, onLanguagePick: noop, onFixLayout: noop, onFixGrammar: noop, onOpenSettings: noop, onDisableField: noop, onDictate: noop };
+const CALLBACKS: WidgetCallbacks = { onIconClick: noop, onLanguagePick: noop, onFixLayout: noop, onFixGrammar: noop, onAddException: noop, onOpenSettings: noop, onDisableField: noop, onDictate: noop };
 const FAVORITES = ['en', 'de', 'uk'].map((code) => findLanguage(code)!);
 const LIVE = 'Hi team, I have sent the report yesterday and they were happy with it. Next week we will review the budget, the timeline and the open questions from the client. Please send me your comments before Friday so I can update the plan.';
 const fix = (text: string, original: string) => `<span class="fix" data-original="${original}">${text}</span>`;

@@ -1,5 +1,6 @@
 import { choice } from '@typesafe-ai/sdk';
-import type { CheckOk } from '../../../../../shared/contract.ts';
+import type { CheckBody, CheckOk } from '../../../../../shared/contract.ts';
+import { mask } from '../../../utils/exceptions.ts';
 import { typeSafeClient } from '../client.ts';
 import { toVerdict, verdictQuestion, type GuardVerdict } from './validateGuard.ts';
 
@@ -9,12 +10,13 @@ const COUNTS = Object.fromEntries(Array.from({ length: 10 }, (_, i) => [String(i
 /**
  * Counts the grammar, spelling and punctuation errors without fixing them: the badge's number.
  * Asks the guard's question in the same call (one round trip, not two): `verdict` is what
- * validateGuard would have answered, so /check runs without guardText.
+ * validateGuard would have answered, so /check runs without guardText. The exceptions are masked,
+ * so a kept term never counts as a spelling error.
  */
-export async function grammarQuality(text: string, signal?: AbortSignal): Promise<CheckOk & { verdict: GuardVerdict | null }> {
+export async function grammarQuality({ text, exceptions }: CheckBody, signal?: AbortSignal): Promise<CheckOk & { verdict: GuardVerdict | null }> {
   const response = await typeSafeClient.systemOne(
     {
-      state: { document: text },
+      state: { document: mask(text, exceptions).text },
       questions: {
         verdict: verdictQuestion,
         errors: choice('How many grammar, spelling and punctuation errors does this text have?', COUNTS),

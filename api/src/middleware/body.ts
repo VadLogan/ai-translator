@@ -1,23 +1,31 @@
 import { createMiddleware } from 'hono/factory';
 import {
+  EXCEPTION_KINDS,
   HOSTNAME,
   LANGUAGE_CODE,
   MAX_AUDIO_BYTES,
   MAX_DICTATION_SECONDS,
   MAX_DICTATION_WORDS,
   MAX_DISABLED_SITES,
+  MAX_EXCEPTIONS,
+  MAX_EXPLAIN_LENGTH,
   MAX_FAVORITE_LANGUAGES,
+  MAX_SUMMARY_CHARS,
+  MAX_SUMMARY_LINES,
   MAX_TEXT_LENGTH,
   MAX_URL_LENGTH,
   REWRITE_STYLES,
   type DetectBody,
   type DictationBody,
+  type ExplainBody,
   type FixGrammarBody,
   type RewriteBody,
   type RewriteStyle,
   type Settings,
+  type SummarizeBody,
   type TranscribeBody,
   type TranslateBody,
+  type VocabException,
 } from '../../../shared/contract.ts';
 import { fail, type AppEnv } from '../utils/http.ts';
 
@@ -57,13 +65,28 @@ export function parseSettings(body: unknown): Settings | string {
 /** The text + url both request bodies share. Returns the reason as a string when it is invalid. */
 export function parseDetectBody(body: unknown): DetectBody | string {
   if (typeof body !== 'object' || body === null) return 'Body must be a JSON object';
-  const { text, url } = body as Record<string, unknown>;
+  const { text, url, exceptions } = body as Record<string, unknown>;
   if (typeof text !== 'string' || !text.trim()) return 'text is required';
   if (text.length > MAX_TEXT_LENGTH) return `text must be at most ${MAX_TEXT_LENGTH} characters`;
   // Bound the url rather than trusting the caller -- a signed-in client can still send junk. Never parsed.
   if (url !== undefined && (typeof url !== 'string' || url.length > MAX_URL_LENGTH)) return 'url is invalid';
+  const parsed = exceptions === undefined ? [] : parseExceptions(exceptions);
+  if (typeof parsed === 'string') return parsed;
   // Trimmed once here, so every provider call, guard and saved row (and its trace_id) sees the same text.
-  return { text: text.trim(), ...(typeof url === 'string' ? { url } : {}) };
+  return { text: text.trim(), ...(typeof url === 'string' ? { url } : {}), ...(parsed.length ? { exceptions: parsed } : {}) };
+}
+
+const isForm = (form: unknown) => typeof form === 'string' && form.trim().length > 0 && form.length <= 60;
+
+/** The user's exceptions found in the text: at most MAX_EXCEPTIONS, each a short term of a known kind with at most 5 short wrong forms. */
+function parseExceptions(list: unknown): VocabException[] | string {
+  if (!Array.isArray(list) || list.length > MAX_EXCEPTIONS) return `exceptions must be an array of at most ${MAX_EXCEPTIONS}`;
+  const ok = list.every((x) => {
+    const { term, kind, replaces = [] } = (x ?? {}) as Record<string, unknown>;
+    return isForm(term) && EXCEPTION_KINDS.includes(kind as VocabException['kind']) && Array.isArray(replaces) && replaces.length <= 5 && replaces.every(isForm);
+  });
+  if (!ok) return 'exceptions contains an invalid entry';
+  return list.map(({ term, kind, replaces = [] }) => ({ term, kind, replaces }));
 }
 
 export function parseTranslateBody(body: unknown): TranslateBody | string {
@@ -95,6 +118,36 @@ export function parseRewriteBody(body: unknown): RewriteBody | string {
   const { style } = body as Record<string, unknown>;
   if (!REWRITE_STYLES.includes(style as RewriteStyle)) return `style must be one of ${REWRITE_STYLES.join(', ')}`;
   return { ...parsed, style: style as RewriteStyle };
+}
+
+const isUrl = (url: unknown) => url === undefined || (typeof url === 'string' && url.length <= MAX_URL_LENGTH);
+const isLang = (lang: unknown): lang is string => typeof lang === 'string' && LANGUAGE_CODE.test(lang);
+
+/** A highlight to explain, in the line it came from. `text` is what guardText checks. */
+export function parseExplainBody(body: unknown): ExplainBody | string {
+  if (typeof body !== 'object' || body === null) return 'Body must be a JSON object';
+  const { text, context, targetLang, url } = body as Record<string, unknown>;
+  if (typeof text !== 'string' || !text.trim()) return 'text is required';
+  if (text.length > MAX_EXPLAIN_LENGTH) return `text must be at most ${MAX_EXPLAIN_LENGTH} characters`;
+  if (typeof context !== 'string' || context.length > MAX_TEXT_LENGTH) return `context must be a string of at most ${MAX_TEXT_LENGTH} characters`;
+  if (!isLang(targetLang)) return 'targetLang is invalid';
+  if (!isUrl(url)) return 'url is invalid';
+  return { text: text.trim(), context: context.trim(), targetLang, ...(typeof url === 'string' ? { url } : {}) };
+}
+
+/** A meeting's dialog: speaker + text lines, bounded in count and size. */
+export function parseSummarizeBody(body: unknown): SummarizeBody | string {
+  if (typeof body !== 'object' || body === null) return 'Body must be a JSON object';
+  const { lines, targetLang, url } = body as Record<string, unknown>;
+  if (!Array.isArray(lines) || !lines.length || lines.length > MAX_SUMMARY_LINES) return `lines must be an array of 1 to ${MAX_SUMMARY_LINES}`;
+  const valid = lines.every((l) => typeof l?.speaker === 'string' && l.speaker.length <= 60 && typeof l?.text === 'string');
+  if (!valid) return 'each line needs a speaker (at most 60 characters) and a text';
+  const clean = (lines as { speaker: string; text: string }[]).map(({ speaker, text }) => ({ speaker: speaker.trim(), text: text.trim() })).filter((l) => l.text);
+  if (!clean.length) return 'lines must hold some text';
+  if (clean.reduce((sum, l) => sum + l.text.length, 0) > MAX_SUMMARY_CHARS) return `lines must hold at most ${MAX_SUMMARY_CHARS} characters`;
+  if (!isLang(targetLang)) return 'targetLang is invalid';
+  if (!isUrl(url)) return 'url is invalid';
+  return { lines: clean, targetLang, ...(typeof url === 'string' ? { url } : {}) };
 }
 
 /** A dictation upload: multipart with an `audio` file part and an optional `url`. */

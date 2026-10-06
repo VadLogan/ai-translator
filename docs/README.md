@@ -9,8 +9,9 @@ and the clients can change on their own schedules.
 | [frontend.md](frontend.md) | The **client as an abstract unit**: what any client (extension, desktop, mobile, web) must do to use the API, and which product logic currently lives client-side |
 | [extension.md](extension.md) | The **Chrome extension** in particular: code structure, runtime contexts, messaging, browser APIs, storage, UI surfaces |
 
-Snapshot taken 2026-10-01 from the `throttling-strategy` working tree (uncommitted changes included:
-`/stats/dictation`, `core/liveLanguage.ts`, `core/sentenceFixes.ts`).
+Snapshot taken 2026-10-06 from the `main` working tree (uncommitted changes included: exceptions
+applied by the API; meeting mode: the in-page meeting card, History → Meetings, the meeting
+detail screen, `/explain` and `/summarize`; live dictation relayed through the API's `voice` function).
 
 ---
 
@@ -25,7 +26,9 @@ A writing assistant that works **inside any text field on any web page** (and in
 | **Wrong keyboard layout** | Text typed on the wrong layout (`ghbdtn` for `привет`) is recognised; one click re-types it locally. Random keystrokes (`adfasdf`) are recognised and nothing is sent to the AI for them. |
 | **Voice input (dictation)** | Mic button in a field's hover pill or in the popup. Live text appears while speaking; on Stop, English goes to the grammar panel, a language the user usually translates goes straight to translation, anything else gets the language menu. Nothing is written into the page until **Insert**. |
 | **Toolbar popup** | A small translator: type or dictate, pick a pair, translate, "Try another", copy or **Insert** into the page's focused field. Local history (200 entries), starred items, pinned languages, a per-site on/off switch. |
-| **Options page** | Sign-in (Google / Facebook), favorite languages, disabled sites, fields turned off, microphone permission. |
+| **Exceptions** | Select a word → menu → "Add to Exceptions": a brand, name, term or code to keep as written, optionally with the wrong form it replaces. Listed in the options page. The worker sends the ones found in a text, and the API keeps them as written. |
+| **Meetings** | A card on the page with the meeting's transcript. On other speakers' lines the user highlights words → Translate / Explain / Add to vocabulary; the user's own lines show their error count and, on "Show fixes", the fix under the line. Ended meetings are saved locally as text (never audio) under popup History → Meetings, where a meeting's detail screen also summarizes the key points. **The transcript is still a scripted demo** (no meeting audio pipeline yet), and Start shows only in dev builds; every action on it calls the real API. |
+| **Options page** | Sign-in (Google / Facebook), favorite languages, disabled sites, fields turned off, vocabulary (learning words, exceptions), microphone permission. |
 | **Rewrite** | `natural` / `formal` restyle. **API only — no client UI yet.** |
 
 All AI work (translation, detection, grammar, transcription) runs **on the API**; provider keys never
@@ -49,6 +52,7 @@ flowchart LR
     GW["Gateway<br/>verify_jwt"]
     API["Edge Function 'api'<br/>Hono app"]
     H["Edge Function 'health'"]
+    V["Edge Function 'voice'<br/>live-dictation relay"]
     AUTH["GoTrue (Auth)<br/>Google · Facebook"]
     DB[("Postgres")]
   end
@@ -61,15 +65,17 @@ flowchart LR
   API --> DB
   API --> OAI
   API --> TS
-  R -- "WebSocket with<br/>short-lived secret" --> OAI
+  R -- "WebSocket with<br/>60 s ticket" --> V
+  V --> OAI
   H --> DB
 ```
 
-Three outbound connections leave the client:
+Three outbound connections leave the client, all to Supabase:
 1. **API** (`/functions/v1/api/*`) — everything functional.
 2. **Supabase Auth** (`/auth/v1/*`) — sign-in and token refresh only.
-3. **OpenAI Realtime** (`wss://api.openai.com/v1/realtime`) — live dictation audio, authorised by a
-   120 s client secret the API mints. This is the only place a client talks to a provider directly.
+3. **The `voice` function** (`wss://…/functions/v1/voice?ticket=…`) — live dictation audio, authorised
+   by a 60 s ticket from `POST /voice-session`. The API relays it to the provider; **no client talks to
+   a provider, or knows which one does the work**.
 
 ---
 
@@ -79,13 +85,13 @@ Three outbound connections leave the client:
 | --- | --- | --- |
 | Provider choice, prompts, models, keys | **Owns** | Never sees them |
 | Is this text a language? (guard: `mistyped` / `gibberish`) | **Decides** (422) | Renders the verdict; does the local re-type |
-| Language detection, translation, grammar fix, error count, rewrite, transcription | **Owns** | Calls, caches, renders |
+| Language detection, translation, grammar fix, error count, rewrite, transcription, explaining a word, summarizing a meeting | **Owns** | Calls, caches, renders |
 | Edit offsets of a grammar fix | **Computes** (server diff; the model's offsets are never trusted) | Applies them to its own text |
 | Auth | Verifies (gateway) and reads `sub` | Runs OAuth, stores & refreshes tokens |
 | Settings (`favoriteLanguages`, `disabledSites`) | **Source of truth** (`profiles.settings`) | Caches; fills empty favorites from the OS/browser languages |
 | Rate limiting, input validation | **Owns** | — |
 | Audit / analytics rows (`translations`, `detections`, …) | **Owns** | Supplies `url` (page) |
-| History, stars, pinned languages, turned-off fields | — | **Local only** (by choice) |
+| History, stars, pinned languages, turned-off fields, exceptions, vocabulary words, meeting transcripts | — | **Local only** (by choice) |
 | When to call (throttling, chunking text into sentences/paragraphs, prefetching, cancelling) | — | **Owns** |
 | Microphone capture, audio encoding, live socket | Mints the secret; fallback `/transcribe` | **Owns** |
 | Reading / writing the host app's text (DOM, selection, undo) | — | **Owns** (platform-specific) |
@@ -120,8 +126,7 @@ Found while reading the code for this documentation. None are fixed here.
 
 | # | Where | Finding |
 | --- | --- | --- |
-| 1 | `supabase/config.toml` `[functions.health]` | `entrypoint = "../api/src/health.ts"`, but the file is `api/dev/health.ts` (and `api/dev/` is documented as "never deployed"). Deploying `health` as configured should fail. |
-| 2 | `api/src/controllers/{translate,detect,fix-grammar,rewrite}.ts` | The **success** save (`save({ result })`) is commented out; only failures are stored (fix-grammar stores nothing). Consequence: `detections.verified` (written by `/translate`) never finds a row to mark. Docs still describe every attempt as saved. |
+| 2 | `api/src/controllers/{translate,detect,fix-grammar,rewrite}.ts` | The **success** save (`save({ result })`) is commented out; only failures are stored (fix-grammar stores nothing). Consequence: `detections.verified` (written by `/translate`) never finds a row to mark. Docs still describe every attempt as saved, and 7 tests that expect the save fail (6 in `src/app.test.ts`, 1 in `dev/dev-gateway.test.ts`). |
 | 3 | `api/src/resources/aiClient/requests/fix-grammar/fix-grammar.ts` | An AI request logs (`scopedLogger`), breaking the layer rule, and uses the **user's text as the log id**, so user text lands in log tags. |
 | 4 | `extension/src/api.ts` vs `auth/oauth.ts` | API base defaults to `:8787` (local Node), auth base to `:54321` (local Supabase). CLAUDE.md says the API default is `:54321`. Works only if both are running. |
 | 5 | `extension/wxt.config.ts` | `key` (pinned extension id) is commented out and `host_permissions` still has `https://<project-ref>.supabase.co/*`. Sign-in redirect and production API calls both depend on these. |
@@ -129,3 +134,4 @@ Found while reading the code for this documentation. None are fixed here.
 | 7 | `api/README.md` | Stale: refers to `src/translate.ts`, `src/openai.ts`, says detection is done by OpenAI (it is TypeSafe), lists no `/check`, `/fix-grammar`, `/transcribe`, `/voice-session`, `/stats`. [api.md](api.md) supersedes it. |
 | 8 | `api/src/repositories/wordStats.ts` | `/stats` is a dev counter written to a local JSON file; on the edge it silently counts nothing. It is extension-driven telemetry living in the API. |
 | 9 | Guard skipping | `/translate` skips the guard when `sourceLang` is sent, `/fix-grammar` when `guarded: true`. These are client-asserted. Cost exposure only (the client's own rate limit), but a new client must know the rule. |
+| 11 | `extension/src/messaging/transcriptSenders.ts` | A meeting transcript's Translate / Explain write in the **first favorite language**. A meeting held in that same language gets "translations" into itself. |

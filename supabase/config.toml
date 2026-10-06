@@ -449,5 +449,15 @@ import_map = "../api/deno.json"
 # a liveness probe that needs a login is useless.
 enabled = true
 verify_jwt = false
-entrypoint = "../api/src/health.ts"
+entrypoint = "../api/dev/health.ts"
+import_map = "../api/deno.json"
+
+[functions.voice]
+# Live dictation's WebSocket: the API relays the audio to the provider, so a client never talks to
+# it. A separate function because a browser WebSocket can't send an Authorization header, so
+# verify_jwt can't apply; the socket opens only for a ticket from POST /voice-session (signed with
+# VOICE_TICKET_SECRET, which must be set in the function secrets).
+enabled = true
+verify_jwt = false
+entrypoint = "../api/src/voice.ts"
 import_map = "../api/deno.json"

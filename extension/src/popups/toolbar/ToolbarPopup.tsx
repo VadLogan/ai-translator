@@ -7,19 +7,25 @@ import { useActiveSite } from './hooks/useActiveSite';
 import { useDictation } from './hooks/useDictation';
 import { useGrammarFix } from './hooks/useGrammarFix';
 import { useHistory } from './hooks/useHistory';
+import { useMeetingDetail } from './hooks/useMeetingDetail';
+import { useMeetings } from './hooks/useMeetings';
 import { usePinned } from './hooks/usePinned';
 import { useTranslation } from './hooks/useTranslation';
 import { PopupFrame } from './Popup';
 import { History } from './screens/History';
 import { Home } from './screens/Home';
 import { Languages } from './screens/Languages';
+import { MeetingDetail } from './screens/MeetingDetail';
+import { whenLabel, type MeetingRecord } from '../../settings/meetings';
 
-type Screen = 'home' | 'history' | { pick: 'from' | 'into' };
+type Screen = 'home' | 'history' | { pick: 'from' | 'into' } | { meeting: number };
 
 /** The container: composes the hooks and picks the screen. */
 export function ToolbarPopup() {
   const [screen, setScreen] = useState<Screen>('home');
+  const [historyTab, setHistoryTab] = useState<'texts' | 'meetings'>('texts');
   const history = useHistory();
+  const meetings = useMeetings();
   const pins = usePinned();
   // The site switch reports into the translator's notice line, the popup's one message slot.
   const site = useActiveSite((message) => translation.fail(message));
@@ -38,7 +44,7 @@ export function ToolbarPopup() {
     },
   });
 
-  const home = () => (history.dropUndo(), setScreen('home'));
+  const home = () => (history.dropUndo(), meetings.dropUndo(), setHistoryTab('texts'), setScreen('home'));
   const restore = (entry: HistoryEntry) => {
     home();
     grammar.endRun();
@@ -54,7 +60,24 @@ export function ToolbarPopup() {
     else translation.fail('Click into a field on the page first.');
   };
 
-  if (screen === 'history') {
+  if (typeof screen === 'object' && 'meeting' in screen) {
+    const record = meetings.meetings.find((m) => m.at === screen.meeting);
+    if (record) {
+      return (
+        <PopupFrame>
+          <MeetingScreen
+            key={record.at}
+            record={record}
+            onBack={() => setScreen('history')}
+            onDelete={() => (meetings.remove(record), setScreen('history'))}
+            onSaved={meetings.reload}
+          />
+        </PopupFrame>
+      );
+    }
+  }
+
+  if (screen === 'history' || (typeof screen === 'object' && 'meeting' in screen)) {
     return (
       <PopupFrame>
         <History
@@ -70,12 +93,25 @@ export function ToolbarPopup() {
           onDelete={history.remove}
           onClearAll={history.clearAll}
           undo={history.undo}
+          tab={historyTab}
+          onTab={setHistoryTab}
+          meetings={{
+            meetings: meetings.meetings,
+            // The meeting card is still a scripted demo: Start only in dev builds, on a web page.
+            startHost: import.meta.env.DEV && site.tab.host ? site.tab.host : null,
+            onStart: () => void meetings.start(site.tab.id),
+            onCopyNote: meetings.copyNote,
+            onClearAll: meetings.clearAll,
+            onOpen: (record) => (meetings.dropUndo(), setScreen({ meeting: record.at })),
+            notice: meetings.notice,
+            undo: meetings.undo,
+          }}
         />
       </PopupFrame>
     );
   }
 
-  if (typeof screen === 'object') {
+  if (typeof screen === 'object' && 'pick' in screen) {
     const side = screen.pick;
     return (
       <PopupFrame>
@@ -140,4 +176,10 @@ export function ToolbarPopup() {
       />
     </PopupFrame>
   );
+}
+
+/** One saved meeting: a container of its own, so its hook lives and dies with the screen. */
+function MeetingScreen({ record, onBack, onDelete, onSaved }: { record: MeetingRecord; onBack(): void; onDelete(): void; onSaved(): void }) {
+  const detail = useMeetingDetail(record, onSaved);
+  return <MeetingDetail site={record.site} meta={whenLabel(record)} speakers={record.cast ?? []} onBack={onBack} onDelete={onDelete} {...detail} />;
 }

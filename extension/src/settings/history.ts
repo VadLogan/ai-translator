@@ -79,8 +79,8 @@ export function dayLabel(at: number, now = Date.now()): string {
 }
 
 /** Entries under their `dayLabel`, in list order. */
-export function byDay(list: readonly HistoryEntry[], now = Date.now()): { day: string; entries: HistoryEntry[] }[] {
-  const groups: { day: string; entries: HistoryEntry[] }[] = [];
+export function byDay<T extends { at: number }>(list: readonly T[], now = Date.now()): { day: string; entries: T[] }[] {
+  const groups: { day: string; entries: T[] }[] = [];
   for (const entry of list) {
     const day = dayLabel(entry.at, now);
     const last = groups.at(-1);

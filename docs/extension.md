@@ -24,27 +24,26 @@ flowchart TB
   OFF["Offscreen document<br/>entrypoints/offscreen<br/>holds the mic"]
   API[("API")]
   AUTH[("Supabase Auth")]
-  OAI[("OpenAI Realtime")]
 
   CS -- "runtime.sendMessage (Message)" --> BG
   P -- "runtime.sendMessage (Message)" --> BG
   OP -- "runtime.sendMessage (Message)" --> BG
-  P -- "tabs.sendMessage {type:'insert'}" --> CS
+  P -- "tabs.sendMessage {type:'insert' | 'start-meeting'}" --> CS
   BG -- "RecorderMessage {target:'offscreen'}" --> OFF
   OFF -- "voice-level (broadcast)" --> P
   OFF -- "voice-level" --> BG -- "tabs.sendMessage to owner frame" --> CS
   BG --> API
   BG --> AUTH
-  OFF -- WebSocket --> OAI
+  OFF -- "WebSocket (live dictation, ticket)" --> API
 ```
 
 | Context | File | Responsibilities | Why here |
 | --- | --- | --- | --- |
 | **Background worker** | `src/entrypoints/background.ts` | The only API caller; access token + refresh; `url` from `sender.tab`; aborts in-flight requests by id; sign-in; settings pull/save; drives the recorder; forwards level ticks | `host_permissions` exempt it from page CORS and mixed content; `chrome.identity` only works here; a page can't forge `sender` |
-| **Content script** | `src/entrypoints/content.ts` (`<all_urls>`, `allFrames`, `document_idle`) | Mounts the widget; answers the popup's `insert` | Needs the page DOM |
-| **Toolbar popup** | `src/entrypoints/popup/` → `popups/toolbar/ToolbarPopup.tsx` | Standalone translator, history, pins, site switch, dictation, Insert | `action.default_popup` |
+| **Content script** | `src/entrypoints/content.ts` (`<all_urls>`, `allFrames`, `document_idle`) | Mounts the widget; answers the popup's `insert`; mounts the meeting card on the popup's `start-meeting` (top frame only) | Needs the page DOM |
+| **Toolbar popup** | `src/entrypoints/popup/` → `popups/toolbar/ToolbarPopup.tsx` | Standalone translator, history (Texts / Meetings), meeting detail, pins, site switch, dictation, Insert | `action.default_popup` |
 | **Settings page** (options) | `src/entrypoints/options/` → `popups/settings/` | Sign-in, your languages, disabled sites, turned-off fields, mic permission (`#mic`), shortcuts | The only context that can show the mic permission prompt for the extension |
-| **Offscreen document** | `src/entrypoints/offscreen/` | `getUserMedia`, MediaRecorder file, PCM tap, Realtime socket, silence/60 s stop | Worker has no `getUserMedia`; a content script would ask every site for the mic |
+| **Offscreen document** | `src/entrypoints/offscreen/` | `getUserMedia`, MediaRecorder file, PCM tap, the API's live-dictation socket, silence/60 s stop | Worker has no `getUserMedia`; a content script would ask every site for the mic |
 
 The worker is killed between events: nothing is kept in memory across requests except the
 `checks` abort map for in-flight calls. Tokens refresh on demand, never on a timer.
@@ -75,19 +74,21 @@ Build-time env: `WXT_API_URL` (default `http://127.0.0.1:8787/functions/v1/api`)
 
 ```
 extension/
-  wxt.config.ts  vitest.config.ts  tsconfig.json  .storybook/  playground/index.html
+  wxt.config.ts  vitest.config.ts  tsconfig.json  .storybook/  playground/index.html  playground/meeting.html
   src/
     api.ts                      the ONLY fetches to the API (worker-side), ApiError, 401-from-status
     entrypoints/                WXT mounts only: background.ts, content.ts, popup/, options/, offscreen/
     messaging/
       messages.ts               Message / ResponseMap / Response<T>, sendMessage()
       recorder.ts               RecorderMessage, RecorderReply, VoiceLevel (worker ↔ offscreen)
+      transcriptSenders.ts      the messages + storage behind a meeting transcript's actions (both surfaces)
     auth/                       oauth.ts (PKCE, refresh), session.ts (storage item), providers.ts
-    settings/                   chrome.storage items: storage-settings, history, pinned, disabled-fields
-    core/                       pure, tested: languages, layout, sites, fixEdits, pcm, liveTranscript, liveLanguage, sentenceFixes
+    settings/                   chrome.storage items: storage-settings, history, pinned, disabled-fields, vocabulary, meetings
+    core/                       pure, tested: languages, layout, sites, fixEdits, pcm, liveLanguage, sentenceFixes,
+                                transcript (meeting transcripts: highlight, result cards, checks, transcriptActions)
     content/                    DOM domain logic: selection.ts, replace.ts, insert.ts
     components/                 presentational, reusable: buttons, icons, inputs, typography, menu, list,
-                                CountBadge, GrammarPanel, Recording, theme.css, color-scheme
+                                CountBadge, GrammarPanel, Recording, Transcript, theme.css, color-scheme
     widgets/translator/         the in-page widget
       mount.ts                  closed shadow host
       Translator.tsx            container: useTranslatorFlow → toView → <TranslatorWidget>
@@ -95,12 +96,16 @@ extension/
                                 useUnderlines, chunkRequests, requestSlot
       state.ts view.ts position.ts chunks.ts shadow-css.ts   pure, tested
       TranslatorWidget.tsx Trigger.tsx panels/               presentational (+ stories)
+    widgets/meeting/            the in-page meeting card: mount.ts (own closed shadow host), Meeting.tsx (container),
+                                hooks/ (useMeeting; demoFeed = the scripted transcript), state.ts view.ts (pure, tested),
+                                MeetingPanel.tsx (presentational + story)
     popups/
       toolbar/                  ToolbarPopup (container), hooks/ (useTranslation, useHistory, useActiveSite,
-                                usePinned, useDictation, useGrammarFix), screens/ (Home, History, Languages, entries)
+                                usePinned, useDictation, useGrammarFix, useMeetings, useMeetingDetail),
+                                screens/ (Home, History, Meetings, MeetingDetail, Languages, entries)
       settings/                 SettingsApp (container), hooks/ (useAccount, useSettings, useDisabledFields,
                                 useMicPermission, useShortcuts, useHash), SettingsPage + AddLanguage (presentational)
-    demo/                       Storybook demo story
+    demo/                       Storybook demo stories (one per /demo run)
 ```
 
 ### Dependency rules
@@ -126,13 +131,15 @@ structured cloning). Adding a type = update `Message` **and** `ResponseMap`.
 
 | `type` | Payload | Worker does | Response | Senders |
 | --- | --- | --- | --- | --- |
-| `translate` | `text, targetLang, sourceLang?, id?` | `POST /translate` (+ `url` from tab), abortable by `id` | `TranslateOk` | widget, popup |
+| `translate` | `text, targetLang, sourceLang?, id?` | `POST /translate` (+ `url` from tab), abortable by `id` | `TranslateOk` | widget, popup, meeting transcripts |
 | `detect` | `text` | `POST /detect` | `DetectOk` | widget, popup, dictation (live language) |
-| `check` | `text, id` | `POST /check`, abortable | `CheckOk` | widget |
-| `fix-grammar` | `text, id, guarded?` | `POST /fix-grammar`, abortable | `FixGrammarOk` | widget, popup, sentence fixes |
+| `check` | `text, id` | `POST /check`, abortable | `CheckOk` | widget, meeting transcripts (the user's lines) |
+| `fix-grammar` | `text, id, guarded?` | `POST /fix-grammar`, abortable | `FixGrammarOk` | widget, popup, sentence fixes, meeting transcripts ("Show fixes") |
 | `cancel` | `id` | aborts the matching fetch | `void` | widget, popup |
 | `rewrite` | `text, style` | `POST /rewrite` | `RewriteOk` | **none (no UI)** |
-| `voice-start` | — | ensure offscreen doc; `start`; mint `/voice-session` (not awaited) → `live` | `void` / `mic-blocked` | widget, popup |
+| `explain` | `text, context, targetLang` | `POST /explain` (+ `url`) | `ExplainOk` | meeting transcripts (Explain, Add to vocabulary) |
+| `summarize` | `lines, targetLang` | `POST /summarize` | `SummarizeOk` | popup meeting detail |
+| `voice-start` | — | ensure offscreen doc; `start`; ask `/voice-session` (not awaited) → `live` with `voiceSocketUrl(ticket)` | `void` / `mic-blocked` | widget, popup |
 | `voice-stop` | `lang?` | `stop`; live text ⇒ `{text, lang}` (detect if no `lang`); else upload to `/transcribe`; report `/stats/dictation` | `TranscribeOk` | widget, popup |
 | `voice-cancel` | — | recorder `cancel` | `void` | widget, popup |
 | `open-options` | — | `runtime.openOptionsPage()` | `void` | widget, popup |
@@ -161,6 +168,10 @@ recorder, so the worker stays stateless).
 `tabs.sendMessage(tabId, {type: 'insert', text})`. Every frame receives it; only the frame holding a
 focused field answers `true` (`content/insert.ts`). `undefined` = no field focused.
 
+`tabs.sendMessage(tabId, {type: 'start-meeting'})` (History → Meetings → Start, dev builds only while the
+transcript is a demo). The top frame mounts the meeting card, unless one is already open, and answers
+`true`. `undefined` = a page where content scripts don't run, and the popup says so.
+
 ---
 
 ## 5. Browser / Web APIs used
@@ -175,12 +186,12 @@ focused field answers `true` (`content/insert.ts`). `undefined` = no field focus
 | `storage.local` via `wxt/utils/storage` (`defineItem`, `watch`) | `settings/`, `auth/session.ts` | All persistence; `watch` propagates changes to open tabs |
 | `scripting.getRegisteredContentScripts` | worker (dev only) | Reload the playground tab |
 | `navigator.mediaDevices.getUserMedia`, `MediaRecorder`, `AudioContext` + `ScriptProcessorNode` | offscreen | File + 24 kHz PCM |
-| `WebSocket` (`wss://api.openai.com/v1/realtime?intent=transcription`, subprotocol `openai-insecure-api-key.<secret>`) | offscreen | Live transcription |
+| `WebSocket` (the API's `…/functions/v1/voice?ticket=…`; our `VoiceClientEvent` / `VoiceServerEvent`) | offscreen | Live transcription |
 | `navigator.permissions` / `getUserMedia` prompt | options (`useMicPermission`) | One-time mic grant |
 | `crypto.subtle`, `crypto.getRandomValues`, `crypto.randomUUID` | auth, request ids | PKCE, ids |
-| `Intl.Segmenter` | core, chunks | Word/sentence counting (CJK-safe) |
+| `Intl.Segmenter` | core, chunks | Word/sentence counting (CJK-safe); a meeting line's highlightable words (`core/transcript.ts`) |
 | `document.execCommand('insertText'/'insertHTML')`, synthetic `paste` / `input`, `setRangeText`, `Range` | `content/replace.ts` | Writing into fields with native undo, incl. model-based editors |
-| Shadow DOM (closed) | `widgets/translator/mount.ts` | Isolation from page CSS/JS |
+| Shadow DOM (closed) | `widgets/translator/mount.ts`, `widgets/meeting/mount.ts` | Isolation from page CSS/JS |
 | `MutationObserver` | `widgets/translator/hooks/usePageEvents.ts` | Notice editor changes that fire no `input` event |
 | `navigator.languages` | `core/languages.ts` | Default favorites |
 
@@ -195,6 +206,9 @@ focused field answers `true` (`content/insert.ts`). `undefined` = no field focus
 | `local:popupHistory` | `settings/history.ts` | no | Last 200 entries; popup + widget translations + applied grammar fixes |
 | `local:pinnedLanguages` | `settings/pinned.ts` | no | Always first in pickers and the in-page menu |
 | `local:disabledFields` | `settings/disabled-fields.ts` | no | `{site, key: fieldKey(el), label}` |
+| `local:vocabularyExceptions` | `settings/vocabulary.ts` | no | `{term, kind, replaces[]}`; added from the widget menu or Settings → Vocabulary; the worker attaches the ones found in a text to `translate` / `check` / `fix-grammar` / `rewrite` |
+| `local:vocabularyWords` | `settings/vocabulary.ts` | no | Learning words, listed in Settings → Vocabulary; written by a meeting transcript's "Add to vocabulary" (`addWord`: meaning and examples from `/explain`, `source` "Meeting · host", `context` the line, `hit` the highlight) |
+| `local:meetings` | `settings/meetings.ts` | no | Ended meetings, newest first, 100 max: summary fields plus the transcript as text (`cast`, `lines` with error counts and fixes once fetched, `summary` once asked), never audio. Older records have no `lines` |
 
 ---
 
@@ -204,16 +218,17 @@ focused field answers `true` (`content/insert.ts`). `undefined` = no field focus
 
 - **Mount** (`mount.ts`): a fixed-position host with a **closed** shadow root, appended to `<html>` or
   inside the field's dialog/popover (so outside-click and modal inertness leave it alone). `mousedown`
-  inside is `preventDefault`ed to keep focus and selection in the page's field — don't remove it.
+  inside is `preventDefault`ed to keep focus and selection in the page's field — don't remove it. The
+  widget's own text inputs are exempt, and key events stop at the host so typing in them never reaches the page.
 - **Architecture**: `Translator.tsx` composes `useTranslatorFlow` (all behaviour) → pure reducer
   `state.ts` → pure `toView` (`view.ts`) → presentational `TranslatorWidget` / `Trigger` / `panels/*`.
   Page listeners are subscribed **once** (`usePageEvents`) and read state through a `latest` ref
   (re-subscribing loses events in Teams/CKEditor). A `generation` ref drops stale responses.
 - **Three entry flows**:
-  1. *Selection in a field* → icon above it → language menu (detect on open; usual pair as shortcut `1`) → translate & replace; "Grammar fix" item with the selection's error count.
+  1. *Selection in a field* → icon above it → language menu (detect on open; usual pair as shortcut `1`) → translate & replace; "Grammar fix" item with the selection's error count; "Add to Exceptions" for a word or short name (page text too) → the exception form.
   2. *Focused field, nothing selected* → corner icon with badge → grammar panel; inline underlines on textarea/contenteditable (never single-line inputs); hover pill: mic, "Turn off in this field".
   3. *Page text* (`kind: 'page'`) → icon → menu with translation field (read-only, Copy). Never replaced.
-- **Screens** (`Screen` in `state.ts`): `icon`, `languages`, `busy`, `grammar`, `recording`, `layout`, `notText`, `signIn`, `error`.
+- **Screens** (`Screen` in `state.ts`): `icon`, `languages`, `busy`, `grammar`, `recording`, `layout`, `notText`, `exception`, `signIn`, `error`.
 - **Gates** (`useSiteGate`): `Settings.disabledSites` (site + subdomains) and turned-off fields; both follow `storage.watch`, so options changes apply without reload.
 - **Field eligibility** (`content/selection.ts`): text/search inputs, textareas, contenteditable;
   excludes login/email/OTP/card/phone fields (autocomplete, inputmode, name/id/aria-label heuristics);
@@ -233,18 +248,37 @@ Container `ToolbarPopup.tsx`; hooks `useTranslation` (debounced detect, pair ori
 another" versions in memory), `useHistory`, `useActiveSite` (per-site switch writes
 `Settings.disabledSites`), `usePinned`, `useDictation`, `useGrammarFix`; screens `Home`, `Languages`
 (pin toggles, search, A–Z), `History` (day groups, pair filter tabs, Starred, single Undo). The popup
-has no tab `url` (worker sends none), so its history entries have an empty `site`.
+has no tab `url` (worker sends none), so its history entries have an empty `site`. History has
+**Texts | Meetings** tabs (the tab is kept by the container, so Back from a meeting lands on Meetings).
+Meetings: a Start card for the current tab (dev builds only; "copy a note for the chat" copies
+`CHAT_NOTE`), saved meetings by day, Clear all with one Undo. A meeting opens `MeetingDetail`
+(`useMeetingDetail`): the transcript with the meeting card's actions, the user's unchecked lines checked
+on open (two at a time), Summarize key points, Copy (`transcriptText`), Delete. What it fetches is
+written back with `meetingsStore.update`, so reopening asks nothing again.
 
 ### 7.4 Settings page (`popups/settings/`, served as `options.html`)
 
 Sidebar of `#section` anchors, then: Account (Google / Facebook); your languages as chips (remove, or
 "Add a language" search; saved on every change, menu order = list order, at least one kept); disabled
 sites (one hostname per line, pasted urls reduced to hostnames, explicit Save); turned-off fields with
-"Turn back on"; Microphone (`#mic` deep link opened by the worker on `mic-blocked`); Shortcuts: the
+"Turn back on"; Vocabulary (Learning words; Exceptions: add / remove, the same list the widget adds to); Microphone (`#mic` deep link opened by the worker on `mic-blocked`); Shortcuts: the
 popup key from `commands._execute_action` (Chrome-owned, so "Change" opens `chrome://extensions/shortcuts`),
 plus the fixed ⌘ ↵ and menu digits 1–9 shown as text.
 
-### 7.5 Voice pipeline (extension specifics)
+### 7.5 Meeting card (`widgets/meeting/`)
+
+Its own closed shadow host on `<html>` (`mountMeeting`), with the translator host's focus and key rules.
+Bottom right: header (status, clock, Pause, Minimize, End → Close), speaker legend (click a name to
+rename), transcript, live line. **The transcript is a scripted demo** (`hooks/demoFeed.ts`) until a
+meeting audio pipeline exists; every action on it is real. Both it and the popup's meeting detail
+render `components/Transcript.tsx` over `core/transcript.ts`:
+- other speakers' lines: press and drag across words to highlight (our own highlight, since the shadow
+  root's prevented mousedown blocks native selection), then Translate / Explain / Add to vocabulary;
+- the user's lines: `/check` as they commit → "N errors · Show fixes" → the fix under the original.
+
+End saves the meeting to `local:meetings`. Auto-opens on `playground/meeting.html` in dev builds.
+
+### 7.6 Voice pipeline (extension specifics)
 
 Offscreen recorder records webm/opus **and** taps 24 kHz PCM; buffers PCM until the socket opens; on
 Stop commits and waits ≤ 3 s (socket open ≤ 1.5 s); silent fallback to `/transcribe` (the audio crosses

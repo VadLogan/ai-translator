@@ -5,12 +5,14 @@ import { fail, type AppEnv } from './utils/http.ts';
 import { requireUser } from './middleware/auth.ts';
 import { rateLimit } from './middleware/rate-limit.ts';
 import { guardText } from './middleware/guard.ts';
-import { parseDetectBody, parseDictationBody, parseFixGrammarBody, parseRewriteBody, parseSettings, parseTranscribeBody, parseTranslateBody, validate } from './middleware/body.ts';
+import { parseDetectBody, parseDictationBody, parseExplainBody, parseFixGrammarBody, parseRewriteBody, parseSummarizeBody, parseSettings, parseTranscribeBody, parseTranslateBody, validate } from './middleware/body.ts';
 import { getSettings, putSettings } from './controllers/settings.ts';
 import { detectController } from './controllers/detect.ts';
 import { translateController } from './controllers/translate.ts';
 import { fixGrammarController } from './controllers/fix-grammar.ts';
 import { rewriteController } from './controllers/rewrite.ts';
+import { explainController } from './controllers/explain.ts';
+import { summarizeController } from './controllers/summarize.ts';
 import { checkController } from './controllers/check.ts';
 import { transcribeController } from './controllers/transcribe.ts';
 import { voiceSessionController } from './controllers/voiceSession.ts';
@@ -57,6 +59,11 @@ app.post('/fix-grammar', requireUser('Sign in to fix grammar'), rateLimit, valid
 app.post('/check', requireUser('Sign in to check grammar'), rateLimit, validate(parseDetectBody), checkController); // guards itself, in the same call as the count
 
 app.post('/rewrite', requireUser('Sign in to rewrite'), rateLimit, validate(parseRewriteBody), guardText, rewriteController);
+
+// Meeting transcripts: a highlighted word explained (also what "Add to vocabulary" saves), and the
+// whole dialog's key points. No guardText on /summarize -- a dialog isn't one typed text.
+app.post('/explain', requireUser('Sign in to explain'), rateLimit, validate(parseExplainBody), guardText, explainController);
+app.post('/summarize', requireUser('Sign in to summarize'), rateLimit, validate(parseSummarizeBody), summarizeController);
 
 // Voice input: multipart audio in, {text, lang} out. No guardText -- there is no typed text to guard.
 app.post('/transcribe', requireUser('Sign in to use voice input'), rateLimit, validate(parseTranscribeBody), transcribeController);

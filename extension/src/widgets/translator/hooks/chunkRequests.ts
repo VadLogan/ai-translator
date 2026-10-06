@@ -59,6 +59,8 @@ export function chunkRequests<T>(ask: (text: string, id: string) => Promise<Resp
   return {
     /** What is known of `text` in `el`: its answer, a guard verdict, or nothing yet. */
     get: (el: Element, text: string): T | Verdict | undefined => fields.get(el)?.get(text),
+    /** Puts an answer for `text` in `el`'s cache by hand: a re-checked sentence spliced into its paragraph's fix. */
+    set: (el: Element, text: string, value: T): void => void known(el).set(text, value),
     /** Something is in flight or queued. */
     busy: (): boolean => pending.size > 0 || queue.length > 0,
     /** Every text known for `el`, oldest first, with its answer. */

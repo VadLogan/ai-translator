@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { handler } from './health.ts';
-import { checkDb } from './db.ts';
+import { checkDb } from '../src/resources/db.ts';
 
-vi.mock('./db.ts', () => ({ checkDb: vi.fn() }));
+vi.mock('../src/resources/db.ts', () => ({ checkDb: vi.fn() }));
 
 describe('health', () => {
   it.each(['ok', 'disabled'] as const)('200s when the database is %s', async (db) => {

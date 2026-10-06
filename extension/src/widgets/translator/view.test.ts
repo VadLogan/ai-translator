@@ -4,7 +4,7 @@ import { findLanguage } from '../../core/languages';
 import { hidden, reducer, type State } from './state';
 import { toCheck, toDetection, toView } from './view';
 
-const actions = { onPick: vi.fn(), onBack: vi.fn(), onClose: vi.fn(), onReplaceEdit: vi.fn(), onIgnoreEdit: vi.fn(), onReplaceAll: vi.fn(), onStep: vi.fn(), onStopDictation: vi.fn(), onInsertDictation: vi.fn() };
+const actions = { onPick: vi.fn(), onBack: vi.fn(), onClose: vi.fn(), onReplaceEdit: vi.fn(), onIgnoreEdit: vi.fn(), onReplaceAll: vi.fn(), onStep: vi.fn(), onRecheck: vi.fn(), onStopDictation: vi.fn(), onInsertDictation: vi.fn(), onSaveException: vi.fn() };
 const anchor = { x: 1, top: 2, bottom: 3 };
 const selected = (text: string, kind = 'input'): State =>
   reducer(hidden, { type: 'select', selection: { text, kind } as unknown as EditableSelection, anchor });
@@ -105,4 +105,17 @@ it("offers Insert on a dictation's translation only once it has answered", () =>
   expect(toView(state, actions)).toMatchObject({ kind: 'languages', dictation: { transcript: 'Hallo', text: undefined } });
   state = reducer(state, { type: 'translation', translation: { lang: 'en', text: 'Hello' } });
   expect(toView(state, actions)).toMatchObject({ dictation: { text: 'Hello' } });
+});
+
+it('offers "Add to Exceptions" for a word or a short name, not a sentence', () => {
+  const menu = (text: string) => toView(reducer(selected(text), { type: 'open', languages: [], pairs: [] }), actions);
+  expect(menu('TypeMeant')).toMatchObject({ canAddException: true });
+  expect(menu('type meant')).toMatchObject({ canAddException: true });
+  expect(menu('This is a whole sentence about it.')).toMatchObject({ canAddException: false });
+});
+
+it('opens the exception form on the trimmed selection; page text has nothing to fix', () => {
+  const form = (kind: string) => toView(reducer(selected(' Apfel ', kind), { type: 'show', screen: { kind: 'exception' } }), actions);
+  expect(form('input')).toMatchObject({ kind: 'exception', selected: 'Apfel', canFix: true });
+  expect(form('page')).toMatchObject({ canFix: false });
 });

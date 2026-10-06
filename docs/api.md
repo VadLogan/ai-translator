@@ -16,7 +16,7 @@ client is a thin caller that never holds a provider key.
 | Translation, language detection, grammar fix, error count, rewrite, transcription | When/how often a client asks (throttling, chunking, prefetching) |
 | The guard: rejecting wrong-layout and gibberish text **before** any paid call | The local re-type of mistyped text (`switchLayout` is client-side) |
 | Computing grammar-fix edits and their offsets (server-side diff) | Applying edits to a host document |
-| Minting short-lived Realtime secrets for live dictation | Capturing audio, streaming it, assembling live text |
+| Live dictation's provider session: relays the client's audio and answers in its own events (`voice` function) | Capturing audio, streaming it to the API's socket, showing the live text |
 | User settings (`profiles.settings`) — source of truth | Settings defaults that need the OS (browser languages) |
 | Per-user rate limit, request validation, CORS | History, stars, pinned languages, turned-off fields (client-local) |
 | Persisting attempts for analytics (`translations`, `detections`, …) | Auth UI, token storage, token refresh |
@@ -26,13 +26,14 @@ client is a thin caller that never holds a provider key.
 
 ## 2. Runtime and deployment
 
-One Hono app, three entrypoints. Only entrypoints know which runtime they are on; `app.ts` must not branch on it.
+One Hono app, four entrypoints. Only entrypoints know which runtime they are on; `app.ts` must not branch on it.
 
 | Entrypoint | Runtime | URL base | Auth gate |
 | --- | --- | --- | --- |
 | `api/src/index.ts` → `Deno.serve(app.fetch)` | Supabase Edge Function **`api`** (Deno) | `https://<ref>.supabase.co/functions/v1/api` · local `:54321` | Gateway `verify_jwt = true` |
+| `api/src/voice.ts` → `controllers/voiceStream.ts` | Edge Function **`voice`** (WebSocket) | `wss://<ref>.supabase.co/functions/v1/voice?ticket=…` | `verify_jwt = false`; the signed ticket from `/voice-session` (a browser WebSocket carries no header) |
 | `api/dev/health.ts` | Edge Function **`health`** | `/functions/v1/health` | `verify_jwt = false` (public) |
-| `api/src/server.ts` → `dev/dev-gateway.ts` | Local Node (`npm run dev:api`) | `http://127.0.0.1:8787/functions/v1/api` | Emulated (see §6) |
+| `api/src/server.ts` → `dev/dev-gateway.ts` | Local Node (`npm run dev:api`) | `http://127.0.0.1:8787/functions/v1/api` (and `ws://…/functions/v1/voice` via `ws`) | Emulated (see §6); a per-process `VOICE_TICKET_SECRET` when unset |
 
 - `app` uses `basePath('/api')` because Supabase strips `/functions/v1` and passes `/api/...`.
 - `api/src/**` deliberately lives outside `supabase/functions/`; `supabase/config.toml` points
@@ -40,12 +41,11 @@ One Hono app, three entrypoints. Only entrypoints know which runtime they are on
 - Deno runs the TS directly: keep code **erasable** (no enums, no parameter properties).
 - Runtime deps are in `api/deno.json` (import map); the same versions are `devDependencies` in
   `api/package.json` for vitest/tsc. Bump both.
-- Two functions exist only because `verify_jwt` is per-function and enforced before the handler.
-- ⚠ `[functions.health] entrypoint` points to `../api/src/health.ts`, but the file is `api/dev/health.ts`.
+- `health` and `voice` are separate functions only because `verify_jwt` is per-function and enforced before the handler.
 
 Commands (repo root): `npm run dev:api` (Node, no Docker) · `npm run db` (local Supabase) ·
 `npm run dev:api:edge` (real gateway + Deno; run before deploying) · `npm run token -w api` (dev JWT) ·
-deploy: `supabase link`, `supabase secrets set --env-file supabase/functions/.env`, `supabase functions deploy api`.
+deploy: `supabase link`, `supabase secrets set --env-file supabase/functions/.env`, `supabase functions deploy api` (and `voice`, `health`).
 
 ---
 
@@ -105,7 +105,7 @@ api/
 | --- | --- | --- |
 | **OpenAI Responses API** | `translate`, `fix-grammar` (streamed, `service_tier: 'priority'`, `reasoning: none`), `rewrite` — all with strict JSON schema output | `OPENAI_API_KEY`, `OPENAI_MODEL` (default `gpt-5.6-luna`) |
 | **OpenAI Audio** | `/transcribe` (`audio.transcriptions.create`) | `OPENAI_TRANSCRIBE_MODEL` (default `gpt-4o-transcribe`) |
-| **OpenAI Realtime** | `/voice-session` mints a client secret (120 s) for a `transcription` session: PCM 24 kHz, near-field noise reduction, **no turn detection** | `OPENAI_LIVE_TRANSCRIBE_MODEL` (default `gpt-live-transcribe`) |
+| **OpenAI Realtime** | The `voice` function mints a client secret (120 s, never leaves the API) for a `transcription` session (PCM 24 kHz, near-field noise reduction, **no turn detection**) and holds the socket, relaying the client's audio | `OPENAI_LIVE_TRANSCRIBE_MODEL` (default `gpt-live-transcribe`) |
 | **TypeSafe** (`@typesafe-ai/sdk`, `systemOne` + `choice`) | Classification: the guard verdict, language detection, error count | `TYPESAFE_API_KEY` |
 | **Postgres** (Supabase) | Attempt logs, profiles/settings | `SUPABASE_DB_URL` (injected) or `DATABASE_URL` override; none ⇒ saves are no-ops |
 | **Supabase Gateway / GoTrue** | JWT verification before the handler; OAuth providers Google, Facebook | `supabase/config.toml`, root `.env` |
@@ -129,8 +129,11 @@ Error body: `{ "error": { "message": string, "code": ApiErrorCode } }`.
 | `POST /check` | user · rate · validate · (guard **in the same call**) | `CheckBody {text, url?}` → `CheckOk {errors 0..9, model?, usage?}` | — |
 | `POST /fix-grammar` | user · rate · validate · (guard **in parallel**, skipped if `guarded`) | `FixGrammarBody {text, url?, guarded?}` → `FixGrammarOk {text, html, edits[], model?}` | `corrections` (disabled) |
 | `POST /rewrite` | user · rate · validate · **guard** | `RewriteBody {text, url?, style}` → `RewriteOk {text, model?, usage?}` | `rewrites` (failures only) |
+| `POST /explain` | user · rate · validate · **guard** | `ExplainBody {text, context, targetLang, url?}` → `ExplainOk {meaning, examples[2], lang, model?, usage?}` | — |
+| `POST /summarize` | user · rate · validate | `SummarizeBody {lines: {speaker, text}[], targetLang, url?}` → `SummarizeOk {points[], model?, usage?}` | — |
 | `POST /transcribe` | user · rate · validate (multipart) | `audio` file (+ `url`) → `TranscribeOk {text, lang, model?}` | `transcriptions` (switched off) |
-| `POST /voice-session` | user · rate | — → `VoiceSessionOk {secret, expiresAt, model}` | — |
+| `POST /voice-session` | user · rate | — → `VoiceSessionOk {ticket, expiresAt}` | — |
+| `WS /functions/v1/voice?ticket=` | the ticket (own function) | `VoiceClientEvent` (`audio`, `commit`) ⇄ `VoiceServerEvent` (`ready`, `text`, `done {text, model}`, `error`) | — |
 | `GET /settings` | user | — → `Settings` | reads `profiles` |
 | `PUT /settings` | user · validate | `Settings` (full object) → `Settings` | upserts `profiles.settings` |
 | `GET /stats` | user | — → word / dictation counters | reads `api/word-stats.json` |
@@ -145,6 +148,8 @@ Error body: `{ "error": { "message": string, "code": ApiErrorCode } }`.
 - `targetLang` / `sourceLang`: `LANGUAGE_CODE` `/^[a-zA-Z-]{2,8}$/` (not restricted to the 31 supported languages).
 - `style`: one of `REWRITE_STYLES` (`natural`, `formal`).
 - `guarded`: boolean; kept only when `true`.
+- Explain: `text` ≤ `MAX_EXPLAIN_LENGTH` (200), `context` a string ≤ `MAX_TEXT_LENGTH`, both trimmed; `targetLang` as above.
+- Summarize: 1..`MAX_SUMMARY_LINES` (400) lines, each `{speaker ≤ 60 chars, text}`; empty lines dropped after trim; ≤ `MAX_SUMMARY_CHARS` (40 000) of text in all.
 - Settings: `favoriteLanguages` ≤ 20 valid codes; `disabledSites` ≤ 100 `HOSTNAME`s (≤ 253 chars).
 - Audio: multipart, `audio` part of type `audio/*`, ≤ `MAX_AUDIO_BYTES` (5 MB).
 - Dictation: `0 < seconds ≤ 600`, `words` integer 0..10 000, `model` `/^[\w.:-]{1,64}$/`.
@@ -194,12 +199,31 @@ Response invariant: `edits[i].start/end` index into the **request** text; `text.
 
 **`POST /rewrite`** — OpenAI with a style instruction; strict schema `{text}`. No client UI.
 
+**`POST /explain`** — a highlighted word or phrase of a meeting line, explained as used in that line.
+OpenAI with a strict schema `{meaning, examples, lang}`: `meaning` in `targetLang` (the user's language),
+two `examples` in the highlight's own language (trimmed to 2), `lang` the highlight's language. One
+call serves both Explain and the client's "Add to vocabulary", which stores the answer. The guard runs
+on `text` (the highlight). Not saved.
+
+**`POST /summarize`** — a meeting's whole dialog → 3–7 key points (decisions, owners and dates, open
+questions, what "You" promised), written in `targetLang`. No guard: a dialog is not one typed text.
+The controller logs the line count and language, never the transcript. Not saved.
+
 **`POST /transcribe`** — multipart audio → OpenAI transcription (verbatim) → `detectLang` on the
 text, returned together (`text: ''`, `lang: 'und'` when nothing was heard) so the client can skip
 `/detect` and the guard. No guard (speech can't be mistyped).
 
-**`POST /voice-session`** — mints a Realtime client secret (`expires_after` 120 s; the session
-outlives it). The secret is never logged. Live models smooth grammar slightly; `/transcribe` is verbatim.
+**`POST /voice-session`** — a 60 s ticket for the `voice` socket (`utils/voiceTicket.ts`: HMAC-SHA256
+over `{sub, exp}` with `VOICE_TICKET_SECRET`). Stateless, so short-lived rather than single-use. No
+provider call; the ticket is never logged. 502 when the secret isn't configured (clients fall back to `/transcribe`).
+
+**`voice` (WebSocket)** — `controllers/voiceStream.ts`. A bad or expired ticket closes with **4401**.
+Otherwise it sends `ready`, opens the provider session (`requests/liveTranscribe.ts`: mint a Realtime
+secret, open the provider socket), buffers the client's `audio` frames until that opens, reads the
+provider's events (`liveTranscribe/utils/liveTranscript.ts`) and sends `text` (everything heard so far)
+on each change; after the client's `commit`, `done {text, model}` once every item is final. A provider
+failure sends `error`. Either side closing closes both. Logs the session (user, duration, model, word
+count), never audio or text. Live models smooth grammar slightly; `/transcribe` is verbatim.
 
 **`GET|PUT /settings`** — `profiles.settings` jsonb, merged over `DEFAULT_SETTINGS` on read (new
 settings need no data migration). PUT **replaces the whole object** — clients must send the full
@@ -271,7 +295,8 @@ the same text joins across tables without foreign keys.
 | `OPENAI_API_KEY` | — (required; `client.ts` throws without it) | OpenAI |
 | `OPENAI_MODEL` | `gpt-5.6-luna` | translate, fix-grammar, rewrite |
 | `OPENAI_TRANSCRIBE_MODEL` | `gpt-4o-transcribe` | `/transcribe` |
-| `OPENAI_LIVE_TRANSCRIBE_MODEL` | `gpt-live-transcribe` | `/voice-session` |
+| `OPENAI_LIVE_TRANSCRIBE_MODEL` | `gpt-live-transcribe` | the `voice` function |
+| `VOICE_TICKET_SECRET` | — (required on the edge; local Node makes one up) | Signs `/voice-session` tickets; the `voice` function checks them |
 | `TYPESAFE_API_KEY` | — | guard, detect, check |
 | `ALLOWED_ORIGINS` | unset (any) | CORS allowlist |
 | `DATABASE_URL` | unset | Override of injected `SUPABASE_DB_URL` |

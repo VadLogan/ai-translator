@@ -12,11 +12,12 @@ type Props = {
   onLanguagePick: (code: string) => void;
   onFixGrammar: () => void;
   onFixLayout: () => void;
+  onAddException: () => void;
   onOpenSettings: () => void;
 };
 
 /** The selection's menu: detected language, the targets (digit keys), Grammar fix, the layout fix. */
-export function LanguagesPanel({ view, onLanguagePick, onFixGrammar, onFixLayout, onOpenSettings }: Props) {
+export function LanguagesPanel({ view, onLanguagePick, onFixGrammar, onFixLayout, onAddException, onOpenSettings }: Props) {
   const { suggested } = view;
   // The pair's target takes "1"; the list's digits continue after it.
   const first = suggested ? 2 : 1;
@@ -55,6 +56,12 @@ export function LanguagesPanel({ view, onLanguagePick, onFixGrammar, onFixLayout
         <>
           <Divider />
           <Item label={view.layoutPreview} icon="keyboard" hint="layout" onPress={onFixLayout} />
+        </>
+      )}
+      {view.canAddException && (
+        <>
+          <Divider />
+          <Item label="Add to Exceptions" icon="shield" onPress={onAddException} />
         </>
       )}
       <Divider />

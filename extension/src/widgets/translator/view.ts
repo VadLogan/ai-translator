@@ -6,13 +6,16 @@ import type { Response } from '../../messaging/messages';
 import { plainText } from '../../content/selection';
 import type { Badge } from '../../components/CountBadge';
 import type { GrammarView } from '../../components/GrammarPanel';
-import { badge, detectedLang, grammarCount, isChecking, isVerdict, menuLanguages, pairTarget, visibleEdits, type Check, type Detection, type State } from './state';
+import type { VocabException } from '../../settings/vocabulary';
+import { badge, detectedLang, grammarCount, isChecking, isShortTerm, isVerdict, menuLanguages, pairTarget, visibleEdits, type Check, type Detection, type State } from './state';
 
 export interface WidgetCallbacks {
   onIconClick(): void;
   onLanguagePick(code: string): void;
   onFixLayout(): void;
   onFixGrammar(): void;
+  /** The menu's "Add to Exceptions": opens the form for the selection. */
+  onAddException(): void;
   onOpenSettings(): void;
   /** The hover pill's "Turn off in this field". */
   onDisableField(): void;
@@ -50,6 +53,8 @@ export type WidgetView =
     readOnly?: boolean;
     /** A voice input being translated: the transcript (collapsed), and Insert on the translation. */
     dictation?: Dictation;
+    /** The selection is a word or a short name, so "Add to Exceptions" is offered. */
+    canAddException?: boolean;
   }
   | { kind: 'busy'; label: string }
   | { kind: 'recording'; transcribing: boolean; level: number; seconds: number; text?: string; onStop: () => void; onCancel: () => void }
@@ -63,6 +68,11 @@ export type WidgetView =
   | { kind: 'layout'; typed: string; fixed: string; from: string; to: string; onClose: () => void }
   /** Random keystrokes: a notice, nothing to press. Everything stays off until the text changes. */
   | { kind: 'notText' }
+  /**
+   * "Add to Exceptions" for `selected`. Saving a different spelling records `selected` as a form it
+   * replaces; `canFix` (a field, not page text) offers rewriting the selection too.
+   */
+  | { kind: 'exception'; selected: string; canFix: boolean; onSave: (entry: VocabException, fix: boolean) => void; onCancel: () => void }
   | { kind: 'signIn'; providers: readonly { id: string; name: string }[]; onPick: (id: string) => void }
   | { kind: 'error'; message: string; onBack: () => void };
 
@@ -83,13 +93,17 @@ export interface ViewActions {
   onIgnoreEdit: (edit: FixEdit) => void;
   onReplaceAll: () => void;
   onStep: (index: number) => void;
+  /** Re-asks the shown edit's sentence alone, past the caches. */
+  onRecheck: () => void;
   onStopDictation: () => void;
   /** Writes the dictation's result (`text`) at the field's caret, then closes. */
   onInsertDictation: (text: string) => void;
+  /** Saves the exception, rewrites the selection to it when `fix`, then closes. */
+  onSaveException: (entry: VocabException, fix: boolean) => void;
 }
 
 /** Maps the flow's state onto what the presentational widget renders. */
-export function toView(state: State, { onPick, onBack, onClose, onReplaceEdit, onIgnoreEdit, onReplaceAll, onStep, onStopDictation, onInsertDictation }: ViewActions): WidgetView {
+export function toView(state: State, { onPick, onBack, onClose, onReplaceEdit, onIgnoreEdit, onReplaceAll, onStep, onRecheck, onStopDictation, onInsertDictation, onSaveException }: ViewActions, exceptions?: readonly VocabException[]): WidgetView {
   const { screen, selection, detection } = state;
   const dictation = (text: string | undefined): Dictation | undefined => state.dictation ? {
     transcript: state.dictation.transcript,
@@ -120,6 +134,7 @@ export function toView(state: State, { onPick, onBack, onClose, onReplaceEdit, o
         grammar: grammarCount(state),
         readOnly: selection?.kind === 'page',
         dictation: dictation(state.translation?.text),
+        canAddException: !state.dictation && isShortTerm(selection?.text ?? ''),
       };
     }
     case 'busy':
@@ -133,6 +148,7 @@ export function toView(state: State, { onPick, onBack, onClose, onReplaceEdit, o
       return {
         kind: 'grammar',
         html: fix ? plainText(selection, fix.html) : undefined,
+        exceptions,
         loading: !!fix && screen.loading,
         edits: edits.map(({ kind, original, replacement, reason }) => ({ kind, original: plainText(selection, original), replacement: plainText(selection, replacement), reason })),
         index,
@@ -141,6 +157,8 @@ export function toView(state: State, { onPick, onBack, onClose, onReplaceEdit, o
         onIgnore: () => current && onIgnoreEdit(current),
         onReplaceAll,
         onStep,
+        onRecheck,
+        rechecking: !!screen.rechecking,
         dictation: screen.dictated && state.dictation ? dictation(state.dictation.text) : undefined,
       };
     }
@@ -150,6 +168,8 @@ export function toView(state: State, { onPick, onBack, onClose, onReplaceEdit, o
     }
     case 'notText':
       return { kind: 'notText' };
+    case 'exception':
+      return { kind: 'exception', selected: selection?.text.trim() ?? '', canFix: !!selection && selection.kind !== 'page', onSave: onSaveException, onCancel: onBack };
     case 'signIn':
       return { kind: 'signIn', providers: PROVIDERS, onPick: (provider) => onPick(provider, screen.targetLang) };
     case 'error':
